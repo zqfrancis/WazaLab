@@ -282,10 +282,10 @@ const rot=(x,y,a)=>[x*Math.cos(a)-y*Math.sin(a), x*Math.sin(a)+y*Math.cos(a)];
    Sh: 肩角(0=手臂沿躯干下垂,正=向前上方抬); El: 肘弯曲(0=伸直)
    Hip: 大腿角(0=下垂,90=水平前抬); Knee: 膝弯曲(0=伸直,正=小腿后折)
    Ank: 踝角(越大脚尖越下压/前指) */
-const POSE_KEYS=['hipY','hipX','torso','head','fSh','fEl','bSh','bEl','fHip','fKnee','fAnk','bHip','bKnee','bAnk'];
+const POSE_KEYS=['hipY','hipX','torso','head','fSh','fEl','bSh','bEl','fHip','fKnee','fAnk','fSwing','bHip','bKnee','bAnk','bSwing'];
 const KAMAE={hipY:100,hipX:0,torso:8,head:2,
   fSh:118,fEl:95,bSh:96,bEl:90,
-  fHip:22,fKnee:16,fAnk:80,bHip:-24,bKnee:20,bAnk:80};
+  fHip:22,fKnee:16,fAnk:80,fSwing:0,bHip:-24,bKnee:20,bAnk:80,bSwing:0};
 const P=o=>Object.assign({},KAMAE,o);
 function lerpPose(a,b,k){const o={};for(const key of POSE_KEYS)o[key]=lerp(a[key],b[key],k);return o;}
 function sampleFrames(frames,t){
@@ -326,12 +326,13 @@ const TECHNIQUES=[
   tips:['支撑脚一定要转开，否则髋部卡住，踢击无力还容易伤膝盖。','发力靠髋部翻转，不是抡小腿——想象用髋把腿「甩」出去。','上段踢距离远、速度慢，别在极限距离勉强起腿，容易被接腿反击。'],
   frames:[
     {dur:0.45,ease:'io',pose:KAMAE},
-    {dur:0.30,ease:'io',pose:P({hipY:108,hipX:-4,torso:-10,head:-4,fSh:100,fEl:80,bSh:45,bEl:45,fHip:12,fKnee:8,fAnk:80,bHip:100,bKnee:105,bAnk:120})},
-    {dur:0.16,ease:'out',pose:P({hipY:106,hipX:8,torso:-18,head:-6,fSh:90,fEl:70,bSh:35,bEl:30,fHip:10,fKnee:6,fAnk:80,bHip:95,bKnee:12,bAnk:150})},
-    {dur:0.30,ease:'io',pose:P({hipY:108,hipX:-4,torso:-10,head:-4,fSh:100,fEl:80,bSh:45,bEl:45,fHip:12,fKnee:8,fAnk:80,bHip:100,bKnee:105,bAnk:120})},
+    {dur:0.30,ease:'io',pose:P({hipY:110,hipX:-6,torso:-12,head:-5,fSh:100,fEl:80,bSh:45,bEl:45,fHip:12,fKnee:8,fAnk:80,bHip:108,bKnee:112,bAnk:120,bSwing:1})},
+    {dur:0.16,ease:'out',pose:P({hipY:106,hipX:10,torso:-20,head:-7,fSh:88,fEl:68,bSh:32,bEl:28,fHip:10,fKnee:6,fAnk:80,bHip:94,bKnee:10,bAnk:150,bSwing:0.2})},
+    {dur:0.30,ease:'io',pose:P({hipY:110,hipX:-6,torso:-12,head:-5,fSh:100,fEl:80,bSh:45,bEl:45,fHip:12,fKnee:8,fAnk:80,bHip:108,bKnee:112,bAnk:120,bSwing:0.7})},
     {dur:0.40,ease:'io',pose:KAMAE},
   ],
   atk:{zone:'high',damage:24,range:140,win:[2,0.15,0.95]},
+  trail:true,
 },
 {
   id:'chudan', cn:'中段回旋踢', jp:'中段回し蹴り', roma:'Mawashi Geri Chudan',
@@ -345,12 +346,13 @@ const TECHNIQUES=[
   tips:['中段是回旋踢最实用的高度，攻守兼备、风险最低。','击打目标是肋部或腹部，发力要透进去。','收腿要快——踢完腿停在空中，就是给对手送反击机会。'],
   frames:[
     {dur:0.40,ease:'io',pose:KAMAE},
-    {dur:0.26,ease:'io',pose:P({hipY:106,hipX:-2,torso:-8,head:-3,fSh:102,fEl:82,bSh:48,bEl:48,fHip:14,fKnee:9,fAnk:80,bHip:78,bKnee:100,bAnk:115})},
-    {dur:0.14,ease:'out',pose:P({hipY:104,hipX:7,torso:-14,head:-5,fSh:92,fEl:72,bSh:38,bEl:32,fHip:12,fKnee:7,fAnk:80,bHip:80,bKnee:12,bAnk:145})},
-    {dur:0.26,ease:'io',pose:P({hipY:106,hipX:-2,torso:-8,head:-3,fSh:102,fEl:82,bSh:48,bEl:48,fHip:14,fKnee:9,fAnk:80,bHip:78,bKnee:100,bAnk:115})},
+    {dur:0.26,ease:'io',pose:P({hipY:108,hipX:-4,torso:-10,head:-4,fSh:102,fEl:82,bSh:48,bEl:48,fHip:14,fKnee:9,fAnk:80,bHip:86,bKnee:104,bAnk:115,bSwing:0.9})},
+    {dur:0.14,ease:'out',pose:P({hipY:104,hipX:8,torso:-16,head:-6,fSh:92,fEl:72,bSh:38,bEl:32,fHip:12,fKnee:7,fAnk:80,bHip:82,bKnee:12,bAnk:145,bSwing:0.2})},
+    {dur:0.26,ease:'io',pose:P({hipY:108,hipX:-4,torso:-10,head:-4,fSh:102,fEl:82,bSh:48,bEl:48,fHip:14,fKnee:9,fAnk:80,bHip:86,bKnee:104,bAnk:115,bSwing:0.6})},
     {dur:0.35,ease:'io',pose:KAMAE},
   ],
   atk:{zone:'mid',damage:16,range:135,win:[2,0.15,0.95]},
+  trail:true,
 },
 {
   id:'gedan', cn:'下段扫踢', jp:'下段回し蹴り', roma:'Mawashi Geri Gedan',
@@ -364,12 +366,13 @@ const TECHNIQUES=[
   tips:['下段踢不靠大幅度，靠速度和突然性。','用胫骨扫大腿外侧，连续扫同一位置最能瓦解对手。','这是组手中最常用的消耗技术，多练左右连扫。'],
   frames:[
     {dur:0.35,ease:'io',pose:KAMAE},
-    {dur:0.20,ease:'io',pose:P({hipY:104,hipX:-1,torso:-4,head:-2,fSh:108,fEl:86,bSh:55,bEl:55,fHip:16,fKnee:10,fAnk:80,bHip:48,bKnee:88,bAnk:100})},
-    {dur:0.12,ease:'out',pose:P({hipY:102,hipX:6,torso:-8,head:-3,fSh:98,fEl:76,bSh:42,bEl:36,fHip:14,fKnee:8,fAnk:80,bHip:50,bKnee:14,bAnk:130})},
-    {dur:0.20,ease:'io',pose:P({hipY:104,hipX:-1,torso:-4,head:-2,fSh:108,fEl:86,bSh:55,bEl:55,fHip:16,fKnee:10,fAnk:80,bHip:48,bKnee:88,bAnk:100})},
+    {dur:0.20,ease:'io',pose:P({hipY:104,hipX:-2,torso:-5,head:-2,fSh:108,fEl:86,bSh:55,bEl:55,fHip:16,fKnee:10,fAnk:80,bHip:52,bKnee:92,bAnk:100,bSwing:0.8})},
+    {dur:0.12,ease:'out',pose:P({hipY:102,hipX:7,torso:-9,head:-3,fSh:98,fEl:76,bSh:42,bEl:36,fHip:14,fKnee:8,fAnk:80,bHip:52,bKnee:14,bAnk:130,bSwing:0.15})},
+    {dur:0.20,ease:'io',pose:P({hipY:104,hipX:-2,torso:-5,head:-2,fSh:108,fEl:86,bSh:55,bEl:55,fHip:16,fKnee:10,fAnk:80,bHip:52,bKnee:92,bAnk:100,bSwing:0.5})},
     {dur:0.30,ease:'io',pose:KAMAE},
   ],
   atk:{zone:'low',damage:10,range:118,win:[2,0.10,0.90]},
+  trail:true,
 },
 {
   id:'mae', cn:'前踢', jp:'前蹴り', roma:'Mae Geri Chudan',
@@ -603,18 +606,22 @@ function drawFighter(c,f,pose,opt){
   const dot=(x,y,r,col)=>{c.fillStyle=col;c.beginPath();c.arc(x,y,r,0,Math.PI*2);c.fill();};
 
   // 腿: 大腿角 h(0=下垂,90=前平); 膝 k(0=直); 足 = shin 旋转 -ank
-  function leg(hipA,kneeA,ankA,col,w){
+  // sw: 出平面挥动量(0~1),腿抡向观众时加粗上移,制造近大远小的3D感
+  function leg(hipA,kneeA,ankA,col,w,sw){
+    sw=sw||0;
     // 本地坐标系(面向右)计算,再整体乘 dir 镜像
     const lhx=Math.sin(hipA*D2R)*BODY.thigh, lhy=Math.cos(hipA*D2R)*BODY.thigh;
     let [lsx,lsy]=rot(Math.sin(hipA*D2R),Math.cos(hipA*D2R),kneeA*D2R);
     const akx=lsx*BODY.shin, aky=lsy*BODY.shin;
-    const kneeX=px+lhx*dir, kneeY=py+lhy;
-    const ankX=px+(lhx+akx)*dir, ankY=py+lhy+aky;
+    const ww=w*(1+0.35*sw);
+    const kneeX=px+lhx*dir, kneeY=py+lhy-sw*7;
+    const ankX=px+(lhx+akx)*dir, ankY=py+lhy+aky-sw*13;
     let [txx,tyy]=rot(lsx,lsy,-ankA*D2R);
-    const toeX=px+(lhx+akx+txx*BODY.foot)*dir, toeY=py+lhy+aky+tyy*BODY.foot;
-    limb(kneeX,kneeY,ankX,ankY,w,col);
-    limb(ankX,ankY,toeX,toeY,Math.max(6,w-5),col);
-    limb(px,py,kneeX,kneeY,w+2,col);
+    const toeX=px+(lhx+akx+txx*BODY.foot)*dir, toeY=py+lhy+aky+tyy*BODY.foot-sw*20;
+    limb(kneeX,kneeY,ankX,ankY,ww,col);
+    limb(ankX,ankY,toeX,toeY,Math.max(6,ww-5),col);
+    limb(px,py,kneeX,kneeY,ww+2,col);
+    dot(toeX,toeY,5+sw*4,col); // 脚尖点,挥动时更大
     return {ankX,ankY,toeX,toeY};
   }
   // 手臂: 肩角 a(0=下垂,正=向前上); 肘 e(0=直)
@@ -631,7 +638,7 @@ function drawFighter(c,f,pose,opt){
   }
 
   // 后侧肢体(深色) → 躯干 → 头 → 前侧肢体
-  leg(pose.bHip,pose.bKnee,pose.bAnk,dark,13);
+  const bLeg=leg(pose.bHip,pose.bKnee,pose.bAnk,dark,13,pose.bSwing);
   arm(pose.bSh,pose.bEl,dark,10);
   limb(px,py,tx,ty,20,main);
   // 腰带
@@ -651,8 +658,9 @@ function drawFighter(c,f,pose,opt){
   c.quadraticCurveTo(hx-(BODY.headR+13)*dir,hy+8-flutter,hx-(BODY.headR+24)*dir,hy+14-flutter*1.4);
   c.stroke(); c.restore();
 
-  leg(pose.fHip,pose.fKnee,pose.fAnk,main,13);
+  leg(pose.fHip,pose.fKnee,pose.fAnk,main,13,pose.fSwing);
   arm(pose.fSh,pose.fEl,main,10);
+  return {toeX:bLeg.toeX,toeY:bLeg.toeY};
 }
 
 /* ================= 粒子与飘字 ================= */
@@ -691,6 +699,28 @@ function drawFx(){
   }
 }
 
+/* ================= 踢击弧线拖尾 =================
+   回旋踢的脚走的是环形轨迹(区别于前踢的直线),用渐隐弧线把它画出来 */
+function pushTrail(f,info){
+  if(!f.trail)f.trail=[];
+  f.trail.push({x:info.toeX,y:info.toeY});
+  if(f.trail.length>16)f.trail.shift();
+}
+function fadeTrail(f){
+  if(f.trail&&f.trail.length)f.trail.shift();
+}
+function drawTrail(f){
+  const pts=f.trail; if(!pts||pts.length<2)return;
+  ctx.save(); ctx.lineCap='round';
+  for(let i=1;i<pts.length;i++){
+    const k=i/pts.length;
+    ctx.strokeStyle='rgba(242,177,52,'+(k*0.55).toFixed(3)+')';
+    ctx.lineWidth=2+k*10;
+    ctx.beginPath(); ctx.moveTo(pts[i-1].x,pts[i-1].y); ctx.lineTo(pts[i].x,pts[i].y); ctx.stroke();
+  }
+  ctx.restore();
+}
+
 /* ================= 武者状态 ================= */
 function makeFighter(x,facing,isPlayer){
   return {x,facing,isPlayer,hp:100,maxhp:100,dispHp:100,
@@ -703,7 +733,7 @@ let freeze=0, shakeT=0, roundOver=false, mode='dojo';
 function fighterPose(f,t){
   if(f.state==='ko'){
     const k=EASE.out(clamp(f.koT/0.55,0,1));
-    return lerpPose(KAMAE,{hipY:26,hipX:10*f.facing,torso:78,head:12,fSh:60,fEl:30,bSh:55,bEl:35,fHip:70,fKnee:42,fAnk:80,bHip:58,bKnee:52,bAnk:80},k);
+    return lerpPose(KAMAE,{hipY:26,hipX:10*f.facing,torso:78,head:12,fSh:60,fEl:30,bSh:55,bEl:35,fHip:70,fKnee:42,fAnk:80,fSwing:0,bHip:58,bKnee:52,bAnk:80,bSwing:0},k);
   }
   if(f.state==='attack'&&f.tech) return sampleFrames(f.tech.frames,f.t);
   if(f.state==='block'){
@@ -805,7 +835,7 @@ function renderTechList(){
     const d=document.createElement('div');
     d.className='techitem'+(t===dojoTech?' active':'');
     d.innerHTML=`<div class="cn">${techName(t)}</div><div class="jpen"><span class="jp">${t.jp}</span> · <span class="roma">${t.roma}</span></div>`;
-    d.onclick=()=>{ dojoTech=t; dojoStep=0; dojoT=0; renderTechList(); renderDetail(); };
+    d.onclick=()=>{ dojoTech=t; dojoStep=0; dojoT=0; demoFighter.trail=[]; renderTechList(); renderDetail(); };
     techlistEl.appendChild(d);
   }
 }
@@ -927,7 +957,9 @@ function frame(now){
     dojoT+=dt;
     demoFighter.x=W/2; demoFighter.facing=1;
     const pose=dojoPose(dojoT);
-    drawFighter(ctx,demoFighter,pose,{time:t});
+    const dinfo=drawFighter(ctx,demoFighter,pose,{time:t});
+    if(dojoTech.trail)pushTrail(demoFighter,dinfo); else fadeTrail(demoFighter);
+    drawTrail(demoFighter);
     // 当前步骤标注
     ctx.save(); ctx.textAlign='center';
     ctx.font='700 20px "Noto Sans SC",sans-serif'; ctx.fillStyle='#8f1d26';
@@ -969,8 +1001,11 @@ function frame(now){
       updateHpBars(false);
     }
     updateFx(dt);
-    drawFighter(ctx,ai,fighterPose(ai,t),{time:t,flash:ai.flash>0});
-    drawFighter(ctx,player,fighterPose(player,t),{time:t,flash:player.flash>0});
+    for(const f of [ai,player]){
+      const finfo=drawFighter(ctx,f,fighterPose(f,t),{time:t,flash:f.flash>0});
+      if(f.state==='attack'&&f.tech&&f.tech.trail)pushTrail(f,finfo); else fadeTrail(f);
+      drawTrail(f);
+    }
     drawFx();
     // 招式名提示(攻击中)
     for(const f of [player,ai]){
