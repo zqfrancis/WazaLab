@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>WazaLab 空手道动作教学游戏 (Demo)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=Noto+Serif+JP:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0d0f16; --panel:#151824; --panel2:#1b2030; --line:#2a3044;
+    --red:#e63946; --red-d:#b02330; --white:#f1f2f6; --muted:#9aa3b8;
+    --gold:#f2b134; --green:#43d17c;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{
+    background:var(--bg); color:var(--white);
+    font-family:'Noto Sans SC',system-ui,sans-serif;
+    min-height:100vh; display:flex; flex-direction:column; align-items:center;
+    overflow-x:hidden;
+  }
+  .jp{font-family:'Noto Serif JP',serif;}
+
+  /* ---------- header ---------- */
+  header{width:100%;max-width:1180px;padding:14px 16px 8px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;}
+  .brand{display:flex;align-items:center;gap:12px;}
+  .logo{
+    width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,var(--red),var(--red-d));
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Noto Serif JP',serif;font-weight:700;font-size:24px;color:#fff;
+    box-shadow:0 4px 18px rgba(230,57,70,.35);
+  }
+  .brand h1{font-size:20px;font-weight:900;letter-spacing:.5px;}
+  .brand h1 .demo{font-size:11px;font-weight:500;color:#0d0f16;background:var(--gold);border-radius:6px;padding:2px 7px;margin-left:8px;vertical-align:middle;}
+  .brand p{font-size:12px;color:var(--muted);margin-top:2px;}
+  .modes{display:flex;gap:8px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:5px;}
+  .modes button{
+    border:none;cursor:pointer;background:transparent;color:var(--muted);
+    font-family:inherit;font-size:14px;font-weight:700;padding:9px 20px;border-radius:8px;transition:all .18s;
+  }
+  .modes button.active{background:var(--red);color:#fff;box-shadow:0 3px 12px rgba(230,57,70,.4);}
+
+  /* ---------- layout ---------- */
+  main{width:100%;max-width:1180px;padding:8px 16px 20px;display:flex;gap:14px;align-items:flex-start;}
+  #stage-wrap{flex:1 1 auto;min-width:0;position:relative;}
+  canvas#stage{
+    width:100%;height:auto;display:block;border-radius:14px;border:1px solid var(--line);
+    background:#10131c; touch-action:none; user-select:none;-webkit-user-select:none;
+  }
+  /* health bars */
+  #hud{position:absolute;top:10px;left:12px;right:12px;display:flex;gap:10px;align-items:flex-start;pointer-events:none;}
+  .hpbox{flex:1;max-width:46%;}
+  .hpbox.right{text-align:right;}
+  .hpname{font-size:13px;font-weight:700;margin-bottom:4px;text-shadow:0 1px 4px #000;}
+  .hpname .tag{font-size:10px;color:var(--muted);font-weight:500;margin-left:6px;}
+  .hpbar{height:16px;background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.18);border-radius:9px;overflow:hidden;position:relative;}
+  .hpbar .ghost{position:absolute;top:0;bottom:0;background:rgba(255,255,255,.55);transition:width .6s ease .15s;}
+  .hpbar .fill{position:absolute;top:0;bottom:0;transition:width .12s;}
+  .hpbox.left .fill{background:linear-gradient(90deg,#ff5964,var(--red-d));left:0;}
+  .hpbox.left .ghost{right:0;}
+  .hpbox.right .fill{background:linear-gradient(90deg,#3f8cff,#2b5cb8);right:0;}
+  .hpbox.right .ghost{left:0;}
+  #roundmsg{
+    position:absolute;inset:0;display:none;align-items:center;justify-content:center;flex-direction:column;gap:14px;
+    background:rgba(8,10,16,.55);border-radius:14px;z-index:5;text-align:center;padding:20px;
+  }
+  #roundmsg.show{display:flex;}
+  #roundmsg h2{font-size:52px;font-weight:900;color:var(--red);text-shadow:0 4px 24px rgba(230,57,70,.6);letter-spacing:8px;}
+  #roundmsg p{font-size:16px;color:var(--white);}
+  #roundmsg button{
+    pointer-events:auto;cursor:pointer;border:none;border-radius:10px;padding:12px 34px;
+    background:var(--red);color:#fff;font-family:inherit;font-size:16px;font-weight:700;
+    box-shadow:0 4px 16px rgba(230,57,70,.45);
+  }
+  #roundmsg button:active{transform:scale(.96);}
+
+  /* control hint */
+  #hintbar{
+    margin-top:10px;background:var(--panel);border:1px solid var(--line);border-radius:12px;
+    padding:9px 14px;font-size:12.5px;color:var(--muted);display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;
+  }
+  #hintbar b{color:var(--white);font-weight:700;}
+  kbd{
+    display:inline-block;background:#0b0d13;border:1px solid var(--line);border-bottom-width:2px;border-radius:6px;
+    padding:1px 7px;font-family:inherit;font-size:12px;color:var(--gold);font-weight:700;margin:0 1px;
+  }
+
+  /* touch controls */
+  #touchpad{display:none;margin-top:10px;gap:10px;justify-content:space-between;}
+  .tgroup{display:flex;gap:10px;}
+  .tbtn{
+    width:64px;height:64px;border-radius:50%;border:2px solid var(--line);background:var(--panel2);
+    color:var(--white);font-family:inherit;font-weight:700;font-size:13px;line-height:1.15;
+    display:flex;align-items:center;justify-content:center;touch-action:none;user-select:none;-webkit-user-select:none;
+  }
+  .tbtn.atk{border-color:var(--red-d);background:#2a1620;}
+  .tbtn:active,.tbtn.held{background:var(--red);border-color:var(--red);color:#fff;}
+  .tbtn small{display:block;font-size:9px;color:var(--muted);font-weight:500;}
+  .tbtn:active small,.tbtn.held small{color:#fff;}
+
+  /* ---------- tutorial side panels ---------- */
+  aside.panel{
+    width:300px;flex:0 0 300px;background:var(--panel);border:1px solid var(--line);border-radius:14px;
+    padding:14px;display:flex;flex-direction:column;gap:10px;max-height:640px;overflow-y:auto;
+  }
+  aside.panel h3{font-size:14px;font-weight:900;color:var(--gold);letter-spacing:1px;border-bottom:1px solid var(--line);padding-bottom:8px;}
+  #techlist{display:flex;flex-direction:column;gap:8px;}
+  .techitem{
+    cursor:pointer;border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--panel2);transition:all .15s;
+  }
+  .techitem:hover{border-color:var(--red-d);}
+  .techitem.active{border-color:var(--red);background:#26141a;box-shadow:0 0 0 1px var(--red);}
+  .techitem .cn{font-size:14px;font-weight:700;}
+  .techitem .jpen{font-size:11px;color:var(--muted);margin-top:2px;}
+  .techitem .jpen .roma{color:var(--gold);}
+  #detail{display:none;flex-direction:column;gap:10px;}
+  #detail .dhead .cn{font-size:18px;font-weight:900;}
+  #detail .dhead .jp{font-size:13px;color:var(--gold);margin-top:2px;}
+  .stepbox{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:12px;}
+  .stepbox .snum{font-size:11px;color:var(--red);font-weight:700;letter-spacing:1px;}
+  .stepbox .stitle{font-size:15px;font-weight:700;margin:3px 0 6px;}
+  .stepbox .stitle .jp{font-size:12px;color:var(--muted);font-weight:500;margin-left:6px;}
+  .stepbox .sdesc{font-size:13px;line-height:1.75;color:#d6dbe8;}
+  .stepnav{display:flex;gap:8px;align-items:center;justify-content:space-between;}
+  .stepnav button{
+    cursor:pointer;border:1px solid var(--line);background:var(--panel2);color:var(--white);
+    font-family:inherit;font-size:13px;font-weight:700;border-radius:8px;padding:8px 16px;
+  }
+  .stepnav button:disabled{opacity:.35;cursor:default;}
+  .stepnav button:not(:disabled):active{background:var(--red);border-color:var(--red);}
+  #stepdots{display:flex;gap:6px;}
+  #stepdots span{width:9px;height:9px;border-radius:50%;background:var(--line);}
+  #stepdots span.on{background:var(--red);}
+  .tips{background:#12241a;border:1px solid #1f4d33;border-radius:10px;padding:12px;}
+  .tips h4{font-size:13px;color:var(--green);margin-bottom:6px;font-weight:700;}
+  .tips li{font-size:12.5px;line-height:1.7;color:#cfe8d8;margin-left:16px;margin-bottom:4px;}
+  .stats{display:flex;flex-direction:column;gap:7px;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:12px;}
+  .stat{display:flex;align-items:center;gap:10px;font-size:12.5px;}
+  .stat label{width:40px;color:var(--muted);flex:none;}
+  .stat .bar{flex:1;height:8px;background:#0b0d13;border-radius:5px;overflow:hidden;}
+  .stat .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--gold),var(--red));border-radius:5px;}
+  #goSpar{
+    cursor:pointer;border:none;border-radius:10px;padding:13px;background:linear-gradient(135deg,var(--red),var(--red-d));
+    color:#fff;font-family:inherit;font-size:15px;font-weight:900;letter-spacing:1px;
+    box-shadow:0 4px 16px rgba(230,57,70,.4);
+  }
+  #goSpar:active{transform:scale(.97);}
+
+  footer{width:100%;max-width:1180px;padding:6px 16px 26px;font-size:11.5px;color:var(--muted);text-align:center;}
+  footer .sep{margin:0 8px;color:var(--line);}
+
+  body[data-mode="spar"] #panel-left, body[data-mode="spar"] #panel-right{display:none;}
+  body[data-mode="dojo"] #hintbar, body[data-mode="dojo"] #touchpad{display:none;}
+  body[data-mode="dojo"] #hud{display:none;}
+
+  @media (max-width:900px){
+    main{flex-direction:column;}
+    aside.panel{width:100%;flex:none;max-height:none;}
+    #panel-left{order:2;} #stage-wrap{order:1;width:100%;} #panel-right{order:3;}
+    #techlist{flex-direction:row;overflow-x:auto;padding-bottom:4px;}
+    .techitem{flex:0 0 150px;}
+    #roundmsg h2{font-size:40px;}
+  }
+  @media (pointer:coarse){
+    body[data-mode="spar"] #touchpad{display:flex;}
+    body[data-mode="spar"] #hintbar{display:none;}
+  }
+</style>
+</head>
+<body data-mode="dojo">
+
+<header>
+  <div class="brand">
+    <div class="logo">技</div>
+    <div>
+      <h1>WazaLab <span style="font-size:15px;font-weight:500;">空手道动作教学游戏</span><span class="demo">Demo v0.1</span></h1>
+      <p>AxisMotion 出品 · 构えから残心まで、技をゲームで学ぶ</p>
+    </div>
+  </div>
+  <div class="modes">
+    <button id="tabDojo" class="active">📖 教学模式</button>
+    <button id="tabSpar">⚔️ 对战模式</button>
+  </div>
+</header>
+
+<main>
+  <!-- left: technique list -->
+  <aside class="panel" id="panel-left">
+    <h3>技一览 · TECHNIQUES</h3>
+    <div id="techlist"></div>
+  </aside>
+
+  <!-- center: stage -->
+  <div id="stage-wrap">
+    <canvas id="stage" width="960" height="480"></canvas>
+    <div id="hud">
+      <div class="hpbox left">
+        <div class="hpname">あなた <span class="tag">YOU · 红方</span></div>
+        <div class="hpbar"><div class="ghost" id="ghostP"></div><div class="fill" id="fillP" style="width:100%"></div></div>
+      </div>
+      <div style="flex:0 0 auto;align-self:center;font-weight:900;color:var(--gold);font-size:14px;text-shadow:0 1px 4px #000;">VS</div>
+      <div class="hpbox right">
+        <div class="hpname"><span class="tag">AI 相手 · 蓝方</span> あいて</div>
+        <div class="hpbar"><div class="ghost" id="ghostA"></div><div class="fill" id="fillA" style="width:100%"></div></div>
+      </div>
+    </div>
+    <div id="roundmsg"><h2 id="roundTitle">KO!</h2><p id="roundSub"></p><button id="btnRematch">再来一局</button></div>
+
+    <div id="hintbar">
+      <span><b>移动</b> <kbd>A</kbd><kbd>D</kbd> / <kbd>←</kbd><kbd>→</kbd></span>
+      <span><b>防御</b> <kbd>S</kbd>（按住）</span>
+      <span><b>前踢</b> <kbd>J</kbd></span>
+      <span><b>中段回旋踢</b> <kbd>K</kbd></span>
+      <span><b>高段回旋踢</b> <kbd>L</kbd></span>
+      <span><b>下段扫踢</b> <kbd>U</kbd></span>
+      <span><b>逆突</b> <kbd>I</kbd></span>
+    </div>
+
+    <div id="touchpad">
+      <div class="tgroup">
+        <button class="tbtn" data-k="left">◀</button>
+        <button class="tbtn" data-k="right">▶</button>
+      </div>
+      <div class="tgroup">
+        <button class="tbtn" data-k="block">防<small>防御</small></button>
+        <button class="tbtn atk" data-k="mae">前踢<small>J</small></button>
+        <button class="tbtn atk" data-k="chudan">中段踢<small>K</small></button>
+        <button class="tbtn atk" data-k="jodan">高段踢<small>L</small></button>
+        <button class="tbtn atk" data-k="gedan">下段踢<small>U</small></button>
+        <button class="tbtn atk" data-k="zuki">逆突<small>I</small></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- right: technique detail -->
+  <aside class="panel" id="panel-right">
+    <h3>動作解説 · BREAKDOWN</h3>
+    <div id="detail">
+      <div class="dhead"><div class="cn" id="dCn"></div><div class="jp" id="dJp"></div></div>
+      <div class="stepbox">
+        <div class="snum" id="sNum"></div>
+        <div class="stitle"><span id="sTitle"></span><span class="jp" id="sJp"></span></div>
+        <div class="sdesc" id="sDesc"></div>
+      </div>
+      <div class="stepnav">
+        <button id="btnPrev">← 上一步</button>
+        <div id="stepdots"></div>
+        <button id="btnNext">下一步 →</button>
+      </div>
+      <div class="tips"><h4>💡 初学者要点</h4><ul id="dTips"></ul></div>
+      <div class="stats" id="dStats"></div>
+      <button id="goSpar">⚔️ 去对战试试 →</button>
+    </div>
+  </aside>
+</main>
+
+<footer>
+  WazaLab v0.1 Demo<span class="sep">|</span>AxisMotion<span class="sep">|</span>FormBuddy 姊妹项目<span class="sep">|</span>动作演示为教学示意，请在有资质教练指导下练习
+</footer>
+
+<script>
+'use strict';
+/* ================= 基础工具 ================= */
+const D2R = Math.PI/180;
+const lerp = (a,b,k)=>a+(b-a)*k;
+const clamp = (v,a,b)=>Math.max(a,Math.min(b,v));
+const EASE = {
+  linear:t=>t,
+  io:t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2,
+  out:t=>1-Math.pow(1-t,3),
+  in:t=>t*t*t,
+};
+const rot=(x,y,a)=>[x*Math.cos(a)-y*Math.sin(a), x*Math.sin(a)+y*Math.cos(a)];
+
+/* ================= 骨骼姿势系统 =================
+   姿势 = 一组关节角度(度) + 髋部位置。
+   髋 hipY: 髋部离地高度(px); hipX: 髋部前后偏移(px,正=前)
+   torso: 躯干前倾角(度,正=前倾); head: 头部相对躯干角
+   f/b = 前手(脚)/后手(脚,lead/rear)
+   Sh: 肩角(0=手臂沿躯干下垂,正=向前上方抬); El: 肘弯曲(0=伸直)
+   Hip: 大腿角(0=下垂,90=水平前抬); Knee: 膝弯曲(0=伸直,正=小腿后折)
+   Ank: 踝角(越大脚尖越下压/前指) */
+const POSE_KEYS=['hipY','hipX','torso','head','fSh','fEl','bSh','bEl','fHip','fKnee','fAnk','bHip','bKnee','bAnk'];
+const KAMAE={hipY:100,hipX:0,torso:8,head:2,
+  fSh:118,fEl:95,bSh:96,bEl:90,
+  fHip:22,fKnee:16,fAnk:80,bHip:-24,bKnee:20,bAnk:80};
+const P=o=>Object.assign({},KAMAE,o);
+function lerpPose(a,b,k){const o={};for(const key of POSE_KEYS)o[key]=lerp(a[key],b[key],k);return o;}
+function sampleFrames(frames,t){
+  let total=0;for(const f of frames)total+=f.dur;
+  if(t<=0)return frames[0].pose;
+  if(t>=total)return frames[frames.length-1].pose;
+  let acc=0;
+  for(let i=0;i<frames.length;i++){
+    const f=frames[i];
+    if(t<acc+f.dur){
+      const prev=i===0?frames[0].pose:frames[i-1].pose;
+      const k=EASE[f.ease||'io']((t-acc)/f.dur);
+      return lerpPose(prev,f.pose,k);
+    }
+    acc+=f.dur;
+  }
+  return frames[frames.length-1].pose;
+}
+function framesTotal(frames){let s=0;for(const f of frames)s+=f.dur;return s;}
+// 把攻击判定窗(关键帧序号+帧内比例)换算成绝对秒数
+function resolveAtk(frames,win){
+  let acc=0;
+  for(let i=0;i<frames.length;i++){ if(i===win[0]) return [acc+frames[i].dur*win[1], acc+frames[i].dur*win[2]]; acc+=frames[i].dur; }
+  return [0,0];
+}
+
+/* ================= 技库 ================= */
+const TECHNIQUES=[
+{
+  id:'jodan', cn:'上段回旋踢', jp:'上段回し蹴り', roma:'Mawashi Geri Jodan',
+  stats:{速度:2,距离:4,威力:5},
+  steps:[
+    {jp:'構え',cn:'构え',desc:'前后站立（以左脚在前为例），重心居中略低，双拳护住面部与下颌，目视对手。这是所有技术出发与回归的姿势。'},
+    {jp:'提膝',cn:'提膝蓄力',desc:'重心移到前腿，后腿提膝——膝盖提到与肩同高、大小腿折叠；支撑脚以前脚掌为轴向外转动约180°，脚跟转向对手，髋部开始翻转。转脚不充分，髋就转不开。'},
+    {jp:'蹴り',cn:'蹴り·弹射',desc:'以髋部翻转带动，小腿如鞭子般弹出，用脚背（或胫骨）击打对手头部高度。命中瞬间全身收紧发力——这就是「极め」(kime)。'},
+    {jp:'残心',cn:'残心·收势',desc:'踢击后小腿原路收回至提膝，再落回构え。全程保持目视对手、戒备不懈，不可低头泄气——残心即是战斗意识的延续。'},
+  ],
+  tips:['支撑脚一定要转开，否则髋部卡住，踢击无力还容易伤膝盖。','发力靠髋部翻转，不是抡小腿——想象用髋把腿「甩」出去。','上段踢距离远、速度慢，别在极限距离勉强起腿，容易被接腿反击。'],
+  frames:[
+    {dur:0.45,ease:'io',pose:KAMAE},
+    {dur:0.30,ease:'io',pose:P({hipY:108,hipX:-4,torso:-10,head:-4,fSh:100,fEl:80,bSh:45,bEl:45,fHip:12,fKnee:8,fAnk:80,bHip:100,bKnee:105,bAnk:120})},
+    {dur:0.16,ease:'out',pose:P({hipY:106,hipX:8,torso:-18,head:-6,fSh:90,fEl:70,bSh:35,bEl:30,fHip:10,fKnee:6,fAnk:80,bHip:95,bKnee:12,bAnk:150})},
+    {dur:0.30,ease:'io',pose:P({hipY:108,hipX:-4,torso:-10,head:-4,fSh:100,fEl:80,bSh:45,bEl:45,fHip:12,fKnee:8,fAnk:80,bHip:100,bKnee:105,bAnk:120})},
+    {dur:0.40,ease:'io',pose:KAMAE},
+  ],
+  atk:{zone:'high',damage:24,range:140,win:[2,0.15,0.95]},
+},
+{
+  id:'chudan', cn:'中段回旋踢', jp:'中段回し蹴り', roma:'Mawashi Geri Chudan',
+  stats:{速度:3,距离:4,威力:4},
+  steps:[
+    {jp:'構え',cn:'构え',desc:'标准组手构え，重心稳定，双拳护头。'},
+    {jp:'提膝',cn:'提膝蓄力',desc:'后腿提膝至躯干高度即可，不必像上段那样提到肩膀；支撑脚同样转开，髋部翻转先行。'},
+    {jp:'蹴り',cn:'蹴り·弹射',desc:'小腿弹出，用脚背/胫骨击打对手肋部或腹部（水月一带）。落点要「穿透」目标，而非点到为止。'},
+    {jp:'残心',cn:'残心·收势',desc:'原路收回提膝，落回构え，保持戒备。'},
+  ],
+  tips:['中段是回旋踢最实用的高度，攻守兼备、风险最低。','击打目标是肋部或腹部，发力要透进去。','收腿要快——踢完腿停在空中，就是给对手送反击机会。'],
+  frames:[
+    {dur:0.40,ease:'io',pose:KAMAE},
+    {dur:0.26,ease:'io',pose:P({hipY:106,hipX:-2,torso:-8,head:-3,fSh:102,fEl:82,bSh:48,bEl:48,fHip:14,fKnee:9,fAnk:80,bHip:78,bKnee:100,bAnk:115})},
+    {dur:0.14,ease:'out',pose:P({hipY:104,hipX:7,torso:-14,head:-5,fSh:92,fEl:72,bSh:38,bEl:32,fHip:12,fKnee:7,fAnk:80,bHip:80,bKnee:12,bAnk:145})},
+    {dur:0.26,ease:'io',pose:P({hipY:106,hipX:-2,torso:-8,head:-3,fSh:102,fEl:82,bSh:48,bEl:48,fHip:14,fKnee:9,fAnk:80,bHip:78,bKnee:100,bAnk:115})},
+    {dur:0.35,ease:'io',pose:KAMAE},
+  ],
+  atk:{zone:'mid',damage:16,range:135,win:[2,0.15,0.95]},
+},
+{
+  id:'gedan', cn:'下段扫踢', jp:'下段回し蹴り', roma:'Mawashi Geri Gedan',
+  stats:{速度:5,距离:3,威力:2},
+  steps:[
+    {jp:'構え',cn:'构え',desc:'标准组手构え。'},
+    {jp:'提膝',cn:'小幅提膝',desc:'后腿小幅度提膝即可，膝盖微提、折叠；支撑脚转开。幅度小，所以启动极快、难以预判。'},
+    {jp:'蹴り',cn:'蹴り·扫击',desc:'小腿如镰刀般横扫，用胫骨扫击对手大腿外侧肌肉，破坏其重心与移动。'},
+    {jp:'残心',cn:'残心·收势',desc:'迅速收回落回构え。下段踢后摇小，可立刻衔接下一击。'},
+  ],
+  tips:['下段踢不靠大幅度，靠速度和突然性。','用胫骨扫大腿外侧，连续扫同一位置最能瓦解对手。','这是组手中最常用的消耗技术，多练左右连扫。'],
+  frames:[
+    {dur:0.35,ease:'io',pose:KAMAE},
+    {dur:0.20,ease:'io',pose:P({hipY:104,hipX:-1,torso:-4,head:-2,fSh:108,fEl:86,bSh:55,bEl:55,fHip:16,fKnee:10,fAnk:80,bHip:48,bKnee:88,bAnk:100})},
+    {dur:0.12,ease:'out',pose:P({hipY:102,hipX:6,torso:-8,head:-3,fSh:98,fEl:76,bSh:42,bEl:36,fHip:14,fKnee:8,fAnk:80,bHip:50,bKnee:14,bAnk:130})},
+    {dur:0.20,ease:'io',pose:P({hipY:104,hipX:-1,torso:-4,head:-2,fSh:108,fEl:86,bSh:55,bEl:55,fHip:16,fKnee:10,fAnk:80,bHip:48,bKnee:88,bAnk:100})},
+    {dur:0.30,ease:'io',pose:KAMAE},
+  ],
+  atk:{zone:'low',damage:10,range:118,win:[2,0.10,0.90]},
+},
+{
+  id:'mae', cn:'前踢', jp:'前蹴り', roma:'Mae Geri Chudan',
+  stats:{速度:4,距离:3,威力:3},
+  steps:[
+    {jp:'構え',cn:'构え',desc:'标准组手构え。'},
+    {jp:'提膝',cn:'提膝蓄力',desc:'后腿膝盖直向前上方提起，大腿与地面平行、小腿下垂；击打脚勾脚（用前脚掌则脚尖上勾、踝关节锁死）。'},
+    {jp:'蹴り',cn:'蹴り·直踹',desc:'支撑腿蹬地送髋，小腿沿直线向前弹出，如活塞般直踹对手腹部（水月）。前踢是直线技术：提膝、弹出、收回三点一线。'},
+    {jp:'残心',cn:'残心·收势',desc:'原路收回提膝再落回构え，保持戒备。'},
+  ],
+  tips:['击打部位用脚掌前部（拇指球），踝关节必须锁死，否则崴脚。','支撑腿微屈、蹬地送髋，把身体重量送进踢击。','前踢直线距离长，适合在对手突进时迎击。'],
+  frames:[
+    {dur:0.40,ease:'io',pose:KAMAE},
+    {dur:0.26,ease:'io',pose:P({hipY:106,hipX:-2,torso:2,head:0,fSh:110,fEl:88,bSh:60,bEl:60,fHip:14,fKnee:10,fAnk:80,bHip:92,bKnee:100,bAnk:45})},
+    {dur:0.14,ease:'out',pose:P({hipY:104,hipX:10,torso:-4,head:-2,fSh:100,fEl:78,bSh:45,bEl:40,fHip:13,fKnee:9,fAnk:80,bHip:86,bKnee:8,bAnk:35})},
+    {dur:0.26,ease:'io',pose:P({hipY:106,hipX:-2,torso:2,head:0,fSh:110,fEl:88,bSh:60,bEl:60,fHip:14,fKnee:10,fAnk:80,bHip:92,bKnee:100,bAnk:45})},
+    {dur:0.35,ease:'io',pose:KAMAE},
+  ],
+  atk:{zone:'mid',damage:14,range:128,win:[2,0.15,0.95]},
+},
+{
+  id:'zuki', cn:'逆突', jp:'逆突き', roma:'Gyaku Zuki',
+  stats:{速度:5,距离:2,威力:3},
+  steps:[
+    {jp:'構え',cn:'构え',desc:'标准组手构え。'},
+    {jp:'引手',cn:'引手·拧转',desc:'出拳的同时，另一手猛地收回腰间——这就是「引手」。肩与髋开始拧转，力量自地面经后腿、髋部向上传导。'},
+    {jp:'突き',cn:'突き·直线',desc:'后手沿直线打出，拳眼向上、前脚掌内扣；命中瞬间髋部拧转到位、全身收紧（极め）。击打用拳峰（食指中指拳面），腕关节锁死保持直线。'},
+    {jp:'残心',cn:'残心·收势',desc:'拳原路收回，恢复构え与戒备。'},
+  ],
+  tips:['逆突的力量来自髋部拧转，不是手臂——手臂只是传导。','引手和出拳必须同步：收回的手越快，打出的拳越重。','出拳时后脚跟随之转动，前脚掌内扣，力量才踩得实。'],
+  frames:[
+    {dur:0.35,ease:'io',pose:KAMAE},
+    {dur:0.18,ease:'io',pose:P({hipX:10,torso:14,head:4,fSh:88,fEl:70,bSh:100,bEl:55,fHip:24,fKnee:18,fAnk:80,bHip:-22,bKnee:22,bAnk:80})},
+    {dur:0.12,ease:'out',pose:P({hipX:16,torso:17,head:4,fSh:42,fEl:32,bSh:102,bEl:6,fHip:26,fKnee:20,fAnk:80,bHip:-20,bKnee:24,bAnk:80})},
+    {dur:0.18,ease:'linear',pose:P({hipX:16,torso:17,head:4,fSh:42,fEl:32,bSh:102,bEl:6,fHip:26,fKnee:20,fAnk:80,bHip:-20,bKnee:24,bAnk:80})},
+    {dur:0.35,ease:'io',pose:KAMAE},
+  ],
+  atk:{zone:'mid',damage:12,range:108,win:[2,0.20,1.0]},
+},
+{
+  id:'uke', cn:'格挡', jp:'上段受け', roma:'Jodan Uke',
+  stats:{速度:4,距离:1,威力:1},
+  steps:[
+    {jp:'構え',cn:'构え',desc:'标准组手构え。'},
+    {jp:'受け',cn:'举臂格挡',desc:'前臂上举护住头部上方，手臂与头部保持一拳距离；另一手收回腰间作引手，重心略下沉。'},
+    {jp:'保持',cn:'格挡保持',desc:'格挡不是硬顶——用前臂外侧将对方攻击「拨开」。保持姿势，等待反击时机。'},
+    {jp:'残心',cn:'残心·收势',desc:'防反一体：格挡成功后立刻反击，再回构え。'},
+  ],
+  tips:['游戏里按住 S（或「防」按钮）就是格挡，可减免大部分伤害。','不要用手掌去抓，用前臂骨外侧接触。','格挡后立刻反击——只防不攻会被压制。'],
+  frames:[
+    {dur:0.18,ease:'out',pose:P({hipY:94,torso:4,head:0,fSh:150,fEl:45,bSh:40,bEl:25,fHip:24,fKnee:20,fAnk:80,bHip:-22,bKnee:24,bAnk:80})},
+    {dur:0.60,ease:'linear',pose:P({hipY:94,torso:4,head:0,fSh:150,fEl:45,bSh:40,bEl:25,fHip:24,fKnee:20,fAnk:80,bHip:-22,bKnee:24,bAnk:80})},
+  ],
+  atk:null,
+},
+];
+const TECH_BY_ID={}; for(const t of TECHNIQUES)TECH_BY_ID[t.id]=t;
+// 预计算攻击判定窗绝对时间
+for(const t of TECHNIQUES){ if(t.atk) t.atk.abs=resolveAtk(t.frames,t.atk.win); t.total=framesTotal(t.frames); }
+const BLOCK_POSE=TECH_BY_ID.uke.frames[1].pose;
+
+/* ================= 渲染:道场场景 ================= */
+const canvas=document.getElementById('stage');
+const ctx=canvas.getContext('2d');
+const W=canvas.width, H=canvas.height, GROUND=H-72;
+
+function drawDojo(t){
+  // 墙面
+  const wg=ctx.createLinearGradient(0,0,0,GROUND);
+  wg.addColorStop(0,'#1b1f2e'); wg.addColorStop(1,'#11141d');
+  ctx.fillStyle=wg; ctx.fillRect(0,0,W,GROUND);
+  // 红日
+  ctx.save(); ctx.globalAlpha=0.14; ctx.fillStyle='#e63946';
+  ctx.beginPath(); ctx.arc(W/2,GROUND-190,120,0,Math.PI*2); ctx.fill(); ctx.restore();
+  // 道場 竖字
+  ctx.save(); ctx.globalAlpha=0.07; ctx.fillStyle='#fff';
+  ctx.font='700 72px "Noto Serif JP",serif'; ctx.textAlign='center';
+  ctx.fillText('道',W-70,GROUND-300); ctx.fillText('場',W-70,GROUND-220); ctx.restore();
+  // 地板
+  const fg=ctx.createLinearGradient(0,GROUND,0,H);
+  fg.addColorStop(0,'#33291b'); fg.addColorStop(1,'#1c150d');
+  ctx.fillStyle=fg; ctx.fillRect(0,GROUND,W,H-GROUND);
+  ctx.strokeStyle='rgba(0,0,0,.35)'; ctx.lineWidth=2;
+  for(let i=0;i<6;i++){ const y=GROUND+12+i*14; ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+  ctx.strokeStyle='rgba(230,57,70,.25)'; ctx.lineWidth=3;
+  ctx.beginPath(); ctx.moveTo(0,GROUND); ctx.lineTo(W,GROUND); ctx.stroke();
+}
+
+/* ================= 渲染:骨骼武者 =================
+   侧视剪影: pelvis→torso→head; 手臂 肩→肘→拳 ×2; 腿 髋→膝→足 ×2 */
+const BODY={torso:55,neck:8,headR:12,uArm:30,fArm:28,thigh:48,shin:46,foot:16};
+function drawFighter(c,f,pose,opt){
+  opt=opt||{};
+  const t=opt.time||0;
+  const fx=f.x, dir=f.facing; // 面向: +1 右, -1 左
+  const main=opt.flash?'#ffffff':(f.isPlayer?'#181c26':'#101320');
+  const dark=opt.flash?'#ffffff':'#080a10';
+  const accent=f.isPlayer?'#e63946':'#dfe6f2';
+
+  // 髋部(根)
+  const px=fx+pose.hipX*dir, py=GROUND-pose.hipY;
+  // 躯干
+  const ta=pose.torso*D2R;
+  const tx=px+Math.sin(ta)*BODY.torso*dir, ty=py-Math.cos(ta)*BODY.torso;
+  // 头
+  const ha=(pose.torso+pose.head)*D2R;
+  const hx=tx+Math.sin(ha)*(BODY.neck+BODY.headR)*dir, hy=ty-Math.cos(ha)*(BODY.neck+BODY.headR);
+
+  // 阴影
+  c.save(); c.globalAlpha=0.35; c.fillStyle='#000';
+  c.beginPath(); c.ellipse(fx,GROUND+8,52*(pose.hipY/100),10,0,0,Math.PI*2); c.fill(); c.restore();
+
+  const limb=(x1,y1,x2,y2,w,col)=>{c.strokeStyle=col;c.lineWidth=w;c.lineCap='round';c.beginPath();c.moveTo(x1,y1);c.lineTo(x2,y2);c.stroke();};
+  const dot=(x,y,r,col)=>{c.fillStyle=col;c.beginPath();c.arc(x,y,r,0,Math.PI*2);c.fill();};
+
+  // 腿: 大腿角 h(0=下垂,90=前平); 膝 k(0=直); 足 = shin 旋转 -ank
+  function leg(hipA,kneeA,ankA,col,w){
+    // 本地坐标系(面向右)计算,再整体乘 dir 镜像
+    const lhx=Math.sin(hipA*D2R)*BODY.thigh, lhy=Math.cos(hipA*D2R)*BODY.thigh;
+    let [lsx,lsy]=rot(Math.sin(hipA*D2R),Math.cos(hipA*D2R),kneeA*D2R);
+    const akx=lsx*BODY.shin, aky=lsy*BODY.shin;
+    const kneeX=px+lhx*dir, kneeY=py+lhy;
+    const ankX=px+(lhx+akx)*dir, ankY=py+lhy+aky;
+    let [txx,tyy]=rot(lsx,lsy,-ankA*D2R);
+    const toeX=px+(lhx+akx+txx*BODY.foot)*dir, toeY=py+lhy+aky+tyy*BODY.foot;
+    limb(kneeX,kneeY,ankX,ankY,w,col);
+    limb(ankX,ankY,toeX,toeY,Math.max(6,w-5),col);
+    limb(px,py,kneeX,kneeY,w+2,col);
+    return {ankX,ankY,toeX,toeY};
+  }
+  // 手臂: 肩角 a(0=下垂,正=向前上); 肘 e(0=直)
+  function arm(shA,elA,col,w){
+    const sx0=tx-Math.sin(ta)*6*dir, sy0=ty+Math.cos(ta)*6; // 肩略低于颈
+    let [ux,uy]=[Math.sin(shA*D2R),Math.cos(shA*D2R)];
+    const ex=sx0+ux*BODY.uArm*dir, ey=sy0+uy*BODY.uArm;
+    let [fx2,fy2]=rot(ux,uy,-elA*D2R);
+    const hx2=sx0+(ux*BODY.uArm+fx2*BODY.fArm)*dir, hy2=sy0+uy*BODY.uArm+fy2*BODY.fArm;
+    limb(sx0,sy0,ex,ey,w,col);
+    limb(ex,ey,hx2,hy2,w-1,col);
+    dot(hx2,hy2,6.5,col); // 拳
+    return {hx:hx2,hy:hy2};
+  }
+
+  // 后侧肢体(深色) → 躯干 → 头 → 前侧肢体
+  leg(pose.bHip,pose.bKnee,pose.bAnk,dark,13);
+  arm(pose.bSh,pose.bEl,dark,10);
+  limb(px,py,tx,ty,20,main);
+  // 腰带
+  c.save(); c.strokeStyle=accent; c.lineWidth=22; c.lineCap='butt';
+  c.beginPath(); c.moveTo(px-Math.sin(ta)*4*dir-10*dir,py+Math.cos(ta)*4-2); c.lineTo(px-Math.sin(ta)*4*dir+10*dir,py+Math.cos(ta)*4-2); c.stroke(); c.restore();
+  dot(hx,hy,BODY.headR,main);
+  // 頭巾(鉢巻) + 飘带
+  c.save(); c.strokeStyle=accent; c.lineWidth=5;
+  c.beginPath(); c.arc(hx,hy,BODY.headR-1,-0.5*Math.PI-0.6,-0.5*Math.PI+0.6); c.stroke();
+  const flutter=Math.sin(t*7)*4;
+  c.lineWidth=4; c.beginPath();
+  c.moveTo(hx-BODY.headR*dir,hy-2);
+  c.quadraticCurveTo(hx-(BODY.headR+16)*dir,hy+2+flutter,hx-(BODY.headR+30)*dir,hy+8+flutter*1.6);
+  c.stroke();
+  c.beginPath();
+  c.moveTo(hx-BODY.headR*dir,hy+1);
+  c.quadraticCurveTo(hx-(BODY.headR+13)*dir,hy+8-flutter,hx-(BODY.headR+24)*dir,hy+14-flutter*1.4);
+  c.stroke(); c.restore();
+
+  leg(pose.fHip,pose.fKnee,pose.fAnk,main,13);
+  arm(pose.fSh,pose.fEl,main,10);
+}
+
+/* ================= 粒子与飘字 ================= */
+let particles=[], floaters=[];
+function spawnSpark(x,y,big,blocked){
+  const n=big?16:9;
+  for(let i=0;i<n;i++){
+    const a=Math.random()*Math.PI*2, sp=(big?260:170)*(0.4+Math.random()*0.8);
+    particles.push({x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-60,life:0.35+Math.random()*0.2,t:0,
+      col:blocked?'#9adcff':(Math.random()<0.5?'#ffd166':'#ff6b5e'),w:2+Math.random()*3});
+  }
+  particles.push({x,y,vx:0,vy:0,life:0.18,t:0,col:'#ffffff',w:big?34:20,ring:true});
+}
+function spawnFloater(x,y,text,col){ floaters.push({x,y,text,col:col||'#ffd166',t:0,life:1.1}); }
+function updateFx(dt){
+  for(const p of particles){ p.t+=dt; p.x+=p.vx*dt; p.y+=p.vy*dt; p.vy+=900*dt; }
+  particles=particles.filter(p=>p.t<p.life);
+  for(const fl of floaters){ fl.t+=dt; fl.y-=46*dt; }
+  floaters=floaters.filter(fl=>fl.t<fl.life);
+}
+function drawFx(){
+  for(const p of particles){
+    const k=1-p.t/p.life;
+    ctx.save(); ctx.globalAlpha=k;
+    if(p.ring){ ctx.strokeStyle=p.col; ctx.lineWidth=4; ctx.beginPath(); ctx.arc(p.x,p.y,p.w*(1.6-k),0,Math.PI*2); ctx.stroke(); }
+    else { ctx.strokeStyle=p.col; ctx.lineWidth=p.w; ctx.lineCap='round';
+      ctx.beginPath(); ctx.moveTo(p.x,p.y); ctx.lineTo(p.x-p.vx*0.03,p.y-p.vy*0.03); ctx.stroke(); }
+    ctx.restore();
+  }
+  for(const fl of floaters){
+    const k=1-fl.t/fl.life;
+    ctx.save(); ctx.globalAlpha=Math.min(1,k*2); ctx.fillStyle=fl.col;
+    ctx.font='900 26px "Noto Sans SC",sans-serif'; ctx.textAlign='center';
+    ctx.shadowColor='#000'; ctx.shadowBlur=8;
+    ctx.fillText(fl.text,fl.x,fl.y); ctx.restore();
+  }
+}
+
+/* ================= 武者状态 ================= */
+function makeFighter(x,facing,isPlayer){
+  return {x,facing,isPlayer,hp:100,maxhp:100,dispHp:100,
+    state:'idle',tech:null,t:0,blockT:0,moveDir:0,walkPhase:0,
+    hitDone:false,koT:0,flash:0,atkCd:0,thinkT:Math.random()*0.3,aiMode:'idle',aiT:0};
+}
+let player=makeFighter(300,1,true), ai=makeFighter(660,-1,false);
+let freeze=0, shakeT=0, roundOver=false, mode='dojo';
+
+function fighterPose(f,t){
+  if(f.state==='ko'){
+    const k=EASE.out(clamp(f.koT/0.55,0,1));
+    return lerpPose(KAMAE,{hipY:26,hipX:10*f.facing,torso:78,head:12,fSh:60,fEl:30,bSh:55,bEl:35,fHip:70,fKnee:42,fAnk:80,bHip:58,bKnee:52,bAnk:80},k);
+  }
+  if(f.state==='attack'&&f.tech) return sampleFrames(f.tech.frames,f.t);
+  if(f.state==='block'){
+    const k=EASE.out(clamp(f.blockT/0.12,0,1));
+    return lerpPose(KAMAE,BLOCK_POSE,k);
+  }
+  if(f.moveDir!==0){
+    const p=f.walkPhase;
+    return P({
+      fHip:22+Math.sin(p)*24, fKnee:16+Math.max(0,-Math.sin(p))*32,
+      bHip:-24-Math.sin(p)*24, bKnee:20+Math.max(0,Math.sin(p))*32,
+      hipY:100-Math.abs(Math.sin(p))*4, torso:8+Math.sin(p*2)*1.5,
+      fSh:118+Math.sin(p)*6, bSh:96-Math.sin(p)*6,
+    });
+  }
+  // 呼吸
+  return P({hipY:100+Math.sin(t*2.2+(f.isPlayer?0:2))*1.6, torso:8+Math.sin(t*2.2+(f.isPlayer?0:2))*1.1, head:2+Math.sin(t*1.3)*1.5});
+}
+
+function startAttack(f,id){
+  const tech=TECH_BY_ID[id];
+  if(!tech||f.state==='attack'||f.state==='ko'||roundOver) return false;
+  f.state='attack'; f.tech=tech; f.t=0; f.hitDone=false; f.moveDir=0;
+  return true;
+}
+function setBlock(f,on){
+  if(f.state==='ko'||roundOver) return;
+  if(on&&f.state!=='attack'){ if(f.state!=='block'){f.state='block';f.blockT=0;} f.moveDir=0; }
+  else if(!on&&f.state==='block'){ f.state='idle'; }
+}
+
+/* 命中判定 */
+function tryHit(att,def){
+  const tech=att.tech; if(!tech||!tech.atk||att.hitDone) return;
+  const [a0,a1]=tech.atk.abs;
+  if(att.t<a0||att.t>a1) return;
+  const dx=(def.x-att.x)*att.facing;
+  if(dx<0||dx>tech.atk.range) return;
+  att.hitDone=true;
+  const blocked=def.state==='block';
+  const dmg=blocked?Math.max(1,Math.round(tech.atk.damage*0.2)):tech.atk.damage;
+  def.hp=Math.max(0,def.hp-dmg);
+  def.flash=0.12;
+  const zoneY=tech.atk.zone==='high'?GROUND-165:tech.atk.zone==='low'?GROUND-45:GROUND-110;
+  spawnSpark(def.x-att.facing*30,zoneY,tech.atk.damage>=16,blocked);
+  spawnFloater(def.x-att.facing*40,zoneY-40,blocked?'防住了!':tech.cn+'!',blocked?'#9adcff':'#ffd166');
+  freeze=blocked?0.06:0.13; shakeT=blocked?0.08:0.16;
+  def.x+=att.facing*(blocked?8:26);
+  if(def.hp<=0&&def.state!=='ko'){ def.state='ko'; def.koT=0; def.moveDir=0; endRound(att); }
+}
+
+/* ================= 对战 AI ================= */
+function aiThink(dt){
+  ai.thinkT-=dt;
+  if(ai.thinkT>0) return;
+  ai.thinkT=0.22+Math.random()*0.15;
+  if(ai.state==='attack'||ai.state==='ko'||roundOver) return;
+  const dist=Math.abs(player.x-ai.x);
+  const dirToP=Math.sign(player.x-ai.x)||1;
+
+  // 玩家正在攻击 → 有概率格挡
+  if(player.state==='attack'&&player.tech&&dist<220&&Math.random()<(ai.hp<35?0.5:0.32)){
+    ai.aiMode='block'; ai.aiT=0.45+Math.random()*0.3; setBlock(ai,true); return;
+  }
+  if(ai.aiMode==='block'){ ai.aiT-=0.25; if(ai.aiT<=0){setBlock(ai,false);ai.aiMode='idle';} return; }
+
+  const r=Math.random();
+  if(ai.hp<30&&r<0.3){ // 残血拉开
+    ai.aiMode='retreat'; ai.aiT=0.5;
+  } else if(dist>200){
+    ai.aiMode='approach'; ai.aiT=0.5;
+  } else if(dist<95&&r<0.4){
+    ai.aiMode='retreat'; ai.aiT=0.35;
+  } else if(dist<170){
+    if(ai.atkCd<=0&&r<0.62){
+      const pool=['gedan','gedan','chudan','chudan','mae','zuki','zuki','jodan'];
+      startAttack(ai,pool[Math.floor(Math.random()*pool.length)]);
+      ai.atkCd=0.9+Math.random()*0.9;
+      ai.aiMode='idle';
+    } else if(r<0.75){ ai.aiMode='approach'; ai.aiT=0.3; }
+    else { ai.aiMode='idle'; setBlock(ai,false); }
+  } else { ai.aiMode='idle'; }
+}
+function aiAct(dt){
+  ai.atkCd-=dt;
+  ai.moveDir=0;
+  if(ai.aiMode==='block'){ setBlock(ai,true); return; }
+  if(ai.state==='block') setBlock(ai,false);
+  if(ai.aiMode==='approach'){ ai.moveDir=Math.sign(player.x-ai.x)||1; }
+  else if(ai.aiMode==='retreat'){ ai.moveDir=-Math.sign(player.x-ai.x)||1; }
+}
+
+/* ================= 教学模式 ================= */
+let dojoTech=TECHNIQUES[0], dojoStep=0, dojoT=0;
+const techlistEl=document.getElementById('techlist');
+function renderTechList(){
+  techlistEl.innerHTML='';
+  for(const t of TECHNIQUES){
+    const d=document.createElement('div');
+    d.className='techitem'+(t===dojoTech?' active':'');
+    d.innerHTML=`<div class="cn">${t.cn}</div><div class="jpen"><span class="jp">${t.jp}</span> · <span class="roma">${t.roma}</span></div>`;
+    d.onclick=()=>{ dojoTech=t; dojoStep=0; dojoT=0; renderTechList(); renderDetail(); };
+    techlistEl.appendChild(d);
+  }
+}
+function renderDetail(){
+  document.getElementById('detail').style.display='flex';
+  document.getElementById('dCn').textContent=dojoTech.cn;
+  document.getElementById('dJp').innerHTML=`<span class="jp">${dojoTech.jp}</span> · ${dojoTech.roma}`;
+  const s=dojoTech.steps[dojoStep];
+  document.getElementById('sNum').textContent=`STEP ${dojoStep+1} / ${dojoTech.steps.length}`;
+  document.getElementById('sTitle').textContent=s.cn;
+  document.getElementById('sJp').textContent=s.jp;
+  document.getElementById('sDesc').textContent=s.desc;
+  document.getElementById('btnPrev').disabled=dojoStep===0;
+  document.getElementById('btnNext').disabled=dojoStep===dojoTech.steps.length-1;
+  const dots=document.getElementById('stepdots'); dots.innerHTML='';
+  for(let i=0;i<dojoTech.steps.length;i++){ const sp=document.createElement('span'); if(i===dojoStep)sp.className='on'; dots.appendChild(sp); }
+  document.getElementById('dTips').innerHTML=dojoTech.tips.map(x=>`<li>${x}</li>`).join('');
+  const st=document.getElementById('dStats');
+  st.innerHTML=Object.entries(dojoTech.stats).map(([k,v])=>
+    `<div class="stat"><label>${k}</label><div class="bar"><i style="width:${v*20}%"></i></div><span>${v}/5</span></div>`).join('');
+}
+// 教学演示:循环当前步骤的动作片段(前一关键帧→当前关键帧 + 停顿)
+function dojoPose(t){
+  const fr=dojoTech.frames;
+  const s=dojoStep;
+  const kfIdx=Math.min(s,fr.length-1);
+  let segStart=0;
+  for(let i=0;i<kfIdx;i++)segStart+=fr[i].dur;
+  const segDur=fr[kfIdx].dur, holdT=0.8;
+  const cyc=(t%(segDur+holdT));
+  const prev=kfIdx===0?fr[0].pose:fr[kfIdx-1].pose;
+  if(cyc<segDur){
+    const k=EASE[fr[kfIdx].ease||'io'](cyc/segDur);
+    return lerpPose(prev,fr[kfIdx].pose,k);
+  }
+  return fr[kfIdx].pose;
+}
+
+/* ================= 输入 ================= */
+const keys={left:false,right:false,block:false};
+const KEYMAP={KeyA:'left',ArrowLeft:'left',KeyD:'right',ArrowRight:'right',KeyS:'block',ArrowDown:'block'};
+const ATKMAP={KeyJ:'mae',KeyK:'chudan',KeyL:'jodan',KeyU:'gedan',KeyI:'zuki'};
+window.addEventListener('keydown',e=>{
+  if(KEYMAP[e.code]||ATKMAP[e.code]) e.preventDefault();
+  if(e.repeat) return;
+  if(mode!=='spar'||roundOver) return;
+  if(KEYMAP[e.code]) keys[KEYMAP[e.code]]=true;
+  if(ATKMAP[e.code]) startAttack(player,ATKMAP[e.code]);
+});
+window.addEventListener('keyup',e=>{ if(KEYMAP[e.code]) keys[KEYMAP[e.code]]=false; });
+// 触屏按钮
+document.querySelectorAll('.tbtn').forEach(b=>{
+  const k=b.dataset.k;
+  const on=e=>{ e.preventDefault(); b.classList.add('held');
+    if(mode!=='spar'||roundOver) return;
+    if(k==='left'||k==='right'||k==='block') keys[k]=true; else startAttack(player,k); };
+  const off=e=>{ e.preventDefault(); b.classList.remove('held');
+    if(k==='left'||k==='right'||k==='block') keys[k]=false; };
+  b.addEventListener('pointerdown',on);
+  b.addEventListener('pointerup',off);
+  b.addEventListener('pointercancel',off);
+  b.addEventListener('pointerleave',off);
+});
+
+/* ================= 模式切换 / 回合 ================= */
+function setMode(m){
+  mode=m;
+  document.body.dataset.mode=m;
+  document.getElementById('tabDojo').classList.toggle('active',m==='dojo');
+  document.getElementById('tabSpar').classList.toggle('active',m==='spar');
+  if(m==='spar') resetRound();
+}
+document.getElementById('tabDojo').onclick=()=>setMode('dojo');
+document.getElementById('tabSpar').onclick=()=>setMode('spar');
+document.getElementById('goSpar').onclick=()=>setMode('spar');
+document.getElementById('btnPrev').onclick=()=>{ if(dojoStep>0){dojoStep--;dojoT=0;renderDetail();} };
+document.getElementById('btnNext').onclick=()=>{ if(dojoStep<dojoTech.steps.length-1){dojoStep++;dojoT=0;renderDetail();} };
+
+function resetRound(){
+  player=makeFighter(300,1,true); ai=makeFighter(660,-1,false);
+  particles=[]; floaters=[]; freeze=0; shakeT=0; roundOver=false;
+  document.getElementById('roundmsg').classList.remove('show');
+  updateHpBars(true);
+}
+function endRound(winner){
+  roundOver=true;
+  const title=document.getElementById('roundTitle'), sub=document.getElementById('roundSub');
+  if(winner.isPlayer){ title.textContent='勝!'; title.style.color='#43d17c'; sub.textContent=`漂亮！${winner.tech?winner.tech.cn:''}终结了对手。再来一局？`; }
+  else { title.textContent='KO!'; title.style.color='#e63946'; sub.textContent='被 AI 终结了……去教学模式练练那招，再回来复仇！'; }
+  setTimeout(()=>document.getElementById('roundmsg').classList.add('show'),700);
+}
+document.getElementById('btnRematch').onclick=resetRound;
+
+function updateHpBars(snap){
+  for(const [f,pre] of [[player,'P'],[ai,'A']]){
+    if(snap) f.dispHp=f.hp;
+    f.dispHp+=(f.hp-f.dispHp)*0.08;
+    if(Math.abs(f.dispHp-f.hp)<0.5) f.dispHp=f.hp;
+    document.getElementById('fill'+pre).style.width=(f.hp/f.maxhp*100)+'%';
+    document.getElementById('ghost'+pre).style.width=(f.dispHp/f.maxhp*100)+'%';
+  }
+}
+
+/* ================= 主循环 ================= */
+let lastT=performance.now();
+const demoFighter=makeFighter(0,1,true);
+function frame(now){
+  let dt=(now-lastT)/1000; lastT=now;
+  dt=Math.min(dt,0.05);
+  const t=now/1000;
+
+  ctx.save();
+  if(shakeT>0){ shakeT-=dt; ctx.translate((Math.random()-0.5)*10*shakeT*8,(Math.random()-0.5)*8*shakeT*8); }
+  drawDojo(t);
+
+  if(mode==='dojo'){
+    dojoT+=dt;
+    demoFighter.x=W/2; demoFighter.facing=1;
+    const pose=dojoPose(dojoT);
+    drawFighter(ctx,demoFighter,pose,{time:t});
+    // 当前步骤标注
+    ctx.save(); ctx.textAlign='center';
+    ctx.font='700 20px "Noto Sans SC",sans-serif'; ctx.fillStyle='#f2b134';
+    ctx.shadowColor='#000'; ctx.shadowBlur=6;
+    const s=dojoTech.steps[dojoStep];
+    ctx.fillText(`STEP ${dojoStep+1} · ${s.cn}`,W/2,42);
+    ctx.font='500 14px "Noto Serif JP",serif'; ctx.fillStyle='#9aa3b8';
+    ctx.fillText(`${dojoTech.jp} — ${dojoTech.cn} (${dojoTech.roma})`,W/2,66);
+    ctx.restore();
+  } else {
+    if(freeze>0){ freeze-=dt; }
+    else {
+      // 玩家
+      if(!roundOver&&player.state!=='ko'){
+        if(keys.block) setBlock(player,true); else setBlock(player,false);
+        if(player.state!=='attack'&&player.state!=='block'){
+          player.moveDir=(keys.right?1:0)-(keys.left?1:0);
+          if(player.moveDir!==0){ player.x+=player.moveDir*230*dt; player.walkPhase+=dt*11; }
+        } else player.moveDir=0;
+        if(player.state==='attack'){ player.t+=dt; if(player.t>=player.tech.total){player.state='idle';player.tech=null;} }
+        if(player.state==='block') player.blockT+=dt;
+      }
+      // AI
+      if(!roundOver){
+        aiThink(dt); aiAct(dt);
+        if(ai.state==='attack'){ ai.t+=dt; if(ai.t>=ai.tech.total){ai.state='idle';ai.tech=null;} }
+        if(ai.state==='block') ai.blockT+=dt;
+        if(ai.moveDir!==0&&ai.state!=='attack'){ ai.x+=ai.moveDir*200*dt; ai.walkPhase+=dt*11; }
+      }
+      // 防止穿过 + 朝向
+      if(ai.x-player.x<70){ const mid=(ai.x+player.x)/2; player.x=mid-35; ai.x=mid+35; }
+      player.x=clamp(player.x,70,W-70); ai.x=clamp(ai.x,70,W-70);
+      player.facing=player.x<ai.x?1:-1; ai.facing=-player.facing;
+      if(player.state==='ko')player.koT+=dt;
+      if(ai.state==='ko')ai.koT+=dt;
+      player.flash=Math.max(0,player.flash-dt); ai.flash=Math.max(0,ai.flash-dt);
+      // 命中
+      tryHit(player,ai); tryHit(ai,player);
+      updateHpBars(false);
+    }
+    updateFx(dt);
+    drawFighter(ctx,ai,fighterPose(ai,t),{time:t,flash:ai.flash>0});
+    drawFighter(ctx,player,fighterPose(player,t),{time:t,flash:player.flash>0});
+    drawFx();
+    // 招式名提示(攻击中)
+    for(const f of [player,ai]){
+      if(f.state==='attack'&&f.tech&&!roundOver){
+        ctx.save(); ctx.textAlign='center'; ctx.font='700 15px "Noto Sans SC",sans-serif';
+        ctx.fillStyle=f.isPlayer?'#ffd166':'#9adcff'; ctx.shadowColor='#000'; ctx.shadowBlur=6;
+        ctx.fillText(f.tech.cn,f.x,GROUND-215); ctx.restore();
+      }
+    }
+  }
+  ctx.restore();
+  requestAnimationFrame(frame);
+}
+
+/* ================= 启动 ================= */
+renderTechList();
+renderDetail();
+updateHpBars(true);
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>
