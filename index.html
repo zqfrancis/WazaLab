@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="wazalab-version" content="0.8">
+<meta name="wazalab-version" content="0.9">
 <script>
 // 版本自检:打开时对比服务器最新版,发现本地是旧缓存则自动硬刷新,免手动清缓存
 (function(){
@@ -224,6 +224,35 @@
     body[data-mode="spar"] #touchpad{display:flex;}
     body[data-mode="spar"] #hintbar{display:none;}
   }
+  /* 横屏对战:画布按高度撑满居中,操控悬浮覆盖在画面下方 */
+  #lsExit{
+    display:none;flex:none;align-self:center;width:44px;height:44px;border-radius:50%;
+    border:2px solid var(--line);background:var(--panel2);color:var(--white);
+    font-size:18px;align-items:center;justify-content:center;cursor:pointer;
+  }
+  @media (pointer:coarse) and (orientation:landscape){
+    body[data-mode="spar"] header, body[data-mode="spar"] footer{display:none;}
+    body[data-mode="spar"] main{
+      width:100vw;max-width:none;margin:0;padding:0;
+      height:100vh;height:100dvh;display:flex;align-items:center;justify-content:center;
+    }
+    body[data-mode="spar"] #stage-wrap{
+      position:relative;flex:none;width:min(100vw,200vh);width:min(100vw,200dvh);
+    }
+    body[data-mode="spar"] canvas#stage{width:100%;height:auto;border:none;border-radius:0;}
+    body[data-mode="spar"] #touchpad{
+      position:absolute;left:0;right:0;bottom:0;z-index:6;
+      justify-content:space-between;align-items:flex-end;
+      margin-top:0;padding:8px 12px calc(8px + env(safe-area-inset-bottom));
+      pointer-events:none;
+      background:linear-gradient(transparent,rgba(10,10,14,.45));
+    }
+    body[data-mode="spar"] #touchpad>*{pointer-events:auto;}
+    body[data-mode="spar"] #joystick{width:112px;height:112px;}
+    body[data-mode="spar"] #joyknob{width:50px;height:50px;}
+    body[data-mode="spar"] .actions .tbtn{height:52px;}
+    body[data-mode="spar"] #lsExit{display:flex;}
+  }
 </style>
 </head>
 <body data-mode="dojo">
@@ -232,7 +261,7 @@
   <div class="brand">
     <div class="logo">技</div>
     <div>
-      <h1>WazaLab <span id="brandSub" style="font-size:15px;font-weight:500;">空手道动作教学游戏</span><span class="demo">Demo v0.8</span></h1>
+      <h1>WazaLab <span id="brandSub" style="font-size:15px;font-weight:500;">空手道动作教学游戏</span><span class="demo">Demo v0.9</span></h1>
       <p id="brandTag">AxisMotion 出品 · 构えから残心まで、技をゲームで学ぶ</p>
     </div>
   </div>
@@ -278,6 +307,7 @@
 
     <div id="touchpad">
       <div id="joystick"><div id="joyknob"></div></div>
+      <button id="lsExit" title="教学模式">📖</button>
       <div class="actions">
         <button class="tbtn" data-k="block"><span class="tlbl">防</span><small class="tsub">防御</small></button>
         <button class="tbtn atk" data-k="mae"><span class="tlbl">前踢</span><small>J</small></button>
@@ -507,7 +537,7 @@ zh:{
     +'<span><b>逆突</b> <kbd>I</kbd></span>',
   touch:{block:['防','防御'],mae:'前踢',chudan:'中段踢',jodan:'高段踢',gedan:'下段踢',zuki:'逆突'},
   prev:'← 上一步', next:'下一步 →', tipsTitle:'💡 初学者要点', goSpar:'去对战试试',
-  footer:['WazaLab v0.8 Demo','AxisMotion','FormBuddy 姊妹项目','动作演示为教学示意，请在有资质教练指导下练习'],
+  footer:['WazaLab v0.9 Demo','AxisMotion','FormBuddy 姊妹项目','动作演示为教学示意，请在有资质教练指导下练习'],
   blocked:'防住了!', dodged:'闪避!', winTitle:'勝!',
   winSub:cn=>`漂亮！${cn}终结了对手。再来一局？`,
   loseSub:'被 AI 终结了……去教学模式练练那招，再回来复仇！',
@@ -528,7 +558,7 @@ en:{
     +'<span><b>Reverse punch</b> <kbd>I</kbd></span>',
   touch:{block:['Block','hold'],mae:'Front',chudan:'Mid',jodan:'High',gedan:'Low',zuki:'Punch'},
   prev:'← Prev', next:'Next →', tipsTitle:'💡 Tips for beginners', goSpar:'Try it in sparring',
-  footer:['WazaLab v0.8 Demo','AxisMotion','Sister project of FormBuddy','Demos are for teaching — practice under a qualified instructor'],
+  footer:['WazaLab v0.9 Demo','AxisMotion','Sister project of FormBuddy','Demos are for teaching — practice under a qualified instructor'],
   blocked:'Blocked!', dodged:'Dodged!', winTitle:'You Win!',
   winSub:cn=>`Beautiful! Finished with ${cn}. Rematch?`,
   loseSub:'Finished by the AI… drill that technique in Tutorial mode, then come back for revenge!',
@@ -1032,6 +1062,8 @@ document.querySelectorAll('.tbtn').forEach(b=>{
   joy.addEventListener('pointerup',e=>{ if(e.pointerId===pid) release(); });
   joy.addEventListener('pointercancel',e=>{ if(e.pointerId===pid) release(); });
 })();
+// 横屏悬浮退出键 → 回教学模式
+document.getElementById('lsExit').addEventListener('click',()=>{ setMode('dojo'); });
 
 /* ================= 模式切换 / 回合 ================= */
 function setMode(m){
