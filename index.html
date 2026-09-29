@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="wazalab-version" content="0.9">
+<meta name="wazalab-version" content="0.10">
 <script>
 // 版本自检:打开时对比服务器最新版,发现本地是旧缓存则自动硬刷新,免手动清缓存
 (function(){
@@ -234,12 +234,11 @@
     body[data-mode="spar"] header, body[data-mode="spar"] footer{display:none;}
     body[data-mode="spar"] main{
       width:100vw;max-width:none;margin:0;padding:0;
-      height:100vh;height:100dvh;display:flex;align-items:center;justify-content:center;
+      height:100vh;height:100dvh;display:flex;align-items:center;justify-content:center;overflow:hidden;
     }
-    body[data-mode="spar"] #stage-wrap{
-      position:relative;flex:none;width:min(100vw,200vh);width:min(100vw,200dvh);
-    }
-    body[data-mode="spar"] canvas#stage{width:100%;height:auto;border:none;border-radius:0;}
+    /* 画布尺寸由 JS 按真实视口定 px,不依赖 dvh/min() 解析 */
+    body[data-mode="spar"] #stage-wrap{position:relative;flex:none;}
+    body[data-mode="spar"] canvas#stage{width:auto;height:auto;max-width:100vw;max-height:100vh;max-height:100dvh;border:none;border-radius:0;}
     body[data-mode="spar"] #touchpad{
       position:absolute;left:0;right:0;bottom:0;z-index:6;
       justify-content:space-between;align-items:flex-end;
@@ -248,9 +247,9 @@
       background:linear-gradient(transparent,rgba(10,10,14,.45));
     }
     body[data-mode="spar"] #touchpad>*{pointer-events:auto;}
-    body[data-mode="spar"] #joystick{width:112px;height:112px;}
-    body[data-mode="spar"] #joyknob{width:50px;height:50px;}
-    body[data-mode="spar"] .actions .tbtn{height:52px;}
+    body[data-mode="spar"] #joystick{width:104px;height:104px;}
+    body[data-mode="spar"] #joyknob{width:46px;height:46px;}
+    body[data-mode="spar"] .actions .tbtn{height:48px;font-size:12px;}
     body[data-mode="spar"] #lsExit{display:flex;}
   }
 </style>
@@ -261,7 +260,7 @@
   <div class="brand">
     <div class="logo">技</div>
     <div>
-      <h1>WazaLab <span id="brandSub" style="font-size:15px;font-weight:500;">空手道动作教学游戏</span><span class="demo">Demo v0.9</span></h1>
+      <h1>WazaLab <span id="brandSub" style="font-size:15px;font-weight:500;">空手道动作教学游戏</span><span class="demo">Demo v0.10</span></h1>
       <p id="brandTag">AxisMotion 出品 · 构えから残心まで、技をゲームで学ぶ</p>
     </div>
   </div>
@@ -537,7 +536,7 @@ zh:{
     +'<span><b>逆突</b> <kbd>I</kbd></span>',
   touch:{block:['防','防御'],mae:'前踢',chudan:'中段踢',jodan:'高段踢',gedan:'下段踢',zuki:'逆突'},
   prev:'← 上一步', next:'下一步 →', tipsTitle:'💡 初学者要点', goSpar:'去对战试试',
-  footer:['WazaLab v0.9 Demo','AxisMotion','FormBuddy 姊妹项目','动作演示为教学示意，请在有资质教练指导下练习'],
+  footer:['WazaLab v0.10 Demo','AxisMotion','FormBuddy 姊妹项目','动作演示为教学示意，请在有资质教练指导下练习'],
   blocked:'防住了!', dodged:'闪避!', winTitle:'勝!',
   winSub:cn=>`漂亮！${cn}终结了对手。再来一局？`,
   loseSub:'被 AI 终结了……去教学模式练练那招，再回来复仇！',
@@ -558,7 +557,7 @@ en:{
     +'<span><b>Reverse punch</b> <kbd>I</kbd></span>',
   touch:{block:['Block','hold'],mae:'Front',chudan:'Mid',jodan:'High',gedan:'Low',zuki:'Punch'},
   prev:'← Prev', next:'Next →', tipsTitle:'💡 Tips for beginners', goSpar:'Try it in sparring',
-  footer:['WazaLab v0.9 Demo','AxisMotion','Sister project of FormBuddy','Demos are for teaching — practice under a qualified instructor'],
+  footer:['WazaLab v0.10 Demo','AxisMotion','Sister project of FormBuddy','Demos are for teaching — practice under a qualified instructor'],
   blocked:'Blocked!', dodged:'Dodged!', winTitle:'You Win!',
   winSub:cn=>`Beautiful! Finished with ${cn}. Rematch?`,
   loseSub:'Finished by the AI… drill that technique in Tutorial mode, then come back for revenge!',
@@ -832,7 +831,7 @@ function fighterPose(f,t){
   }
   if(f.turnT>0){ // 转身动画:纯视觉,不锁移动/攻击/防御
     const k=EASE.out(clamp(1-f.turnT/0.18,0,1));
-    return lerpPose(KAMAE,{hipY:88,hipX:0,torso:22,head:10,fSh:80,fEl:70,bSh:70,bEl:70,fHip:32,fKnee:34,fAnk:80,fSwing:0,bHip:-12,bKnee:34,bAnk:80,fSwing:0},k);
+    return lerpPose(KAMAE,{hipY:88,hipX:0,torso:22,head:10,fSh:80,fEl:70,bSh:70,bEl:70,fHip:32,fKnee:34,fAnk:80,fSwing:0,bHip:-12,bKnee:34,bAnk:80,bSwing:0},k);
   }
   if(f.stepping){ // 步伐(含纵移)
     const p=f.walkPhase;
@@ -1066,12 +1065,26 @@ document.querySelectorAll('.tbtn').forEach(b=>{
 document.getElementById('lsExit').addEventListener('click',()=>{ setMode('dojo'); });
 
 /* ================= 模式切换 / 回合 ================= */
+// 横屏对战:用 JS 按真实视口给画布定 px 尺寸,不依赖 dvh/min() 解析
+function fitStage(){
+  const cv=document.getElementById('stage');
+  const land=matchMedia('(pointer:coarse)').matches
+    && matchMedia('(orientation:landscape)').matches
+    && document.body.dataset.mode==='spar';
+  if(!land){ cv.style.width=''; cv.style.height=''; return; }
+  const s=Math.min(window.innerWidth/960, window.innerHeight/480);
+  cv.style.width=Math.floor(960*s)+'px';
+  cv.style.height=Math.floor(480*s)+'px';
+}
+window.addEventListener('resize',fitStage);
+window.addEventListener('orientationchange',()=>setTimeout(fitStage,120));
 function setMode(m){
   mode=m;
   document.body.dataset.mode=m;
   document.getElementById('tabDojo').classList.toggle('active',m==='dojo');
   document.getElementById('tabSpar').classList.toggle('active',m==='spar');
   if(m==='spar') resetRound();
+  fitStage();
 }
 document.getElementById('tabDojo').onclick=()=>setMode('dojo');
 document.getElementById('tabSpar').onclick=()=>setMode('spar');
@@ -1208,6 +1221,7 @@ function frame(now){
 /* ================= 启动 ================= */
 document.getElementById('langBtn').onclick=()=>{ LANG=LANG==='zh'?'en':'zh'; applyLang(); };
 applyLang();
+fitStage();
 updateHpBars(true);
 requestAnimationFrame(frame);
 </script>
