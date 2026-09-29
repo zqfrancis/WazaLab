@@ -223,6 +223,8 @@
     <div id="touchpad">
       <div class="tgroup">
         <button class="tbtn" data-k="left">◀</button>
+        <button class="tbtn" data-k="up">▲</button>
+        <button class="tbtn" data-k="down">▼</button>
         <button class="tbtn" data-k="right">▶</button>
       </div>
       <div class="tgroup">
@@ -445,15 +447,17 @@ zh:{
   tabDojo:'📖 教学模式', tabSpar:'⚔️ 对战模式', langBtn:'EN',
   hpYouName:'あなた', hpYouTag:'YOU · 红方', hpAiName:'あいて', hpAiTag:'AI 相手 · 蓝方',
   rematch:'再来一局',
-  hintHTML:'<span><b>移动</b> <kbd>A</kbd><kbd>D</kbd> / <kbd>←</kbd><kbd>→</kbd></span>'
-    +'<span><b>防御</b> <kbd>S</kbd>（按住）</span>'
+  hintHTML:'<span><b>移动</b> <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> / <kbd>←</kbd><kbd>→</kbd><kbd>↑</kbd><kbd>↓</kbd></span>'
+    +'<span><b>防御</b> <kbd>Space</kbd>（按住）</span>'
+    +'<span><b>闪避</b> 纵移（<kbd>W</kbd>/<kbd>S</kbd>）拉开前后距离</span>'
+    +'<span><b>绕后</b> 绕到身后逼其转身</span>'
     +'<span><b>前踢</b> <kbd>J</kbd></span><span><b>中段回旋踢</b> <kbd>K</kbd></span>'
     +'<span><b>高段回旋踢</b> <kbd>L</kbd></span><span><b>下段扫踢</b> <kbd>U</kbd></span>'
     +'<span><b>逆突</b> <kbd>I</kbd></span>',
   touch:{block:['防','防御'],mae:'前踢',chudan:'中段踢',jodan:'高段踢',gedan:'下段踢',zuki:'逆突'},
   prev:'← 上一步', next:'下一步 →', tipsTitle:'💡 初学者要点', goSpar:'去对战试试',
   footer:['WazaLab v0.1 Demo','AxisMotion','FormBuddy 姊妹项目','动作演示为教学示意，请在有资质教练指导下练习'],
-  blocked:'防住了!', winTitle:'勝!',
+  blocked:'防住了!', dodged:'闪避!', winTitle:'勝!',
   winSub:cn=>`漂亮！${cn}终结了对手。再来一局？`,
   loseSub:'被 AI 终结了……去教学模式练练那招，再回来复仇！',
 },
@@ -464,15 +468,17 @@ en:{
   tabDojo:'📖 Tutorial', tabSpar:'⚔️ Sparring', langBtn:'中文',
   hpYouName:'You', hpYouTag:'YOU · RED', hpAiName:'AI', hpAiTag:'AI · BLUE',
   rematch:'Rematch',
-  hintHTML:'<span><b>Move</b> <kbd>A</kbd><kbd>D</kbd> / <kbd>←</kbd><kbd>→</kbd></span>'
-    +'<span><b>Block</b> <kbd>S</kbd> (hold)</span>'
+  hintHTML:'<span><b>Move</b> <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> / <kbd>←</kbd><kbd>→</kbd><kbd>↑</kbd><kbd>↓</kbd></span>'
+    +'<span><b>Block</b> <kbd>Space</kbd> (hold)</span>'
+    +'<span><b>Dodge</b> step in depth (<kbd>W</kbd>/<kbd>S</kbd>)</span>'
+    +'<span><b>Circle</b> get behind to force a turn</span>'
     +'<span><b>Front kick</b> <kbd>J</kbd></span><span><b>Mid roundhouse</b> <kbd>K</kbd></span>'
     +'<span><b>High roundhouse</b> <kbd>L</kbd></span><span><b>Low kick</b> <kbd>U</kbd></span>'
     +'<span><b>Reverse punch</b> <kbd>I</kbd></span>',
   touch:{block:['Block','hold'],mae:'Front',chudan:'Mid',jodan:'High',gedan:'Low',zuki:'Punch'},
   prev:'← Prev', next:'Next →', tipsTitle:'💡 Tips for beginners', goSpar:'Try it in sparring',
   footer:['WazaLab v0.1 Demo','AxisMotion','Sister project of FormBuddy','Demos are for teaching — practice under a qualified instructor'],
-  blocked:'Blocked!', winTitle:'You Win!',
+  blocked:'Blocked!', dodged:'Dodged!', winTitle:'You Win!',
   winSub:cn=>`Beautiful! Finished with ${cn}. Rematch?`,
   loseSub:'Finished by the AI… drill that technique in Tutorial mode, then come back for revenge!',
 }
@@ -585,12 +591,13 @@ function drawFighter(c,f,pose,opt){
   opt=opt||{};
   const t=opt.time||0;
   const fx=f.x, dir=f.facing; // 面向: +1 右, -1 左
+  const depY=f.depth||0; // 纵深位移(正=靠近观众/下屏)
   const main=opt.flash?'#ffffff':(f.isPlayer?'#181c26':'#101320');
   const dark=opt.flash?'#ffffff':'#080a10';
   const accent=f.isPlayer?'#e63946':'#2f6fd0';
 
   // 髋部(根)
-  const px=fx+pose.hipX*dir, py=GROUND-pose.hipY;
+  const px=fx+pose.hipX*dir, py=GROUND-pose.hipY+depY;
   // 躯干
   const ta=pose.torso*D2R;
   const tx=px+Math.sin(ta)*BODY.torso*dir, ty=py-Math.cos(ta)*BODY.torso;
@@ -598,9 +605,9 @@ function drawFighter(c,f,pose,opt){
   const ha=(pose.torso+pose.head)*D2R;
   const hx=tx+Math.sin(ha)*(BODY.neck+BODY.headR)*dir, hy=ty-Math.cos(ha)*(BODY.neck+BODY.headR);
 
-  // 阴影
+  // 阴影(纵深越近越大)
   c.save(); c.globalAlpha=0.35; c.fillStyle='#000';
-  c.beginPath(); c.ellipse(fx,GROUND+8,52*(pose.hipY/100),10,0,0,Math.PI*2); c.fill(); c.restore();
+  c.beginPath(); c.ellipse(fx,GROUND+8+depY,52*(pose.hipY/100)*(1+depY*0.002),10,0,0,Math.PI*2); c.fill(); c.restore();
 
   const limb=(x1,y1,x2,y2,w,col)=>{c.strokeStyle=col;c.lineWidth=w;c.lineCap='round';c.beginPath();c.moveTo(x1,y1);c.lineTo(x2,y2);c.stroke();};
   const dot=(x,y,r,col)=>{c.fillStyle=col;c.beginPath();c.arc(x,y,r,0,Math.PI*2);c.fill();};
@@ -723,9 +730,10 @@ function drawTrail(f){
 
 /* ================= 武者状态 ================= */
 function makeFighter(x,facing,isPlayer){
-  return {x,facing,isPlayer,hp:100,maxhp:100,dispHp:100,
-    state:'idle',tech:null,t:0,blockT:0,moveDir:0,walkPhase:0,
-    hitDone:false,koT:0,flash:0,atkCd:0,thinkT:Math.random()*0.3,aiMode:'idle',aiT:0};
+  return {x,facing,isPlayer,hp:100,maxhp:100,dispHp:100,depth:0,
+    state:'idle',tech:null,t:0,blockT:0,moveDir:0,moveDep:0,stepping:false,walkPhase:0,
+    turnT:0,dodgeShown:false,hitDone:false,koT:0,flash:0,atkCd:0,
+    thinkT:Math.random()*0.3,aiMode:'idle',aiT:0,aiTargetDepth:0};
 }
 let player=makeFighter(300,1,true), ai=makeFighter(660,-1,false);
 let freeze=0, shakeT=0, roundOver=false, mode='dojo';
@@ -735,12 +743,16 @@ function fighterPose(f,t){
     const k=EASE.out(clamp(f.koT/0.55,0,1));
     return lerpPose(KAMAE,{hipY:26,hipX:10*f.facing,torso:78,head:12,fSh:60,fEl:30,bSh:55,bEl:35,fHip:70,fKnee:42,fAnk:80,fSwing:0,bHip:58,bKnee:52,bAnk:80,bSwing:0},k);
   }
+  if(f.state==='turn'){ // 转身: 0.3s 收紧转体
+    const k=EASE.out(clamp(1-f.turnT/0.30,0,1));
+    return lerpPose(KAMAE,{hipY:88,hipX:0,torso:22,head:10,fSh:80,fEl:70,bSh:70,bEl:70,fHip:32,fKnee:34,fAnk:80,fSwing:0,bHip:-12,bKnee:34,bAnk:80,bSwing:0},k);
+  }
   if(f.state==='attack'&&f.tech) return sampleFrames(f.tech.frames,f.t);
   if(f.state==='block'){
     const k=EASE.out(clamp(f.blockT/0.12,0,1));
     return lerpPose(KAMAE,BLOCK_POSE,k);
   }
-  if(f.moveDir!==0){
+  if(f.stepping){ // 步伐(含纵移)
     const p=f.walkPhase;
     return P({
       fHip:22+Math.sin(p)*24, fKnee:16+Math.max(0,-Math.sin(p))*32,
@@ -755,14 +767,27 @@ function fighterPose(f,t){
 
 function startAttack(f,id){
   const tech=TECH_BY_ID[id];
-  if(!tech||f.state==='attack'||f.state==='ko'||roundOver) return false;
-  f.state='attack'; f.tech=tech; f.t=0; f.hitDone=false; f.moveDir=0;
+  if(!tech||f.state==='attack'||f.state==='turn'||f.state==='ko'||roundOver) return false;
+  f.state='attack'; f.tech=tech; f.t=0; f.hitDone=false; f.dodgeShown=false; f.moveDir=0; f.stepping=false;
   return true;
 }
 function setBlock(f,on){
-  if(f.state==='ko'||roundOver) return;
-  if(on&&f.state!=='attack'){ if(f.state!=='block'){f.state='block';f.blockT=0;} f.moveDir=0; }
+  if(f.state==='ko'||f.state==='turn'||roundOver) return;
+  if(on&&f.state!=='attack'){ if(f.state!=='block'){f.state='block';f.blockT=0;} f.moveDir=0; f.stepping=false; }
   else if(!on&&f.state==='block'){ f.state='idle'; }
+}
+
+/* 转身:对手绕到身后 → 0.3s 转身硬直(不能动/攻/防) */
+function updateFacing(f,foe,dt){
+  if(f.state==='turn'){
+    f.turnT-=dt;
+    if(f.turnT<=0){ f.facing*=-1; f.state='idle'; }
+    return;
+  }
+  if(f.state==='attack'||f.state==='ko'||roundOver) return;
+  if((foe.x-f.x)*f.facing < -30){
+    f.state='turn'; f.turnT=0.30; f.moveDir=0; f.stepping=false;
+  }
 }
 
 /* 命中判定 */
@@ -771,7 +796,13 @@ function tryHit(att,def){
   const [a0,a1]=tech.atk.abs;
   if(att.t<a0||att.t>a1) return;
   const dx=(def.x-att.x)*att.facing;
-  if(dx<0||dx>tech.atk.range) return;
+  if(dx<0||dx>tech.atk.range) return; // 身后 → 挥空
+  // 纵深闪避:前后距离拉开则打不中
+  if(Math.abs((att.depth||0)-(def.depth||0))>38){
+    if(!att.dodgeShown){ att.dodgeShown=true;
+      spawnFloater(def.x,GROUND-110+(def.depth||0),STR[LANG].dodged,'#1d6fd8'); }
+    return;
+  }
   att.hitDone=true;
   const blocked=def.state==='block';
   const dmg=blocked?Math.max(1,Math.round(tech.atk.damage*0.2)):tech.atk.damage;
@@ -790,9 +821,9 @@ function aiThink(dt){
   ai.thinkT-=dt;
   if(ai.thinkT>0) return;
   ai.thinkT=0.22+Math.random()*0.15;
-  if(ai.state==='attack'||ai.state==='ko'||roundOver) return;
+  if(ai.state==='attack'||ai.state==='ko'||ai.state==='turn'||roundOver) return;
   const dist=Math.abs(player.x-ai.x);
-  const dirToP=Math.sign(player.x-ai.x)||1;
+  const pDep=player.depth||0, aDep=ai.depth||0;
 
   // 玩家正在攻击 → 有概率格挡
   if(player.state==='attack'&&player.tech&&dist<220&&Math.random()<(ai.hp<35?0.5:0.32)){
@@ -800,11 +831,22 @@ function aiThink(dt){
   }
   if(ai.aiMode==='block'){ ai.aiT-=0.25; if(ai.aiT<=0){setBlock(ai,false);ai.aiMode='idle';} return; }
 
+  // 闪避中 → 倒计时
+  if(ai.aiMode==='dodge'){ ai.aiT-=0.25; if(ai.aiT<=0) ai.aiMode='idle'; return; }
+  // 玩家刚出招 → 概率纵移闪避
+  if(player.state==='attack'&&player.tech&&player.t<0.25&&dist<240&&Math.random()<0.30){
+    ai.aiMode='dodge'; ai.aiT=0.4;
+    ai.aiTargetDepth=clamp(aDep+(aDep>=pDep?55:-55),-30,52);
+    setBlock(ai,false); return;
+  }
+  // 游走中 → 倒计时
+  if(ai.aiMode==='strafe'){ ai.aiT-=0.25; if(ai.aiT<=0) ai.aiMode='idle'; else return; }
+
   const r=Math.random();
   if(ai.hp<30&&r<0.3){ // 残血拉开
     ai.aiMode='retreat'; ai.aiT=0.5;
   } else if(dist>200){
-    ai.aiMode='approach'; ai.aiT=0.5;
+    ai.aiMode='approach'; ai.aiT=0.5; ai.aiTargetDepth=pDep;
   } else if(dist<95&&r<0.4){
     ai.aiMode='retreat'; ai.aiT=0.35;
   } else if(dist<170){
@@ -813,17 +855,24 @@ function aiThink(dt){
       startAttack(ai,pool[Math.floor(Math.random()*pool.length)]);
       ai.atkCd=0.9+Math.random()*0.9;
       ai.aiMode='idle';
-    } else if(r<0.75){ ai.aiMode='approach'; ai.aiT=0.3; }
+    } else if(r<0.72){ ai.aiMode='approach'; ai.aiT=0.3; ai.aiTargetDepth=pDep; }
+    else if(r<0.86){ ai.aiMode='strafe'; ai.aiT=0.5; // 纵向游走找角度
+      ai.aiTargetDepth=clamp(pDep+(Math.random()*80-40),-30,52); }
     else { ai.aiMode='idle'; setBlock(ai,false); }
   } else { ai.aiMode='idle'; }
 }
 function aiAct(dt){
   ai.atkCd-=dt;
-  ai.moveDir=0;
+  ai.moveDir=0; ai.moveDep=0;
   if(ai.aiMode==='block'){ setBlock(ai,true); return; }
   if(ai.state==='block') setBlock(ai,false);
-  if(ai.aiMode==='approach'){ ai.moveDir=Math.sign(player.x-ai.x)||1; }
+  if(ai.state==='turn'||ai.state==='attack') return;
+  if(ai.aiMode==='approach'){ ai.moveDir=Math.sign(player.x-ai.x)||1; ai.moveDep=Math.sign((ai.aiTargetDepth||0)-(ai.depth||0)); }
   else if(ai.aiMode==='retreat'){ ai.moveDir=-Math.sign(player.x-ai.x)||1; }
+  else if(ai.aiMode==='strafe'||ai.aiMode==='dodge'){
+    const dd=(ai.aiTargetDepth||0)-(ai.depth||0);
+    ai.moveDep=Math.abs(dd)>6?Math.sign(dd):0;
+  }
 }
 
 /* ================= 教学模式 ================= */
@@ -876,8 +925,8 @@ function dojoPose(t){
 }
 
 /* ================= 输入 ================= */
-const keys={left:false,right:false,block:false};
-const KEYMAP={KeyA:'left',ArrowLeft:'left',KeyD:'right',ArrowRight:'right',KeyS:'block',ArrowDown:'block'};
+const keys={left:false,right:false,up:false,down:false,block:false};
+const KEYMAP={KeyA:'left',ArrowLeft:'left',KeyD:'right',ArrowRight:'right',KeyW:'up',ArrowUp:'up',KeyS:'down',ArrowDown:'down',Space:'block'};
 const ATKMAP={KeyJ:'mae',KeyK:'chudan',KeyL:'jodan',KeyU:'gedan',KeyI:'zuki'};
 window.addEventListener('keydown',e=>{
   if(KEYMAP[e.code]||ATKMAP[e.code]) e.preventDefault();
@@ -892,9 +941,9 @@ document.querySelectorAll('.tbtn').forEach(b=>{
   const k=b.dataset.k;
   const on=e=>{ e.preventDefault(); b.classList.add('held');
     if(mode!=='spar'||roundOver) return;
-    if(k==='left'||k==='right'||k==='block') keys[k]=true; else startAttack(player,k); };
+    if(k in keys) keys[k]=true; else startAttack(player,k); };
   const off=e=>{ e.preventDefault(); b.classList.remove('held');
-    if(k==='left'||k==='right'||k==='block') keys[k]=false; };
+    if(k in keys) keys[k]=false; };
   b.addEventListener('pointerdown',on);
   b.addEventListener('pointerup',off);
   b.addEventListener('pointercancel',off);
@@ -975,10 +1024,14 @@ function frame(now){
       // 玩家
       if(!roundOver&&player.state!=='ko'){
         if(keys.block) setBlock(player,true); else setBlock(player,false);
-        if(player.state!=='attack'&&player.state!=='block'){
+        if(player.state!=='attack'&&player.state!=='block'&&player.state!=='turn'){
           player.moveDir=(keys.right?1:0)-(keys.left?1:0);
-          if(player.moveDir!==0){ player.x+=player.moveDir*230*dt; player.walkPhase+=dt*11; }
-        } else player.moveDir=0;
+          const mvD=(keys.down?1:0)-(keys.up?1:0);
+          if(player.moveDir!==0) player.x+=player.moveDir*230*dt;
+          if(mvD!==0) player.depth=clamp(player.depth+mvD*150*dt,-30,52);
+          player.stepping=(player.moveDir!==0||mvD!==0);
+          if(player.stepping) player.walkPhase+=dt*11;
+        } else { player.moveDir=0; player.stepping=false; }
         if(player.state==='attack'){ player.t+=dt; if(player.t>=player.tech.total){player.state='idle';player.tech=null;} }
         if(player.state==='block') player.blockT+=dt;
       }
@@ -987,12 +1040,24 @@ function frame(now){
         aiThink(dt); aiAct(dt);
         if(ai.state==='attack'){ ai.t+=dt; if(ai.t>=ai.tech.total){ai.state='idle';ai.tech=null;} }
         if(ai.state==='block') ai.blockT+=dt;
-        if(ai.moveDir!==0&&ai.state!=='attack'){ ai.x+=ai.moveDir*200*dt; ai.walkPhase+=dt*11; }
+        if(ai.state!=='attack'&&ai.state!=='turn'){
+          if(ai.moveDir!==0) ai.x+=ai.moveDir*200*dt;
+          if(ai.moveDep!==0) ai.depth=clamp(ai.depth+ai.moveDep*130*dt,-30,52);
+          ai.stepping=(ai.moveDir!==0||ai.moveDep!==0);
+          if(ai.stepping) ai.walkPhase+=dt*11;
+        } else ai.stepping=false;
       }
-      // 防止穿过 + 朝向
-      if(ai.x-player.x<70){ const mid=(ai.x+player.x)/2; player.x=mid-35; ai.x=mid+35; }
+      // 身体碰撞:同纵深才挡路,不同纵深可绕过
+      {
+        const sx=ai.x-player.x, sd=Math.abs((ai.depth||0)-(player.depth||0));
+        if(Math.abs(sx)<64&&sd<34){
+          const push=(64-Math.abs(sx))/2*(sx>=0?1:-1);
+          ai.x+=push; player.x-=push;
+        }
+      }
       player.x=clamp(player.x,70,W-70); ai.x=clamp(ai.x,70,W-70);
-      player.facing=player.x<ai.x?1:-1; ai.facing=-player.facing;
+      player.depth=clamp(player.depth,-30,52); ai.depth=clamp(ai.depth,-30,52);
+      updateFacing(player,ai,dt); updateFacing(ai,player,dt);
       if(player.state==='ko')player.koT+=dt;
       if(ai.state==='ko')ai.koT+=dt;
       player.flash=Math.max(0,player.flash-dt); ai.flash=Math.max(0,ai.flash-dt);
@@ -1001,10 +1066,15 @@ function frame(now){
       updateHpBars(false);
     }
     updateFx(dt);
-    for(const f of [ai,player]){
+    // 纵深排序:远的先画;纵深越近人越大
+    const order=[ai,player].sort((a,b)=>(a.depth||0)-(b.depth||0));
+    for(const f of order){
+      const fy=GROUND+(f.depth||0), ds=1+(f.depth||0)*0.0016;
+      ctx.save(); ctx.translate(f.x,fy); ctx.scale(ds,ds); ctx.translate(-f.x,-fy);
       const finfo=drawFighter(ctx,f,fighterPose(f,t),{time:t,flash:f.flash>0});
       if(f.state==='attack'&&f.tech&&f.tech.trail)pushTrail(f,finfo); else fadeTrail(f);
       drawTrail(f);
+      ctx.restore();
     }
     drawFx();
     // 招式名提示(攻击中)
@@ -1012,7 +1082,7 @@ function frame(now){
       if(f.state==='attack'&&f.tech&&!roundOver){
         ctx.save(); ctx.textAlign='center'; ctx.font='700 15px "Noto Sans SC",sans-serif';
         ctx.fillStyle=f.isPlayer?'#a16207':'#1d4ed8'; ctx.shadowColor='rgba(255,255,255,.9)'; ctx.shadowBlur=6;
-        ctx.fillText(techName(f.tech),f.x,GROUND-215); ctx.restore();
+        ctx.fillText(techName(f.tech),f.x,GROUND-215+(f.depth||0)); ctx.restore();
       }
     }
   }
