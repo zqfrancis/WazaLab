@@ -3,6 +3,24 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="wazalab-version" content="0.7">
+<script>
+// 版本自检:打开时对比服务器最新版,发现本地是旧缓存则自动硬刷新,免手动清缓存
+(function(){
+  try{
+    var V=document.querySelector('meta[name="wazalab-version"]').getAttribute('content');
+    if(sessionStorage.getItem('wzcv')===V) return;
+    fetch(location.pathname+'?wzcv='+Date.now(),{cache:'no-store'})
+      .then(function(r){ return r.text(); })
+      .then(function(t){
+        var m=t.match(/<meta name="wazalab-version" content="([^"]+)"/);
+        sessionStorage.setItem('wzcv',V);
+        if(m&&m[1]!==V){ location.replace(location.pathname+'?v='+Date.now()+(location.hash||'')); }
+      })
+      .catch(function(){});
+  }catch(_){}
+})();
+</script>
 <title>WazaLab 空手道动作教学游戏 (Demo)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -489,7 +507,7 @@ zh:{
     +'<span><b>逆突</b> <kbd>I</kbd></span>',
   touch:{block:['防','防御'],mae:'前踢',chudan:'中段踢',jodan:'高段踢',gedan:'下段踢',zuki:'逆突'},
   prev:'← 上一步', next:'下一步 →', tipsTitle:'💡 初学者要点', goSpar:'去对战试试',
-  footer:['WazaLab v0.1 Demo','AxisMotion','FormBuddy 姊妹项目','动作演示为教学示意，请在有资质教练指导下练习'],
+  footer:['WazaLab v0.7 Demo','AxisMotion','FormBuddy 姊妹项目','动作演示为教学示意，请在有资质教练指导下练习'],
   blocked:'防住了!', dodged:'闪避!', winTitle:'勝!',
   winSub:cn=>`漂亮！${cn}终结了对手。再来一局？`,
   loseSub:'被 AI 终结了……去教学模式练练那招，再回来复仇！',
@@ -510,7 +528,7 @@ en:{
     +'<span><b>Reverse punch</b> <kbd>I</kbd></span>',
   touch:{block:['Block','hold'],mae:'Front',chudan:'Mid',jodan:'High',gedan:'Low',zuki:'Punch'},
   prev:'← Prev', next:'Next →', tipsTitle:'💡 Tips for beginners', goSpar:'Try it in sparring',
-  footer:['WazaLab v0.1 Demo','AxisMotion','Sister project of FormBuddy','Demos are for teaching — practice under a qualified instructor'],
+  footer:['WazaLab v0.7 Demo','AxisMotion','Sister project of FormBuddy','Demos are for teaching — practice under a qualified instructor'],
   blocked:'Blocked!', dodged:'Dodged!', winTitle:'You Win!',
   winSub:cn=>`Beautiful! Finished with ${cn}. Rematch?`,
   loseSub:'Finished by the AI… drill that technique in Tutorial mode, then come back for revenge!',
