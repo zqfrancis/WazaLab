@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="wazalab-version" content="0.7">
+<meta name="wazalab-version" content="0.8">
 <script>
 // 版本自检:打开时对比服务器最新版,发现本地是旧缓存则自动硬刷新,免手动清缓存
 (function(){
@@ -79,7 +79,7 @@
   .hpbar .fill{position:absolute;top:0;bottom:0;transition:width .12s;}
   .hpbox.left .fill{background:linear-gradient(90deg,#ff5964,var(--red-d));left:0;}
   .hpbox.left .ghost{right:0;}
-  .hpbox.right .fill{background:linear-gradient(90deg,#3f8cff,#2b5cb8);right:0;}
+  .hpbox.right .fill{background:linear-gradient(90deg,#ffffff,#c3ccd9);right:0;}
   .hpbox.right .ghost{left:0;}
   #roundmsg{
     position:absolute;inset:0;display:none;align-items:center;justify-content:center;flex-direction:column;gap:14px;
@@ -232,7 +232,7 @@
   <div class="brand">
     <div class="logo">技</div>
     <div>
-      <h1>WazaLab <span id="brandSub" style="font-size:15px;font-weight:500;">空手道动作教学游戏</span><span class="demo">Demo v0.7</span></h1>
+      <h1>WazaLab <span id="brandSub" style="font-size:15px;font-weight:500;">空手道动作教学游戏</span><span class="demo">Demo v0.8</span></h1>
       <p id="brandTag">AxisMotion 出品 · 构えから残心まで、技をゲームで学ぶ</p>
     </div>
   </div>
@@ -260,7 +260,7 @@
       </div>
       <div style="flex:0 0 auto;align-self:center;font-weight:900;color:var(--gold);font-size:14px;text-shadow:0 1px 4px #000;">VS</div>
       <div class="hpbox right">
-        <div class="hpname"><span class="tag" id="hpAiTag">AI 相手 · 蓝方</span> <span id="hpAiName">あいて</span></div>
+        <div class="hpname"><span class="tag" id="hpAiTag">AI 相手 · 白方</span> <span id="hpAiName">あいて</span></div>
         <div class="hpbar"><div class="ghost" id="ghostA"></div><div class="fill" id="fillA" style="width:100%"></div></div>
       </div>
     </div>
@@ -496,7 +496,7 @@ zh:{
   brandSub:'空手道动作教学游戏',
   brandTag:'AxisMotion 出品 · 构えから残心まで、技をゲームで学ぶ',
   tabDojo:'📖 教学模式', tabSpar:'⚔️ 对战模式', langBtn:'EN',
-  hpYouName:'あなた', hpYouTag:'YOU · 红方', hpAiName:'あいて', hpAiTag:'AI 相手 · 蓝方',
+  hpYouName:'あなた', hpYouTag:'YOU · 红方', hpAiName:'あいて', hpAiTag:'AI 相手 · 白方',
   rematch:'再来一局',
   hintHTML:'<span><b>移动</b> <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> / <kbd>←</kbd><kbd>→</kbd><kbd>↑</kbd><kbd>↓</kbd></span>'
     +'<span><b>防御</b> <kbd>Space</kbd>（按住）</span>'
@@ -507,7 +507,7 @@ zh:{
     +'<span><b>逆突</b> <kbd>I</kbd></span>',
   touch:{block:['防','防御'],mae:'前踢',chudan:'中段踢',jodan:'高段踢',gedan:'下段踢',zuki:'逆突'},
   prev:'← 上一步', next:'下一步 →', tipsTitle:'💡 初学者要点', goSpar:'去对战试试',
-  footer:['WazaLab v0.7 Demo','AxisMotion','FormBuddy 姊妹项目','动作演示为教学示意，请在有资质教练指导下练习'],
+  footer:['WazaLab v0.8 Demo','AxisMotion','FormBuddy 姊妹项目','动作演示为教学示意，请在有资质教练指导下练习'],
   blocked:'防住了!', dodged:'闪避!', winTitle:'勝!',
   winSub:cn=>`漂亮！${cn}终结了对手。再来一局？`,
   loseSub:'被 AI 终结了……去教学模式练练那招，再回来复仇！',
@@ -517,7 +517,7 @@ en:{
   brandSub:'Karate Technique Game',
   brandTag:'By AxisMotion · 構えから残心まで、技をゲームで学ぶ',
   tabDojo:'📖 Tutorial', tabSpar:'⚔️ Sparring', langBtn:'中文',
-  hpYouName:'You', hpYouTag:'YOU · RED', hpAiName:'AI', hpAiTag:'AI · BLUE',
+  hpYouName:'You', hpYouTag:'YOU · RED', hpAiName:'AI', hpAiTag:'AI · WHITE',
   rematch:'Rematch',
   hintHTML:'<span><b>Move</b> <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> / <kbd>←</kbd><kbd>→</kbd><kbd>↑</kbd><kbd>↓</kbd></span>'
     +'<span><b>Block</b> <kbd>Space</kbd> (hold)</span>'
@@ -528,7 +528,7 @@ en:{
     +'<span><b>Reverse punch</b> <kbd>I</kbd></span>',
   touch:{block:['Block','hold'],mae:'Front',chudan:'Mid',jodan:'High',gedan:'Low',zuki:'Punch'},
   prev:'← Prev', next:'Next →', tipsTitle:'💡 Tips for beginners', goSpar:'Try it in sparring',
-  footer:['WazaLab v0.7 Demo','AxisMotion','Sister project of FormBuddy','Demos are for teaching — practice under a qualified instructor'],
+  footer:['WazaLab v0.8 Demo','AxisMotion','Sister project of FormBuddy','Demos are for teaching — practice under a qualified instructor'],
   blocked:'Blocked!', dodged:'Dodged!', winTitle:'You Win!',
   winSub:cn=>`Beautiful! Finished with ${cn}. Rematch?`,
   loseSub:'Finished by the AI… drill that technique in Tutorial mode, then come back for revenge!',
@@ -646,7 +646,7 @@ function drawFighter(c,f,pose,opt){
   const depY=f.depth||0; // 纵深位移(正=靠近观众/下屏)
   const main=opt.flash?'#ffffff':(f.isPlayer?'#181c26':'#101320');
   const dark=opt.flash?'#ffffff':'#080a10';
-  const accent=f.isPlayer?'#e63946':'#2f6fd0';
+  const accent=f.isPlayer?'#e63946':'#eef1f6';
 
   // 髋部(根)
   const px=fx+pose.hipX*dir, py=GROUND-pose.hipY+depY;
@@ -795,14 +795,14 @@ function fighterPose(f,t){
     const k=EASE.out(clamp(f.koT/0.55,0,1));
     return lerpPose(KAMAE,{hipY:26,hipX:10*f.facing,torso:78,head:12,fSh:60,fEl:30,bSh:55,bEl:35,fHip:70,fKnee:42,fAnk:80,fSwing:0,bHip:58,bKnee:52,bAnk:80,bSwing:0},k);
   }
-  if(f.state==='turn'){ // 转身: 0.3s 收紧转体
-    const k=EASE.out(clamp(1-f.turnT/0.30,0,1));
-    return lerpPose(KAMAE,{hipY:88,hipX:0,torso:22,head:10,fSh:80,fEl:70,bSh:70,bEl:70,fHip:32,fKnee:34,fAnk:80,fSwing:0,bHip:-12,bKnee:34,bAnk:80,bSwing:0},k);
-  }
   if(f.state==='attack'&&f.tech) return sampleFrames(f.tech.frames,f.t);
   if(f.state==='block'){
     const k=EASE.out(clamp(f.blockT/0.12,0,1));
     return lerpPose(KAMAE,BLOCK_POSE,k);
+  }
+  if(f.turnT>0){ // 转身动画:纯视觉,不锁移动/攻击/防御
+    const k=EASE.out(clamp(1-f.turnT/0.18,0,1));
+    return lerpPose(KAMAE,{hipY:88,hipX:0,torso:22,head:10,fSh:80,fEl:70,bSh:70,bEl:70,fHip:32,fKnee:34,fAnk:80,fSwing:0,bHip:-12,bKnee:34,bAnk:80,fSwing:0},k);
   }
   if(f.stepping){ // 步伐(含纵移)
     const p=f.walkPhase;
@@ -819,26 +819,23 @@ function fighterPose(f,t){
 
 function startAttack(f,id){
   const tech=TECH_BY_ID[id];
-  if(!tech||f.state==='attack'||f.state==='turn'||f.state==='ko'||roundOver) return false;
+  if(!tech||f.state==='attack'||f.state==='ko'||roundOver) return false;
   f.state='attack'; f.tech=tech; f.t=0; f.hitDone=false; f.dodgeShown=false; f.moveDir=0; f.stepping=false;
   return true;
 }
 function setBlock(f,on){
-  if(f.state==='ko'||f.state==='turn'||roundOver) return;
+  if(f.state==='ko'||roundOver) return;
   if(on&&f.state!=='attack'){ if(f.state!=='block'){f.state='block';f.blockT=0;} f.moveDir=0; f.stepping=false; }
   else if(!on&&f.state==='block'){ f.state='idle'; }
 }
 
-/* 转身:对手绕到身后 → 0.3s 转身硬直(不能动/攻/防) */
+/* 转身:对手绕到身后 → 立即转身+0.18s转体动画(不锁操作,无卡顿) */
 function updateFacing(f,foe,dt){
-  if(f.state==='turn'){
-    f.turnT-=dt;
-    if(f.turnT<=0){ f.facing*=-1; f.state='idle'; }
-    return;
-  }
+  if(f.turnT>0) f.turnT=Math.max(0,f.turnT-dt);
   if(f.state==='attack'||f.state==='ko'||roundOver) return;
   if((foe.x-f.x)*f.facing < -30){
-    f.state='turn'; f.turnT=0.30; f.moveDir=0; f.stepping=false;
+    f.facing*=-1;
+    f.turnT=0.18;
   }
 }
 
@@ -873,7 +870,7 @@ function aiThink(dt){
   ai.thinkT-=dt;
   if(ai.thinkT>0) return;
   ai.thinkT=0.22+Math.random()*0.15;
-  if(ai.state==='attack'||ai.state==='ko'||ai.state==='turn'||roundOver) return;
+  if(ai.state==='attack'||ai.state==='ko'||roundOver) return;
   const dist=Math.abs(player.x-ai.x);
   const pDep=player.depth||0, aDep=ai.depth||0;
 
@@ -918,7 +915,7 @@ function aiAct(dt){
   ai.moveDir=0; ai.moveDep=0;
   if(ai.aiMode==='block'){ setBlock(ai,true); return; }
   if(ai.state==='block') setBlock(ai,false);
-  if(ai.state==='turn'||ai.state==='attack') return;
+  if(ai.state==='attack') return;
   if(ai.aiMode==='approach'){ ai.moveDir=Math.sign(player.x-ai.x)||1; ai.moveDep=Math.sign((ai.aiTargetDepth||0)-(ai.depth||0)); }
   else if(ai.aiMode==='retreat'){ ai.moveDir=-Math.sign(player.x-ai.x)||1; }
   else if(ai.aiMode==='strafe'||ai.aiMode==='dodge'){
@@ -1110,7 +1107,7 @@ function frame(now){
       // 玩家
       if(!roundOver&&player.state!=='ko'){
         if(keys.block) setBlock(player,true); else setBlock(player,false);
-        if(player.state!=='attack'&&player.state!=='block'&&player.state!=='turn'){
+        if(player.state!=='attack'&&player.state!=='block'){
           player.moveDir=(keys.right?1:0)-(keys.left?1:0);
           const mvD=(keys.down?1:0)-(keys.up?1:0);
           if(player.moveDir!==0) player.x+=player.moveDir*230*dt;
@@ -1126,7 +1123,7 @@ function frame(now){
         aiThink(dt); aiAct(dt);
         if(ai.state==='attack'){ ai.t+=dt; if(ai.t>=ai.tech.total){ai.state='idle';ai.tech=null;} }
         if(ai.state==='block') ai.blockT+=dt;
-        if(ai.state!=='attack'&&ai.state!=='turn'){
+        if(ai.state!=='attack'){
           if(ai.moveDir!==0) ai.x+=ai.moveDir*200*dt;
           if(ai.moveDep!==0) ai.depth=clamp(ai.depth+ai.moveDep*130*dt,-30,52);
           ai.stepping=(ai.moveDir!==0||ai.moveDep!==0);
@@ -1167,7 +1164,7 @@ function frame(now){
     for(const f of [player,ai]){
       if(f.state==='attack'&&f.tech&&!roundOver){
         ctx.save(); ctx.textAlign='center'; ctx.font='700 15px "Noto Sans SC",sans-serif';
-        ctx.fillStyle=f.isPlayer?'#a16207':'#1d4ed8'; ctx.shadowColor='rgba(255,255,255,.9)'; ctx.shadowBlur=6;
+        ctx.fillStyle=f.isPlayer?'#a16207':'#4b5563'; ctx.shadowColor='rgba(255,255,255,.9)'; ctx.shadowBlur=6;
         ctx.fillText(techName(f.tech),f.x,GROUND-215+(f.depth||0)); ctx.restore();
       }
     }
