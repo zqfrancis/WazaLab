@@ -3,18 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="wazalab-version" content="0.10">
+<meta name="wazalab-version" content="0.11">
 <script>
-// 版本自检:打开时对比服务器最新版,发现本地是旧缓存则自动硬刷新,免手动清缓存
+// 版本自检:每次打开都对比服务器最新版,发现本地是旧缓存则自动硬刷新一次
 (function(){
   try{
     var V=document.querySelector('meta[name="wazalab-version"]').getAttribute('content');
-    if(sessionStorage.getItem('wzcv')===V) return;
     fetch(location.pathname+'?wzcv='+Date.now(),{cache:'no-store'})
       .then(function(r){ return r.text(); })
       .then(function(t){
         var m=t.match(/<meta name="wazalab-version" content="([^"]+)"/);
-        sessionStorage.setItem('wzcv',V);
         if(m&&m[1]!==V){ location.replace(location.pathname+'?v='+Date.now()+(location.hash||'')); }
       })
       .catch(function(){});
@@ -260,7 +258,7 @@
   <div class="brand">
     <div class="logo">技</div>
     <div>
-      <h1>WazaLab <span id="brandSub" style="font-size:15px;font-weight:500;">空手道动作教学游戏</span><span class="demo">Demo v0.10</span></h1>
+      <h1>WazaLab <span id="brandSub" style="font-size:15px;font-weight:500;">空手道动作教学游戏</span><span class="demo">Demo v0.11</span></h1>
       <p id="brandTag">AxisMotion 出品 · 构えから残心まで、技をゲームで学ぶ</p>
     </div>
   </div>
@@ -286,7 +284,7 @@
         <div class="hpname"><span id="hpYouName">あなた</span> <span class="tag" id="hpYouTag">YOU · 红方</span></div>
         <div class="hpbar"><div class="ghost" id="ghostP"></div><div class="fill" id="fillP" style="width:100%"></div></div>
       </div>
-      <div style="flex:0 0 auto;align-self:center;font-weight:900;color:var(--gold);font-size:14px;text-shadow:0 1px 4px #000;">VS</div>
+      <div style="flex:0 0 auto;align-self:center;text-align:center;"><div style="font-weight:900;color:var(--gold);font-size:14px;text-shadow:0 1px 4px #000;">VS</div><div id="vtag" style="font-size:9px;color:#8a8fa3;font-weight:400;line-height:1.2;"></div></div>
       <div class="hpbox right">
         <div class="hpname"><span class="tag" id="hpAiTag">AI 相手 · 白方</span> <span id="hpAiName">あいて</span></div>
         <div class="hpbar"><div class="ghost" id="ghostA"></div><div class="fill" id="fillA" style="width:100%"></div></div>
@@ -536,7 +534,7 @@ zh:{
     +'<span><b>逆突</b> <kbd>I</kbd></span>',
   touch:{block:['防','防御'],mae:'前踢',chudan:'中段踢',jodan:'高段踢',gedan:'下段踢',zuki:'逆突'},
   prev:'← 上一步', next:'下一步 →', tipsTitle:'💡 初学者要点', goSpar:'去对战试试',
-  footer:['WazaLab v0.10 Demo','AxisMotion','FormBuddy 姊妹项目','动作演示为教学示意，请在有资质教练指导下练习'],
+  footer:['WazaLab v0.11 Demo','AxisMotion','FormBuddy 姊妹项目','动作演示为教学示意，请在有资质教练指导下练习'],
   blocked:'防住了!', dodged:'闪避!', winTitle:'勝!',
   winSub:cn=>`漂亮！${cn}终结了对手。再来一局？`,
   loseSub:'被 AI 终结了……去教学模式练练那招，再回来复仇！',
@@ -557,7 +555,7 @@ en:{
     +'<span><b>Reverse punch</b> <kbd>I</kbd></span>',
   touch:{block:['Block','hold'],mae:'Front',chudan:'Mid',jodan:'High',gedan:'Low',zuki:'Punch'},
   prev:'← Prev', next:'Next →', tipsTitle:'💡 Tips for beginners', goSpar:'Try it in sparring',
-  footer:['WazaLab v0.10 Demo','AxisMotion','Sister project of FormBuddy','Demos are for teaching — practice under a qualified instructor'],
+  footer:['WazaLab v0.11 Demo','AxisMotion','Sister project of FormBuddy','Demos are for teaching — practice under a qualified instructor'],
   blocked:'Blocked!', dodged:'Dodged!', winTitle:'You Win!',
   winSub:cn=>`Beautiful! Finished with ${cn}. Rematch?`,
   loseSub:'Finished by the AI… drill that technique in Tutorial mode, then come back for revenge!',
@@ -1222,6 +1220,7 @@ function frame(now){
 document.getElementById('langBtn').onclick=()=>{ LANG=LANG==='zh'?'en':'zh'; applyLang(); };
 applyLang();
 fitStage();
+document.getElementById('vtag').textContent='v'+document.querySelector('meta[name="wazalab-version"]').getAttribute('content');
 updateHpBars(true);
 requestAnimationFrame(frame);
 </script>
