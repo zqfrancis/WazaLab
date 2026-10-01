@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="wazalab-version" content="0.11">
+<meta name="wazalab-version" content="0.12">
 <script>
 // 版本自检:每次打开都对比服务器最新版,发现本地是旧缓存则自动硬刷新一次
 (function(){
@@ -163,6 +163,12 @@
   .stepbox .stitle{font-size:15px;font-weight:700;margin:3px 0 6px;}
   .stepbox .stitle .jp{font-size:12px;color:var(--muted);font-weight:500;margin-left:6px;}
   .stepbox .sdesc{font-size:13px;line-height:1.75;color:#d6dbe8;}
+  .simg{width:100%;border-radius:8px;margin:8px 0 4px;display:block;border:1px solid var(--line);}
+  .vocab{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 8px;}
+  .vocab span{font-size:11px;background:#2a2f42;border:1px solid var(--line);color:#cfd6ea;border-radius:20px;padding:3px 10px;cursor:default;}
+  .applybox{background:#232838;border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-top:10px;}
+  .applybox h4{font-size:13px;margin:0 0 6px;color:var(--gold);}
+  .applybox p{font-size:13px;line-height:1.7;color:#d6dbe8;margin:0;}
   .stepnav{display:flex;gap:8px;align-items:center;justify-content:space-between;}
   .stepnav button{
     cursor:pointer;border:1px solid var(--line);background:var(--panel2);color:var(--white);
@@ -258,7 +264,7 @@
   <div class="brand">
     <div class="logo">技</div>
     <div>
-      <h1>WazaLab <span id="brandSub" style="font-size:15px;font-weight:500;">空手道动作教学游戏</span><span class="demo">Demo v0.11</span></h1>
+      <h1>WazaLab <span id="brandSub" style="font-size:15px;font-weight:500;">空手道动作教学游戏</span><span class="demo">Demo v0.12</span></h1>
       <p id="brandTag">AxisMotion 出品 · 构えから残心まで、技をゲームで学ぶ</p>
     </div>
   </div>
@@ -321,8 +327,10 @@
     <h3>動作解説 · BREAKDOWN</h3>
     <div id="detail">
       <div class="dhead"><div class="cn" id="dCn"></div><div class="jp" id="dJp"></div></div>
+      <div class="vocab" id="dVocab"></div>
       <div class="stepbox">
         <div class="snum" id="sNum"></div>
+        <img class="simg" id="sImg" alt="">
         <div class="stitle"><span id="sTitle"></span><span class="jp" id="sJp"></span></div>
         <div class="sdesc" id="sDesc"></div>
       </div>
@@ -331,6 +339,7 @@
         <div id="stepdots"></div>
         <button id="btnNext">下一步 →</button>
       </div>
+      <div class="applybox" id="applyBox"><h4 id="applyTitle">🥋 实战应用</h4><p id="dApply"></p></div>
       <div class="tips"><h4 id="tipsTitle">💡 初学者要点</h4><ul id="dTips"></ul></div>
       <div class="stats" id="dStats"></div>
       <button id="goSpar">⚔️ <span id="goSparTxt">去对战试试</span> →</button>
@@ -397,13 +406,19 @@ const TECHNIQUES=[
 {
   id:'jodan', cn:'上段回旋踢', jp:'上段回し蹴り', roma:'Mawashi Geri Jodan',
   stats:{速度:2,距离:4,威力:5},
-  steps:[
-    {jp:'構え',cn:'构え',desc:'前后站立（以左脚在前为例），重心居中略低，双拳护住面部与下颌，目视对手。这是所有技术出发与回归的姿势。'},
-    {jp:'提膝',cn:'提膝蓄力',desc:'重心移到前腿，后腿提膝——膝盖提到与肩同高、大小腿折叠；支撑脚以前脚掌为轴向外转动约180°，脚跟转向对手，髋部开始翻转。转脚不充分，髋就转不开。'},
-    {jp:'蹴り',cn:'蹴り·弹射',desc:'以髋部翻转带动，小腿如鞭子般弹出，用脚背（或胫骨）击打对手头部高度。命中瞬间全身收紧发力——这就是「极め」(kime)。'},
-    {jp:'残心',cn:'残心·收势',desc:'踢击后小腿原路收回至提膝，再落回构え。全程保持目视对手、戒备不懈，不可低头泄气——残心即是战斗意识的延续。'},
+  vocab:[
+    {t:'Jodan / head level',c:'上段 · 头部高度'},
+    {t:'Geri / kick',c:'蹴り · 踢'},
+    {t:'Mawashi / circular motion',c:'回し · 回旋'},
+    {t:'Haisoku / instep',c:'足背 · 脚背'},
   ],
-  tips:['支撑脚一定要转开，否则髋部卡住，踢击无力还容易伤膝盖。','发力靠髋部翻转，不是抡小腿——想象用髋把腿「甩」出去。','上段踢距离远、速度慢，别在极限距离勉强起腿，容易被接腿反击。'],
+  steps:[
+    {jp:'提膝',cn:'提膝',img:'assets/jodan-1.jpg',desc:'屈膝，把踢击脚提到尽可能高——膝盖提到肩膀附近、大小腿充分折叠，双拳护住面部。出腿前膝盖折叠得越充分，弹射越快。'},
+    {jp:'転身',cn:'转髋',img:'assets/jodan-2.jpg',desc:'膝盖横扫过身体中线，同时翻转髋部、支撑脚以前脚掌为轴向外拧转（脚跟转向对手）。转脚不充分，髋就转不开，踢击无力还容易伤膝盖。'},
+    {jp:'蹴り',cn:'蹴り · 弹踢',img:'assets/jodan-3.jpg',desc:'从侧方由下而上踢向对手头部，用足背（Haisoku）击打；踢击侧的手臂向后摆，带动加速。命中瞬间全身收紧——这就是「极め」(kime)。'},
+  ],
+  apply:{zh:'踢向对手的 Komekami（太阳穴）或 Ago（下颌）。'},
+  tips:['发力靠髋部翻转，不是抡小腿——想象用髋把腿「甩」出去。','上段踢距离远、速度慢，别在极限距离勉强起腿，容易被接腿反击。','收腿要快——踢完腿停在空中，就是给对手送反击机会。'],
   frames:[
     {dur:0.45,ease:'io',pose:KAMAE},
     {dur:0.30,ease:'io',pose:P({hipY:112,hipX:-6,torso:-14,head:-6,fSh:100,fEl:80,bSh:45,bEl:45,fHip:12,fKnee:8,fAnk:80,bHip:122,bKnee:118,bAnk:120,bSwing:1})},
@@ -417,12 +432,18 @@ const TECHNIQUES=[
 {
   id:'chudan', cn:'中段回旋踢', jp:'中段回し蹴り', roma:'Mawashi Geri Chudan',
   stats:{速度:3,距离:4,威力:4},
-  steps:[
-    {jp:'構え',cn:'构え',desc:'标准组手构え，重心稳定，双拳护头。'},
-    {jp:'提膝',cn:'提膝蓄力',desc:'后腿提膝至躯干高度即可，不必像上段那样提到肩膀；支撑脚同样转开，髋部翻转先行。'},
-    {jp:'蹴り',cn:'蹴り·弹射',desc:'小腿弹出，用脚背/胫骨击打对手肋部或腹部（水月一带）。落点要「穿透」目标，而非点到为止。'},
-    {jp:'残心',cn:'残心·收势',desc:'原路收回提膝，落回构え，保持戒备。'},
+  vocab:[
+    {t:'Chudan / middle level',c:'中段 · 躯干高度'},
+    {t:'Haisoku / instep',c:'足背 · 脚背'},
+    {t:'Mawashi / circular motion',c:'回し · 回旋'},
+    {t:'Geri / kick',c:'蹴り · 踢'},
   ],
+  steps:[
+    {jp:'提膝',cn:'提膝',img:'assets/chudan-1.jpg',desc:'屈膝，把踢击脚提到腰带高度即可——不必像上段那样提到肩膀；双拳护头。'},
+    {jp:'転身',cn:'转髋',img:'assets/chudan-2.jpg',desc:'膝盖横扫过身体中线，翻转髋部、支撑脚拧转。髋部翻转先行，小腿才跟得上。'},
+    {jp:'蹴り',cn:'蹴り · 弹踢',img:'assets/chudan-3.jpg',desc:'从侧方水平踢向对手躯干侧面，用足背击打；踢击侧手臂向后摆加速，收腿时再把手臂拉回来——这条适用于所有回旋踢。落点要「穿透」目标，而非点到为止。'},
+  ],
+  apply:{zh:'踢向对手身体侧面（肋部）。'},
   tips:['中段是回旋踢最实用的高度，攻守兼备、风险最低。','击打目标是肋部或腹部，发力要透进去。','收腿要快——踢完腿停在空中，就是给对手送反击机会。'],
   frames:[
     {dur:0.40,ease:'io',pose:KAMAE},
@@ -437,12 +458,19 @@ const TECHNIQUES=[
 {
   id:'gedan', cn:'下段扫踢', jp:'下段回し蹴り', roma:'Mawashi Geri Gedan',
   stats:{速度:5,距离:3,威力:2},
-  steps:[
-    {jp:'構え',cn:'构え',desc:'标准组手构え。'},
-    {jp:'提膝',cn:'小幅提膝',desc:'后腿小幅度提膝即可，膝盖微提、折叠；支撑脚转开。幅度小，所以启动极快、难以预判。'},
-    {jp:'蹴り',cn:'蹴り·扫击',desc:'小腿如镰刀般横扫，用胫骨扫击对手大腿外侧肌肉，破坏其重心与移动。'},
-    {jp:'残心',cn:'残心·收势',desc:'迅速收回落回构え。下段踢后摇小，可立刻衔接下一击。'},
+  vocab:[
+    {t:'Gedan / leg level',c:'下段 · 腿部高度'},
+    {t:'Geri / kick',c:'蹴り · 踢'},
+    {t:'Haisoku / instep',c:'足背 · 脚背'},
+    {t:'Mawashi / circular motion',c:'回し · 回旋'},
+    {t:'Sune / shin',c:'脛 · 胫骨'},
   ],
+  steps:[
+    {jp:'提膝',cn:'小幅提膝',img:'assets/gedan-1.jpg',desc:'后腿小幅度提膝即可，踢击脚提到腰带下方一点、微微折叠，双拳护头。幅度小，所以启动极快、难以预判。'},
+    {jp:'転身',cn:'转髋沉身',img:'assets/gedan-2.jpg',desc:'开始翻转髋部、拧转支撑脚，同时支撑腿多弯一点、把重心向下送向目标——重心下沉，踢击才有分量。'},
+    {jp:'蹴り',cn:'蹴り · 扫击',img:'assets/gedan-3.jpg',desc:'向下扫出，用足背或胫骨（Sune）击打，踢击侧手臂向后摆。像镰刀一样把腿「砍」下去，扫击对手大腿外侧、破坏其重心。'},
+  ],
+  apply:{zh:'踢向对手大腿，或扫腿破坏其平衡、将其摔倒。'},
   tips:['下段踢不靠大幅度，靠速度和突然性。','用胫骨扫大腿外侧，连续扫同一位置最能瓦解对手。','这是组手中最常用的消耗技术，多练左右连扫。'],
   frames:[
     {dur:0.35,ease:'io',pose:KAMAE},
@@ -533,8 +561,8 @@ zh:{
     +'<span><b>高段回旋踢</b> <kbd>L</kbd></span><span><b>下段扫踢</b> <kbd>U</kbd></span>'
     +'<span><b>逆突</b> <kbd>I</kbd></span>',
   touch:{block:['防','防御'],mae:'前踢',chudan:'中段踢',jodan:'高段踢',gedan:'下段踢',zuki:'逆突'},
-  prev:'← 上一步', next:'下一步 →', tipsTitle:'💡 初学者要点', goSpar:'去对战试试',
-  footer:['WazaLab v0.11 Demo','AxisMotion','FormBuddy 姊妹项目','动作演示为教学示意，请在有资质教练指导下练习'],
+  prev:'← 上一步', next:'下一步 →', tipsTitle:'💡 初学者要点', applyTitle:'🥋 实战应用', goSpar:'去对战试试',
+  footer:['WazaLab v0.12 Demo','AxisMotion','FormBuddy 姊妹项目','动作演示为教学示意，请在有资质教练指导下练习'],
   blocked:'防住了!', dodged:'闪避!', winTitle:'勝!',
   winSub:cn=>`漂亮！${cn}终结了对手。再来一局？`,
   loseSub:'被 AI 终结了……去教学模式练练那招，再回来复仇！',
@@ -554,8 +582,8 @@ en:{
     +'<span><b>High roundhouse</b> <kbd>L</kbd></span><span><b>Low kick</b> <kbd>U</kbd></span>'
     +'<span><b>Reverse punch</b> <kbd>I</kbd></span>',
   touch:{block:['Block','hold'],mae:'Front',chudan:'Mid',jodan:'High',gedan:'Low',zuki:'Punch'},
-  prev:'← Prev', next:'Next →', tipsTitle:'💡 Tips for beginners', goSpar:'Try it in sparring',
-  footer:['WazaLab v0.11 Demo','AxisMotion','Sister project of FormBuddy','Demos are for teaching — practice under a qualified instructor'],
+  prev:'← Prev', next:'Next →', tipsTitle:'💡 Tips for beginners', applyTitle:'🥋 How to Apply It', goSpar:'Try it in sparring',
+  footer:['WazaLab v0.12 Demo','AxisMotion','Sister project of FormBuddy','Demos are for teaching — practice under a qualified instructor'],
   blocked:'Blocked!', dodged:'Dodged!', winTitle:'You Win!',
   winSub:cn=>`Beautiful! Finished with ${cn}. Rematch?`,
   loseSub:'Finished by the AI… drill that technique in Tutorial mode, then come back for revenge!',
@@ -563,22 +591,22 @@ en:{
 };
 const TECH_EN={
 jodan:{en:'High Roundhouse Kick',steps:[
-  {en:'Kamae (Ready Stance)',edesc:'Stand in a fighting stance (left foot forward), weight centered and slightly low, fists guarding the face and chin, eyes on the opponent. Every technique starts and returns here.'},
-  {en:'Chamber the Knee',edesc:'Shift your weight onto the front leg and raise the rear knee — fold it up to shoulder height; pivot the supporting foot outward about 180° on the ball of the foot, heel turning toward the opponent, hips beginning to rotate. Without a full pivot, the hips cannot turn over.'},
-  {en:'Snap the Kick',edesc:'Drive the hip over and whip the shin out like a lash, striking head height with the instep (or shin). Tighten the whole body at impact — that is kime (focus).'},
-  {en:'Zanshin (Follow-through)',edesc:'Rechamber along the same path back to the knee-up position, then return to kamae. Keep your eyes on the opponent and stay alert — never drop your gaze. Zanshin is the continuation of fighting spirit.'}],
-  tips:['Pivot the supporting foot fully, or the hip locks up — the kick loses power and strains the knee.','Power comes from hip rotation, not swinging the shin — think of hurling the leg with your hip.','High kicks are slow with long range; never force one at maximum distance or you will eat a leg-catch counter.']},
+  {en:'Chamber the Knee',edesc:'Bend the knee and raise the kicking foot as high as possible — knee up near the shoulder, shin fully folded; fists guard the face. The deeper the chamber, the faster the snap.'},
+  {en:'Turn the Hips',edesc:'Sweep the knee across your body center while turning the hips over and pivoting on the ball of the supporting foot (heel turning toward the opponent). Without a full pivot, the hips lock and the kick dies.'},
+  {en:'Snap the Kick',edesc:'Kick upward from the side toward the opponent\u2019s head with the instep (Haisoku), swinging the kicking-side arm back to accelerate. Tighten the whole body at impact — that is kime (focus).'}],
+  apply:'Kick to the opponent\u2019s Komekami (temple) or Ago (chin).',
+  tips:['Power comes from hip rotation, not swinging the shin — think of hurling the leg with your hip.','High kicks are slow with long range; never force one at maximum distance or you will eat a leg-catch counter.','Rechamber fast — a leg left hanging in the air is an invitation to counter.']},
 chudan:{en:'Middle Roundhouse Kick',steps:[
-  {en:'Kamae',edesc:'Standard sparring stance, stable weight, fists guarding the head.'},
-  {en:'Chamber the Knee',edesc:'Raise the rear knee only to torso height — no need for the shoulder-high chamber of the high kick; pivot the supporting foot and let the hips lead the rotation.'},
-  {en:'Snap the Kick',edesc:'Snap the shin out to strike the ribs or abdomen (the solar plexus area). Drive through the target, do not just tap it.'},
-  {en:'Zanshin',edesc:'Rechamber along the same path and return to kamae, staying alert.'}],
+  {en:'Chamber the Knee',edesc:'Bend the knee and raise the kicking foot to belt level — no need for the shoulder-high chamber of the high kick; fists guard the head.'},
+  {en:'Turn the Hips',edesc:'Bring the knee across the center as you turn the hips over and pivot on the supporting foot. The hips lead; the shin follows.'},
+  {en:'Snap the Kick',edesc:'Kick horizontally from the side into the opponent\u2019s torso with the instep, swinging the kicking-side arm back to accelerate — and pull the arm back up as you rechamber. This applies to every Mawashi Geri. Drive through the target, don\u2019t just tap it.'}],
+  apply:'Kick to the side of the opponent\u2019s body (the ribs).',
   tips:['The middle roundhouse is the most practical height — balanced offense and defense, lowest risk.','Target the ribs or abdomen, and drive the power through.','Rechamber fast — a leg left hanging in the air is an invitation to counter.']},
 gedan:{en:'Low Roundhouse Kick',steps:[
-  {en:'Kamae',edesc:'Standard sparring stance.'},
-  {en:'Short Chamber',edesc:'Raise the rear knee just a little, slightly folded; pivot the supporting foot. The small motion makes it explosive and hard to read.'},
-  {en:'Sweep',edesc:'Swing the shin like a sickle, chopping the outside of the opponent\u2019s thigh with the shin to wreck their balance and movement.'},
-  {en:'Zanshin',edesc:'Snap back to kamae quickly. The low kick has little recovery lag — chain the next strike right away.'}],
+  {en:'Short Chamber',edesc:'Raise the rear knee just a little, the kicking foot hanging just below belt level, slightly folded; fists guard the head. The small motion makes it explosive and hard to read.'},
+  {en:'Turn and Sink',edesc:'Start turning the hips and pivoting the supporting foot while bending the supporting leg more to carry your weight down toward the target — sinking weight gives the kick its heaviness.'},
+  {en:'Sweep Down',edesc:'Kick downward with the instep (Haisoku) or shin (Sune), swinging the kicking-side arm back. Chop the leg down like a sickle into the outer thigh to wreck their balance.'}],
+  apply:'Kick to the opponent\u2019s thigh, or sweep the leg to take them down.',
   tips:['The low kick wins on speed and surprise, not amplitude.','Chop the outer thigh with the shin; hammering the same spot breaks opponents down.','The most-used attrition technique in sparring — drill left-right combinations.']},
 mae:{en:'Front Kick',steps:[
   {en:'Kamae',edesc:'Standard sparring stance.'},
@@ -630,6 +658,7 @@ function applyLang(){
   document.getElementById('btnPrev').textContent=S.prev;
   document.getElementById('btnNext').textContent=S.next;
   document.getElementById('tipsTitle').textContent=S.tipsTitle;
+  document.getElementById('applyTitle').textContent=S.applyTitle;
   document.getElementById('goSparTxt').textContent=S.goSpar;
   document.getElementById('footer').innerHTML=S.footer.map((x,i)=>i?`<span class="sep">|</span>${x}`:x).join('');
   renderTechList();
@@ -671,8 +700,14 @@ function drawFighter(c,f,pose,opt){
   const t=opt.time||0;
   const fx=f.x, dir=f.facing; // 面向: +1 右, -1 左
   const depY=f.depth||0; // 纵深位移(正=靠近观众/下屏)
-  const main=opt.flash?'#ffffff':(f.isPlayer?'#181c26':'#101320');
-  const dark=opt.flash?'#ffffff':'#080a10';
+  const flash=!!opt.flash;
+  // 道服配色:前侧亮白 / 后侧灰白(表远近) / 肤色 / 发色 / 腰带按红白方
+  const giF=flash?'#ffffff':'#f7f8fa';
+  const giB=flash?'#ffffff':'#c2c8d3';
+  const skin=flash?'#ffffff':'#f0bd93';
+  const hair=flash?'#ffffff':'#33291f';
+  const beltC=flash?'#ffffff':(f.isPlayer?'#e63946':'#d7dce5');
+  const beltEdge=flash?'#ffffff':'#23262e';
   const accent=f.isPlayer?'#e63946':'#eef1f6';
 
   // 髋部(根)
@@ -690,10 +725,16 @@ function drawFighter(c,f,pose,opt){
 
   const limb=(x1,y1,x2,y2,w,col)=>{c.strokeStyle=col;c.lineWidth=w;c.lineCap='round';c.beginPath();c.moveTo(x1,y1);c.lineTo(x2,y2);c.stroke();};
   const dot=(x,y,r,col)=>{c.fillStyle=col;c.beginPath();c.arc(x,y,r,0,Math.PI*2);c.fill();};
+  const poly=(pts,col)=>{c.fillStyle=col;c.beginPath();c.moveTo(pts[0][0],pts[0][1]);for(let i=1;i<pts.length;i++)c.lineTo(pts[i][0],pts[i][1]);c.closePath();c.fill();};
+  // 锥形肢段:从(x1,y1,宽w1)到(x2,y2,宽w2),画道服裤/袖用
+  function taper(x1,y1,x2,y2,w1,w2,col){
+    const dx=x2-x1,dy=y2-y1,l=Math.hypot(dx,dy)||1,nx=-dy/l,ny=dx/l;
+    poly([[x1+nx*w1/2,y1+ny*w1/2],[x2+nx*w2/2,y2+ny*w2/2],[x2-nx*w2/2,y2-ny*w2/2],[x1-nx*w1/2,y1-ny*w1/2]],col);
+  }
 
   // 腿: 大腿角 h(0=下垂,90=前平); 膝 k(0=直); 足 = shin 旋转 -ank
   // sw: 出平面挥动量(0~1),腿抡向观众时加粗上移,制造近大远小的3D感
-  function leg(hipA,kneeA,ankA,col,w,sw){
+  function leg(hipA,kneeA,ankA,gi,w,sw){
     sw=sw||0;
     // 本地坐标系(面向右)计算,再整体乘 dir 镜像
     const lhx=Math.sin(hipA*D2R)*BODY.thigh, lhy=Math.cos(hipA*D2R)*BODY.thigh;
@@ -704,33 +745,55 @@ function drawFighter(c,f,pose,opt){
     const ankX=px+(lhx+akx)*dir, ankY=py+lhy+aky-sw*13;
     let [txx,tyy]=rot(lsx,lsy,-ankA*D2R);
     const toeX=px+(lhx+akx+txx*BODY.foot)*dir, toeY=py+lhy+aky+tyy*BODY.foot-sw*20;
-    limb(kneeX,kneeY,ankX,ankY,ww,col);
-    limb(ankX,ankY,toeX,toeY,Math.max(6,ww-5),col);
-    limb(px,py,kneeX,kneeY,ww+2,col);
-    dot(toeX,toeY,5+sw*4,col); // 脚尖点,挥动时更大
+    // 道服裤:大腿→小腿锥形,关节处圆角过渡;足为肤色(赤足)
+    taper(px,py,kneeX,kneeY,ww+5,ww,gi);
+    dot(kneeX,kneeY,ww/2,gi);
+    taper(kneeX,kneeY,ankX,ankY,ww,ww-3,gi);
+    dot(ankX,ankY,(ww-3)/2,gi);
+    limb(ankX,ankY,toeX,toeY,Math.max(6,ww-5),skin);
+    dot(toeX,toeY,5+sw*4,skin); // 脚尖,挥动时更大
     return {ankX,ankY,toeX,toeY};
   }
   // 手臂: 肩角 a(0=下垂,正=向前上); 肘 e(0=直)
-  function arm(shA,elA,col,w){
+  function arm(shA,elA,gi,w){
     const sx0=tx-Math.sin(ta)*6*dir, sy0=ty+Math.cos(ta)*6; // 肩略低于颈
     let [ux,uy]=[Math.sin(shA*D2R),Math.cos(shA*D2R)];
     const ex=sx0+ux*BODY.uArm*dir, ey=sy0+uy*BODY.uArm;
     let [fx2,fy2]=rot(ux,uy,-elA*D2R);
     const hx2=sx0+(ux*BODY.uArm+fx2*BODY.fArm)*dir, hy2=sy0+uy*BODY.uArm+fy2*BODY.fArm;
-    limb(sx0,sy0,ex,ey,w,col);
-    limb(ex,ey,hx2,hy2,w-1,col);
-    dot(hx2,hy2,6.5,col); // 拳
+    // 道服袖:上臂→前臂锥形,拳为肤色
+    taper(sx0,sy0,ex,ey,w+3,w,gi);
+    dot(ex,ey,w/2,gi);
+    taper(ex,ey,hx2,hy2,w,w-2,gi);
+    dot(hx2,hy2,7,skin); // 拳
     return {hx:hx2,hy:hy2};
   }
 
-  // 后侧肢体(深色) → 躯干 → 头 → 前侧肢体
-  const bLeg=leg(pose.bHip,pose.bKnee,pose.bAnk,dark,13,pose.bSwing);
-  arm(pose.bSh,pose.bEl,dark,10);
-  limb(px,py,tx,ty,20,main);
-  // 腰带
-  c.save(); c.strokeStyle=accent; c.lineWidth=22; c.lineCap='butt';
-  c.beginPath(); c.moveTo(px-Math.sin(ta)*4*dir-10*dir,py+Math.cos(ta)*4-2); c.lineTo(px-Math.sin(ta)*4*dir+10*dir,py+Math.cos(ta)*4-2); c.stroke(); c.restore();
-  dot(hx,hy,BODY.headR,main);
+  // 后侧肢体(灰白) → 道服上衣 → 腰带 → 头 → 前侧肢体(亮白)
+  const bLeg=leg(pose.bHip,pose.bKnee,pose.bAnk,giB,13,pose.bSwing);
+  arm(pose.bSh,pose.bEl,giB,10);
+  // 道服上衣:肩宽髋窄
+  taper(px,py,tx,ty,26,36,giF);
+  // 衣襟 V 线
+  c.save(); c.strokeStyle=flash?'#ffffff':'#434a58'; c.lineWidth=2; c.lineCap='round';
+  c.beginPath(); c.moveTo(tx,ty+4); c.lineTo(px-6*dir,py-22); c.stroke();
+  c.beginPath(); c.moveTo(tx,ty+4); c.lineTo(px+9*dir,py-24); c.stroke();
+  c.restore();
+  // 腰带:深色描边 + 主色带身 + 带结与带尾
+  const bx=px-Math.sin(ta)*4*dir, by=py+Math.cos(ta)*4-2;
+  c.save(); c.lineCap='butt';
+  c.strokeStyle=beltEdge; c.lineWidth=22;
+  c.beginPath(); c.moveTo(bx-11*dir,by); c.lineTo(bx+11*dir,by); c.stroke();
+  c.strokeStyle=beltC; c.lineWidth=17;
+  c.beginPath(); c.moveTo(bx-11*dir,by); c.lineTo(bx+11*dir,by); c.stroke();
+  c.restore();
+  dot(bx+8*dir,by+2,6,beltC); // 带结
+  taper(bx+8*dir,by+4,bx+14*dir,by+36,9,6,beltC); // 带尾
+  taper(bx+8*dir,by+4,bx+2*dir,by+32,9,6,beltC);
+  // 颈 + 头:发(后上) + 脸
+  dot(tx,ty-2,8,skin);
+  dot(hx-4*dir,hy-5,BODY.headR+2,hair);
+  dot(hx,hy,BODY.headR,skin);
   // 頭巾(鉢巻) + 飘带
   c.save(); c.strokeStyle=accent; c.lineWidth=5;
   c.beginPath(); c.arc(hx,hy,BODY.headR-1,-0.5*Math.PI-0.6,-0.5*Math.PI+0.6); c.stroke();
@@ -744,8 +807,8 @@ function drawFighter(c,f,pose,opt){
   c.quadraticCurveTo(hx-(BODY.headR+13)*dir,hy+8-flutter,hx-(BODY.headR+24)*dir,hy+14-flutter*1.4);
   c.stroke(); c.restore();
 
-  leg(pose.fHip,pose.fKnee,pose.fAnk,main,13,pose.fSwing);
-  arm(pose.fSh,pose.fEl,main,10);
+  leg(pose.fHip,pose.fKnee,pose.fAnk,giF,13,pose.fSwing);
+  arm(pose.fSh,pose.fEl,giF,10);
   return {toeX:bLeg.toeX,toeY:bLeg.toeY};
 }
 
@@ -968,11 +1031,25 @@ function renderDetail(){
   document.getElementById('detail').style.display='flex';
   document.getElementById('dCn').textContent=techName(dojoTech);
   document.getElementById('dJp').innerHTML=`<span class="jp">${dojoTech.jp}</span> · ${dojoTech.roma}`;
+  const vc=document.getElementById('dVocab');
+  if(dojoTech.vocab&&dojoTech.vocab.length){
+    vc.style.display='flex';
+    vc.innerHTML=dojoTech.vocab.map(x=>`<span title="${x.t}">${LANG==='zh'?x.c:x.t}</span>`).join('');
+  } else { vc.style.display='none'; vc.innerHTML=''; }
   const s=dojoTech.steps[dojoStep];
   document.getElementById('sNum').textContent=`STEP ${dojoStep+1} / ${dojoTech.steps.length}`;
+  const sImg=document.getElementById('sImg');
+  if(s.img){ sImg.style.display='block'; sImg.src=s.img; sImg.alt=stepTitle(dojoTech,dojoStep); }
+  else { sImg.style.display='none'; sImg.removeAttribute('src'); }
   document.getElementById('sTitle').textContent=stepTitle(dojoTech,dojoStep);
   document.getElementById('sJp').textContent=s.jp;
   document.getElementById('sDesc').textContent=stepDesc(dojoTech,dojoStep);
+  const ab=document.getElementById('applyBox');
+  const enApply=TECH_EN[dojoTech.id]&&TECH_EN[dojoTech.id].apply;
+  if(dojoTech.apply){
+    ab.style.display='block';
+    document.getElementById('dApply').textContent=LANG==='zh'?dojoTech.apply.zh:(enApply||dojoTech.apply.zh);
+  } else ab.style.display='none';
   document.getElementById('btnPrev').disabled=dojoStep===0;
   document.getElementById('btnNext').disabled=dojoStep===dojoTech.steps.length-1;
   const dots=document.getElementById('stepdots'); dots.innerHTML='';
