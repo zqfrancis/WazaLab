@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="wazalab-version" content="0.12">
+<meta name="wazalab-version" content="0.13">
 <script>
 // 版本自检:每次打开都对比服务器最新版,发现本地是旧缓存则自动硬刷新一次
 (function(){
@@ -264,7 +264,7 @@
   <div class="brand">
     <div class="logo">技</div>
     <div>
-      <h1>WazaLab <span id="brandSub" style="font-size:15px;font-weight:500;">空手道动作教学游戏</span><span class="demo">Demo v0.12</span></h1>
+      <h1>WazaLab <span id="brandSub" style="font-size:15px;font-weight:500;">空手道动作教学游戏</span><span class="demo">Demo v0.13</span></h1>
       <p id="brandTag">AxisMotion 出品 · 构えから残心まで、技をゲームで学ぶ</p>
     </div>
   </div>
@@ -485,11 +485,13 @@ const TECHNIQUES=[
 {
   id:'mae', cn:'前踢', jp:'前蹴り', roma:'Mae Geri Chudan',
   stats:{速度:4,距离:3,威力:3},
+  vocab:[{jp:'前蹴り',cn:'前踢'},{jp:'提膝',cn:'提膝蓄力'},{jp:'蹴り',cn:'踢击'},{jp:'足底',cn:'前脚掌'}],
+  apply:{zh:'踹向对手腹部（水月），或在对手突进时迎击。'},
   steps:[
     {jp:'構え',cn:'构え',desc:'标准组手构え。'},
-    {jp:'提膝',cn:'提膝蓄力',desc:'后腿膝盖直向前上方提起，大腿与地面平行、小腿下垂；击打脚勾脚（用前脚掌则脚尖上勾、踝关节锁死）。'},
-    {jp:'蹴り',cn:'蹴り·直踹',desc:'支撑腿蹬地送髋，小腿沿直线向前弹出，如活塞般直踹对手腹部（水月）。前踢是直线技术：提膝、弹出、收回三点一线。'},
-    {jp:'残心',cn:'残心·收势',desc:'原路收回提膝再落回构え，保持戒备。'},
+    {img:'assets/mae-1.jpg',jp:'提膝',cn:'提膝蓄力',desc:'后腿膝盖直向前上方提起，大腿与地面平行、小腿下垂；击打脚勾脚（用前脚掌则脚尖上勾、踝关节锁死）。'},
+    {img:'assets/mae-2.jpg',jp:'蹴り',cn:'蹴り·直踹',desc:'支撑腿蹬地送髋，小腿沿直线向前弹出，如活塞般直踹对手腹部（水月）。前踢是直线技术：提膝、弹出、收回三点一线。'},
+    {img:'assets/mae-3.jpg',jp:'残心',cn:'残心·收势',desc:'原路收回提膝再落回构え，保持戒备。'},
   ],
   tips:['击打部位用脚掌前部（拇指球），踝关节必须锁死，否则崴脚。','支撑腿微屈、蹬地送髋，把身体重量送进踢击。','前踢直线距离长，适合在对手突进时迎击。'],
   frames:[
@@ -562,7 +564,7 @@ zh:{
     +'<span><b>逆突</b> <kbd>I</kbd></span>',
   touch:{block:['防','防御'],mae:'前踢',chudan:'中段踢',jodan:'高段踢',gedan:'下段踢',zuki:'逆突'},
   prev:'← 上一步', next:'下一步 →', tipsTitle:'💡 初学者要点', applyTitle:'🥋 实战应用', goSpar:'去对战试试',
-  footer:['WazaLab v0.12 Demo','AxisMotion','FormBuddy 姊妹项目','动作演示为教学示意，请在有资质教练指导下练习'],
+  footer:['WazaLab v0.13 Demo','AxisMotion','FormBuddy 姊妹项目','动作演示为教学示意，请在有资质教练指导下练习'],
   blocked:'防住了!', dodged:'闪避!', winTitle:'勝!',
   winSub:cn=>`漂亮！${cn}终结了对手。再来一局？`,
   loseSub:'被 AI 终结了……去教学模式练练那招，再回来复仇！',
@@ -583,7 +585,7 @@ en:{
     +'<span><b>Reverse punch</b> <kbd>I</kbd></span>',
   touch:{block:['Block','hold'],mae:'Front',chudan:'Mid',jodan:'High',gedan:'Low',zuki:'Punch'},
   prev:'← Prev', next:'Next →', tipsTitle:'💡 Tips for beginners', applyTitle:'🥋 How to Apply It', goSpar:'Try it in sparring',
-  footer:['WazaLab v0.12 Demo','AxisMotion','Sister project of FormBuddy','Demos are for teaching — practice under a qualified instructor'],
+  footer:['WazaLab v0.13 Demo','AxisMotion','Sister project of FormBuddy','Demos are for teaching — practice under a qualified instructor'],
   blocked:'Blocked!', dodged:'Dodged!', winTitle:'You Win!',
   winSub:cn=>`Beautiful! Finished with ${cn}. Rematch?`,
   loseSub:'Finished by the AI… drill that technique in Tutorial mode, then come back for revenge!',
@@ -591,28 +593,29 @@ en:{
 };
 const TECH_EN={
 jodan:{en:'High Roundhouse Kick',steps:[
-  {en:'Chamber the Knee',edesc:'Bend the knee and raise the kicking foot as high as possible — knee up near the shoulder, shin fully folded; fists guard the face. The deeper the chamber, the faster the snap.'},
-  {en:'Turn the Hips',edesc:'Sweep the knee across your body center while turning the hips over and pivoting on the ball of the supporting foot (heel turning toward the opponent). Without a full pivot, the hips lock and the kick dies.'},
-  {en:'Snap the Kick',edesc:'Kick upward from the side toward the opponent\u2019s head with the instep (Haisoku), swinging the kicking-side arm back to accelerate. Tighten the whole body at impact — that is kime (focus).'}],
+  {img:'assets/jodan-1.jpg',en:'Chamber the Knee',edesc:'Bend the knee and raise the kicking foot as high as possible — knee up near the shoulder, shin fully folded; fists guard the face. The deeper the chamber, the faster the snap.'},
+  {img:'assets/jodan-2.jpg',en:'Turn the Hips',edesc:'Sweep the knee across your body center while turning the hips over and pivoting on the ball of the supporting foot (heel turning toward the opponent). Without a full pivot, the hips lock and the kick dies.'},
+  {img:'assets/jodan-3.jpg',en:'Snap the Kick',edesc:'Kick upward from the side toward the opponent\u2019s head with the instep (Haisoku), swinging the kicking-side arm back to accelerate. Tighten the whole body at impact — that is kime (focus).'}],
   apply:'Kick to the opponent\u2019s Komekami (temple) or Ago (chin).',
   tips:['Power comes from hip rotation, not swinging the shin — think of hurling the leg with your hip.','High kicks are slow with long range; never force one at maximum distance or you will eat a leg-catch counter.','Rechamber fast — a leg left hanging in the air is an invitation to counter.']},
 chudan:{en:'Middle Roundhouse Kick',steps:[
-  {en:'Chamber the Knee',edesc:'Bend the knee and raise the kicking foot to belt level — no need for the shoulder-high chamber of the high kick; fists guard the head.'},
-  {en:'Turn the Hips',edesc:'Bring the knee across the center as you turn the hips over and pivot on the supporting foot. The hips lead; the shin follows.'},
-  {en:'Snap the Kick',edesc:'Kick horizontally from the side into the opponent\u2019s torso with the instep, swinging the kicking-side arm back to accelerate — and pull the arm back up as you rechamber. This applies to every Mawashi Geri. Drive through the target, don\u2019t just tap it.'}],
+  {img:'assets/chudan-1.jpg',en:'Chamber the Knee',edesc:'Bend the knee and raise the kicking foot to belt level — no need for the shoulder-high chamber of the high kick; fists guard the head.'},
+  {img:'assets/chudan-2.jpg',en:'Turn the Hips',edesc:'Bring the knee across the center as you turn the hips over and pivot on the supporting foot. The hips lead; the shin follows.'},
+  {img:'assets/chudan-3.jpg',en:'Snap the Kick',edesc:'Kick horizontally from the side into the opponent\u2019s torso with the instep, swinging the kicking-side arm back to accelerate — and pull the arm back up as you rechamber. This applies to every Mawashi Geri. Drive through the target, don\u2019t just tap it.'}],
   apply:'Kick to the side of the opponent\u2019s body (the ribs).',
   tips:['The middle roundhouse is the most practical height — balanced offense and defense, lowest risk.','Target the ribs or abdomen, and drive the power through.','Rechamber fast — a leg left hanging in the air is an invitation to counter.']},
 gedan:{en:'Low Roundhouse Kick',steps:[
-  {en:'Short Chamber',edesc:'Raise the rear knee just a little, the kicking foot hanging just below belt level, slightly folded; fists guard the head. The small motion makes it explosive and hard to read.'},
-  {en:'Turn and Sink',edesc:'Start turning the hips and pivoting the supporting foot while bending the supporting leg more to carry your weight down toward the target — sinking weight gives the kick its heaviness.'},
-  {en:'Sweep Down',edesc:'Kick downward with the instep (Haisoku) or shin (Sune), swinging the kicking-side arm back. Chop the leg down like a sickle into the outer thigh to wreck their balance.'}],
+  {img:'assets/gedan-1.jpg',en:'Short Chamber',edesc:'Raise the rear knee just a little, the kicking foot hanging just below belt level, slightly folded; fists guard the head. The small motion makes it explosive and hard to read.'},
+  {img:'assets/gedan-2.jpg',en:'Turn and Sink',edesc:'Start turning the hips and pivoting the supporting foot while bending the supporting leg more to carry your weight down toward the target — sinking weight gives the kick its heaviness.'},
+  {img:'assets/gedan-3.jpg',en:'Sweep Down',edesc:'Kick downward with the instep (Haisoku) or shin (Sune), swinging the kicking-side arm back. Chop the leg down like a sickle into the outer thigh to wreck their balance.'}],
   apply:'Kick to the opponent\u2019s thigh, or sweep the leg to take them down.',
   tips:['The low kick wins on speed and surprise, not amplitude.','Chop the outer thigh with the shin; hammering the same spot breaks opponents down.','The most-used attrition technique in sparring — drill left-right combinations.']},
 mae:{en:'Front Kick',steps:[
   {en:'Kamae',edesc:'Standard sparring stance.'},
-  {en:'Chamber the Knee',edesc:'Drive the rear knee straight up and forward, thigh parallel to the floor, shin hanging; cock the foot (to strike with the ball of the foot, pull the toes up and lock the ankle).'},
-  {en:'Thrust',edesc:'Push off the supporting leg and drive the hip in as the shin pistons straight forward into the abdomen (solar plexus). The front kick is linear: chamber, extend, rechamber — all on one line.'},
-  {en:'Zanshin',edesc:'Rechamber along the same path, return to kamae, stay alert.'}],
+  {img:'assets/mae-1.jpg',en:'Chamber the Knee',edesc:'Drive the rear knee straight up and forward, thigh parallel to the floor, shin hanging; cock the foot (to strike with the ball of the foot, pull the toes up and lock the ankle).'},
+  {img:'assets/mae-2.jpg',en:'Thrust',edesc:'Push off the supporting leg and drive the hip in as the shin pistons straight forward into the abdomen (solar plexus). The front kick is linear: chamber, extend, rechamber — all on one line.'},
+  {img:'assets/mae-3.jpg',en:'Zanshin',edesc:'Rechamber along the same path, return to kamae, stay alert.'}],
+  apply:'Thrust into the opponent\u2019s solar plexus, or intercept a rushing opponent.',
   tips:['Strike with the ball of the foot and lock the ankle, or you will roll it.','Keep the supporting leg slightly bent, push off the floor and send your weight into the kick.','The front kick covers distance in a straight line — great for intercepting a rushing opponent.']},
 zuki:{en:'Reverse Punch',steps:[
   {en:'Kamae',edesc:'Standard sparring stance.'},
