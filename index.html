@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="wazalab-version" content="0.13">
+<meta name="wazalab-version" content="0.14">
 <script>
 // 版本自检:每次打开都对比服务器最新版,发现本地是旧缓存则自动硬刷新一次
 (function(){
@@ -264,7 +264,7 @@
   <div class="brand">
     <div class="logo">技</div>
     <div>
-      <h1>WazaLab <span id="brandSub" style="font-size:15px;font-weight:500;">空手道动作教学游戏</span><span class="demo">Demo v0.13</span></h1>
+      <h1>WazaLab <span id="brandSub" style="font-size:15px;font-weight:500;">空手道动作教学游戏</span><span class="demo">Demo v0.14</span></h1>
       <p id="brandTag">AxisMotion 出品 · 构えから残心まで、技をゲームで学ぶ</p>
     </div>
   </div>
@@ -506,11 +506,18 @@ const TECHNIQUES=[
 {
   id:'zuki', cn:'逆突', jp:'逆突き', roma:'Gyaku Zuki',
   stats:{速度:5,距离:2,威力:3},
+  vocab:[
+    {t:'Gyaku Zuki / reverse punch',c:'逆突き · 逆突'},
+    {t:'Hikite / pulling hand',c:'引手 · 收手回腰'},
+    {t:'Kime / focus of power',c:'極め · 极め'},
+    {t:'Seiken / knuckles',c:'拳頭 · 拳峰'},
+  ],
+  apply:{zh:'直线打向对手面部或胸部（中段），是组手中最直接的得分技术。'},
   steps:[
     {jp:'構え',cn:'构え',desc:'标准组手构え。'},
-    {jp:'引手',cn:'引手·拧转',desc:'出拳的同时，另一手猛地收回腰间——这就是「引手」。肩与髋开始拧转，力量自地面经后腿、髋部向上传导。'},
-    {jp:'突き',cn:'突き·直线',desc:'后手沿直线打出，拳眼向上、前脚掌内扣；命中瞬间髋部拧转到位、全身收紧（极め）。击打用拳峰（食指中指拳面），腕关节锁死保持直线。'},
-    {jp:'残心',cn:'残心·收势',desc:'拳原路收回，恢复构え与戒备。'},
+    {img:'assets/zuki-1.jpg',jp:'引手',cn:'引手·拧转',desc:'出拳的同时，另一手猛地收回腰间——这就是「引手」。肩与髋开始拧转，力量自地面经后腿、髋部向上传导。'},
+    {img:'assets/zuki-2.jpg',jp:'突き',cn:'突き·直线',desc:'后手沿直线打出，拳眼向上、前脚掌内扣；命中瞬间髋部拧转到位、全身收紧（极め）。击打用拳峰（食指中指拳面），腕关节锁死保持直线。'},
+    {img:'assets/zuki-3.jpg',jp:'残心',cn:'残心·收势',desc:'拳原路收回，恢复构え与戒备。'},
   ],
   tips:['逆突的力量来自髋部拧转，不是手臂——手臂只是传导。','引手和出拳必须同步：收回的手越快，打出的拳越重。','出拳时后脚跟随之转动，前脚掌内扣，力量才踩得实。'],
   frames:[
@@ -564,7 +571,7 @@ zh:{
     +'<span><b>逆突</b> <kbd>I</kbd></span>',
   touch:{block:['防','防御'],mae:'前踢',chudan:'中段踢',jodan:'高段踢',gedan:'下段踢',zuki:'逆突'},
   prev:'← 上一步', next:'下一步 →', tipsTitle:'💡 初学者要点', applyTitle:'🥋 实战应用', goSpar:'去对战试试',
-  footer:['WazaLab v0.13 Demo','AxisMotion','FormBuddy 姊妹项目','动作演示为教学示意，请在有资质教练指导下练习'],
+  footer:['WazaLab v0.14 Demo','AxisMotion','FormBuddy 姊妹项目','动作演示为教学示意，请在有资质教练指导下练习'],
   blocked:'防住了!', dodged:'闪避!', winTitle:'勝!',
   winSub:cn=>`漂亮！${cn}终结了对手。再来一局？`,
   loseSub:'被 AI 终结了……去教学模式练练那招，再回来复仇！',
@@ -585,7 +592,7 @@ en:{
     +'<span><b>Reverse punch</b> <kbd>I</kbd></span>',
   touch:{block:['Block','hold'],mae:'Front',chudan:'Mid',jodan:'High',gedan:'Low',zuki:'Punch'},
   prev:'← Prev', next:'Next →', tipsTitle:'💡 Tips for beginners', applyTitle:'🥋 How to Apply It', goSpar:'Try it in sparring',
-  footer:['WazaLab v0.13 Demo','AxisMotion','Sister project of FormBuddy','Demos are for teaching — practice under a qualified instructor'],
+  footer:['WazaLab v0.14 Demo','AxisMotion','Sister project of FormBuddy','Demos are for teaching — practice under a qualified instructor'],
   blocked:'Blocked!', dodged:'Dodged!', winTitle:'You Win!',
   winSub:cn=>`Beautiful! Finished with ${cn}. Rematch?`,
   loseSub:'Finished by the AI… drill that technique in Tutorial mode, then come back for revenge!',
@@ -619,9 +626,10 @@ mae:{en:'Front Kick',steps:[
   tips:['Strike with the ball of the foot and lock the ankle, or you will roll it.','Keep the supporting leg slightly bent, push off the floor and send your weight into the kick.','The front kick covers distance in a straight line — great for intercepting a rushing opponent.']},
 zuki:{en:'Reverse Punch',steps:[
   {en:'Kamae',edesc:'Standard sparring stance.'},
-  {en:'Hikite & Hip Twist',edesc:'As you punch, snap the other fist back to the hip — that is hikite. Shoulders and hips start to twist, channeling power from the floor through the rear leg and hip.'},
-  {en:'Straight Thrust',edesc:'Drive the rear fist straight out, knuckles up, front foot pivoting inward; at impact the hip twist completes and the whole body tightens (kime). Strike with the first two knuckles, wrist locked straight.'},
-  {en:'Zanshin',edesc:'Snap the fist back along the same line, return to kamae and alertness.'}],
+  {img:'assets/zuki-1.jpg',en:'Hikite & Hip Twist',edesc:'As you punch, snap the other fist back to the hip — that is hikite. Shoulders and hips start to twist, channeling power from the floor through the rear leg and hip.'},
+  {img:'assets/zuki-2.jpg',en:'Straight Thrust',edesc:'Drive the rear fist straight out, knuckles up, front foot pivoting inward; at impact the hip twist completes and the whole body tightens (kime). Strike with the first two knuckles, wrist locked straight.'},
+  {img:'assets/zuki-3.jpg',en:'Zanshin',edesc:'Snap the fist back along the same line, return to kamae and alertness.'}],
+  apply:'Drive the punch straight into the opponent\u2019s face or torso (chudan) — the most direct scoring technique in sparring.',
   tips:['Reverse-punch power comes from hip rotation, not the arm — the arm only delivers it.','Hikite and the punch must sync: the faster the retracting hand, the heavier the punch.','The rear heel turns with the punch and the front foot pivots in — that is what grounds the power.']},
 uke:{en:'High Block',steps:[
   {en:'Kamae',edesc:'Standard sparring stance.'},
