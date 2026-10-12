@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="wazalab-version" content="0.14">
+<meta name="wazalab-version" content="0.15">
 <script>
 // 版本自检:每次打开都对比服务器最新版,发现本地是旧缓存则自动硬刷新一次
 (function(){
@@ -264,7 +264,7 @@
   <div class="brand">
     <div class="logo">技</div>
     <div>
-      <h1>WazaLab <span id="brandSub" style="font-size:15px;font-weight:500;">空手道动作教学游戏</span><span class="demo">Demo v0.14</span></h1>
+      <h1>WazaLab <span id="brandSub" style="font-size:15px;font-weight:500;">空手道动作教学游戏</span><span class="demo">Demo v0.15</span></h1>
       <p id="brandTag">AxisMotion 出品 · 构えから残心まで、技をゲームで学ぶ</p>
     </div>
   </div>
@@ -532,11 +532,18 @@ const TECHNIQUES=[
 {
   id:'uke', cn:'格挡', jp:'上段受け', roma:'Jodan Uke',
   stats:{速度:4,距离:1,威力:1},
+  vocab:[
+    {t:'Jodan Uke / rising block',c:'上段受け · 上段格挡'},
+    {t:'Hikite / pulling hand',c:'引手 · 收手回腰'},
+    {t:'Wan / forearm',c:'腕 · 前臂'},
+    {t:'Hanmi / half-facing stance',c:'半身 · 半身姿势'},
+  ],
+  apply:{zh:'防住对手打向头部的高段攻击（拳、掌或高踢）。格挡的同时另一手已在腰间蓄势，拨开来拳的瞬间立刻反击——先防后攻，是组手的基本节奏。'},
   steps:[
     {jp:'構え',cn:'构え',desc:'标准组手构え。'},
-    {jp:'受け',cn:'举臂格挡',desc:'前臂上举护住头部上方，手臂与头部保持一拳距离；另一手收回腰间作引手，重心略下沉。'},
-    {jp:'保持',cn:'格挡保持',desc:'格挡不是硬顶——用前臂外侧将对方攻击「拨开」。保持姿势，等待反击时机。'},
-    {jp:'残心',cn:'残心·收势',desc:'防反一体：格挡成功后立刻反击，再回构え。'},
+    {img:'assets/uke-1.jpg',jp:'受け',cn:'举臂格挡',desc:'前臂上举护住头部上方，手臂与头部保持一拳距离；另一手收回腰间作引手，重心略下沉。'},
+    {img:'assets/uke-2.jpg',jp:'保持',cn:'格挡保持',desc:'格挡不是硬顶——用前臂外侧将对方攻击「拨开」。保持姿势，等待反击时机。'},
+    {img:'assets/uke-3.jpg',jp:'残心',cn:'残心·收势',desc:'防反一体：格挡成功后立刻反击，再回构え。'},
   ],
   tips:['游戏里按住 S（或「防」按钮）就是格挡，可减免大部分伤害。','不要用手掌去抓，用前臂骨外侧接触。','格挡后立刻反击——只防不攻会被压制。'],
   frames:[
@@ -571,7 +578,7 @@ zh:{
     +'<span><b>逆突</b> <kbd>I</kbd></span>',
   touch:{block:['防','防御'],mae:'前踢',chudan:'中段踢',jodan:'高段踢',gedan:'下段踢',zuki:'逆突'},
   prev:'← 上一步', next:'下一步 →', tipsTitle:'💡 初学者要点', applyTitle:'🥋 实战应用', goSpar:'去对战试试',
-  footer:['WazaLab v0.14 Demo','AxisMotion','FormBuddy 姊妹项目','动作演示为教学示意，请在有资质教练指导下练习'],
+  footer:['WazaLab v0.15 Demo','AxisMotion','FormBuddy 姊妹项目','动作演示为教学示意，请在有资质教练指导下练习'],
   blocked:'防住了!', dodged:'闪避!', winTitle:'勝!',
   winSub:cn=>`漂亮！${cn}终结了对手。再来一局？`,
   loseSub:'被 AI 终结了……去教学模式练练那招，再回来复仇！',
@@ -592,7 +599,7 @@ en:{
     +'<span><b>Reverse punch</b> <kbd>I</kbd></span>',
   touch:{block:['Block','hold'],mae:'Front',chudan:'Mid',jodan:'High',gedan:'Low',zuki:'Punch'},
   prev:'← Prev', next:'Next →', tipsTitle:'💡 Tips for beginners', applyTitle:'🥋 How to Apply It', goSpar:'Try it in sparring',
-  footer:['WazaLab v0.14 Demo','AxisMotion','Sister project of FormBuddy','Demos are for teaching — practice under a qualified instructor'],
+  footer:['WazaLab v0.15 Demo','AxisMotion','Sister project of FormBuddy','Demos are for teaching — practice under a qualified instructor'],
   blocked:'Blocked!', dodged:'Dodged!', winTitle:'You Win!',
   winSub:cn=>`Beautiful! Finished with ${cn}. Rematch?`,
   loseSub:'Finished by the AI… drill that technique in Tutorial mode, then come back for revenge!',
@@ -633,9 +640,10 @@ zuki:{en:'Reverse Punch',steps:[
   tips:['Reverse-punch power comes from hip rotation, not the arm — the arm only delivers it.','Hikite and the punch must sync: the faster the retracting hand, the heavier the punch.','The rear heel turns with the punch and the front foot pivots in — that is what grounds the power.']},
 uke:{en:'High Block',steps:[
   {en:'Kamae',edesc:'Standard sparring stance.'},
-  {en:'Raise the Block',edesc:'Raise the forearm above the head, keeping a fist\u2019s distance from the skull; pull the other hand to the hip as hikite and sink your weight slightly.'},
-  {en:'Hold the Block',edesc:'Do not meet force head-on — deflect the attack with the outer forearm. Hold the posture and wait for your counter opening.'},
-  {en:'Zanshin',edesc:'Block and counter as one: fire back the moment the block lands, then return to kamae.'}],
+  {img:'assets/uke-1.jpg',en:'Raise the Block',edesc:'Raise the forearm above the head, keeping a fist\u2019s distance from the skull; pull the other hand to the hip as hikite and sink your weight slightly.'},
+  {img:'assets/uke-2.jpg',en:'Hold the Block',edesc:'Do not meet force head-on — deflect the attack with the outer forearm. Hold the posture and wait for your counter opening.'},
+  {img:'assets/uke-3.jpg',en:'Zanshin',edesc:'Block and counter as one: fire back the moment the block lands, then return to kamae.'}],
+  apply:'Block strikes aimed at the head (punches, palm strikes or high kicks). The pulling hand is already cocked at the hip — deflect the incoming attack and fire straight back. Block first, counter second: the basic rhythm of sparring.',
   tips:['In-game, hold S (or the Block button) to block and cut most damage.','Deflect with the outer forearm bone, do not grab with the palm.','Counter right after the block — blocking without attacking gets you pressured.']},
 };
 const STATLBL={zh:{速度:'速度',距离:'距离',威力:'威力'},en:{速度:'Speed',距离:'Range',威力:'Power'}};
