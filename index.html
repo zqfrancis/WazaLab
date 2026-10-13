@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="wazalab-version" content="0.15">
+<meta name="wazalab-version" content="0.16">
 <script>
 // 版本自检:每次打开都对比服务器最新版,发现本地是旧缓存则自动硬刷新一次
 (function(){
@@ -92,6 +92,24 @@
     box-shadow:0 4px 16px rgba(230,57,70,.45);
   }
   #roundmsg button:active{transform:scale(.96);}
+  #roundmsg button.ghost{background:transparent;color:var(--red);box-shadow:none;border:2px solid var(--red);padding:10px 30px;}
+
+  /* AI 难度选择 */
+  #diffPicker{
+    position:absolute;inset:0;display:none;align-items:center;justify-content:center;flex-direction:column;gap:14px;
+    background:rgba(250,246,238,.88);border-radius:14px;z-index:6;text-align:center;padding:20px;
+  }
+  #diffPicker.show{display:flex;}
+  #diffPicker h2{font-size:30px;font-weight:900;color:#3a3f4a;}
+  #diffPicker p{font-size:14px;color:#6b7280;}
+  .diffbtn{
+    cursor:pointer;border:2px solid var(--line);border-radius:12px;padding:12px 18px;width:min(320px,80%);
+    background:#fff;font-family:inherit;text-align:left;transition:all .15s;
+  }
+  .diffbtn:hover{border-color:var(--red);box-shadow:0 4px 16px rgba(230,57,70,.18);}
+  .diffbtn:active{transform:scale(.97);}
+  .diffbtn .dname{display:block;font-size:17px;font-weight:900;color:#222;}
+  .diffbtn .ddesc{display:block;font-size:12.5px;color:#6b7280;margin-top:3px;line-height:1.5;}
 
   /* control hint */
   #hintbar{
@@ -264,7 +282,7 @@
   <div class="brand">
     <div class="logo">技</div>
     <div>
-      <h1>WazaLab <span id="brandSub" style="font-size:15px;font-weight:500;">空手道动作教学游戏</span><span class="demo">Demo v0.15</span></h1>
+      <h1>WazaLab <span id="brandSub" style="font-size:15px;font-weight:500;">空手道动作教学游戏</span><span class="demo">Demo v0.16</span></h1>
       <p id="brandTag">AxisMotion 出品 · 构えから残心まで、技をゲームで学ぶ</p>
     </div>
   </div>
@@ -296,7 +314,15 @@
         <div class="hpbar"><div class="ghost" id="ghostA"></div><div class="fill" id="fillA" style="width:100%"></div></div>
       </div>
     </div>
-    <div id="roundmsg"><h2 id="roundTitle">KO!</h2><p id="roundSub"></p><button id="btnRematch">再来一局</button></div>
+    <div id="roundmsg"><h2 id="roundTitle">KO!</h2><p id="roundSub"></p><button id="btnRematch">再来一局</button><button id="btnChangeDiff" class="ghost">换难度</button></div>
+
+    <div id="diffPicker">
+      <h2 id="diffTitle">选择 AI 难度</h2>
+      <p id="diffSub">开始对战前，先选一位对手</p>
+      <button class="diffbtn" data-diff="easy"><span class="dname">🐣 简单</span><span class="ddesc">反应慢，出手少，适合新手练招</span></button>
+      <button class="diffbtn" data-diff="normal"><span class="dname">🥋 普通</span><span class="ddesc">攻守平衡，和之前一样的对手</span></button>
+      <button class="diffbtn" data-diff="hard"><span class="dname">🔥 困难</span><span class="ddesc">反应快，格挡多，出手狠</span></button>
+    </div>
 
     <div id="hintbar">
       <span><b>移动</b> <kbd>A</kbd><kbd>D</kbd> / <kbd>←</kbd><kbd>→</kbd></span>
@@ -568,7 +594,9 @@ zh:{
   brandTag:'AxisMotion 出品 · 构えから残心まで、技をゲームで学ぶ',
   tabDojo:'📖 教学模式', tabSpar:'⚔️ 对战模式', langBtn:'EN',
   hpYouName:'あなた', hpYouTag:'YOU · 红方', hpAiName:'あいて', hpAiTag:'AI 相手 · 白方',
-  rematch:'再来一局',
+  rematch:'再来一局', changeDiff:'换难度',
+  diffTitle:'选择 AI 难度', diffSub:'开始对战前，先选一位对手',
+  diffs:{easy:{name:'🐣 简单',desc:'反应慢，出手少，适合新手练招'},normal:{name:'🥋 普通',desc:'攻守平衡，和之前一样的对手'},hard:{name:'🔥 困难',desc:'反应快，格挡多，出手狠'}},
   hintHTML:'<span><b>移动</b> <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> / <kbd>←</kbd><kbd>→</kbd><kbd>↑</kbd><kbd>↓</kbd></span>'
     +'<span><b>防御</b> <kbd>Space</kbd>（按住）</span>'
     +'<span><b>闪避</b> 纵移（<kbd>W</kbd>/<kbd>S</kbd>）拉开前后距离</span>'
@@ -578,7 +606,7 @@ zh:{
     +'<span><b>逆突</b> <kbd>I</kbd></span>',
   touch:{block:['防','防御'],mae:'前踢',chudan:'中段踢',jodan:'高段踢',gedan:'下段踢',zuki:'逆突'},
   prev:'← 上一步', next:'下一步 →', tipsTitle:'💡 初学者要点', applyTitle:'🥋 实战应用', goSpar:'去对战试试',
-  footer:['WazaLab v0.15 Demo','AxisMotion','FormBuddy 姊妹项目','动作演示为教学示意，请在有资质教练指导下练习'],
+  footer:['WazaLab v0.16 Demo','AxisMotion','FormBuddy 姊妹项目','动作演示为教学示意，请在有资质教练指导下练习'],
   blocked:'防住了!', dodged:'闪避!', winTitle:'勝!',
   winSub:cn=>`漂亮！${cn}终结了对手。再来一局？`,
   loseSub:'被 AI 终结了……去教学模式练练那招，再回来复仇！',
@@ -589,7 +617,9 @@ en:{
   brandTag:'By AxisMotion · 構えから残心まで、技をゲームで学ぶ',
   tabDojo:'📖 Tutorial', tabSpar:'⚔️ Sparring', langBtn:'中文',
   hpYouName:'You', hpYouTag:'YOU · RED', hpAiName:'AI', hpAiTag:'AI · WHITE',
-  rematch:'Rematch',
+  rematch:'Rematch', changeDiff:'Change difficulty',
+  diffTitle:'Choose AI Difficulty', diffSub:'Pick your opponent before the match',
+  diffs:{easy:{name:'🐣 Easy',desc:'Slow reactions, fewer attacks — great for learning'},normal:{name:'🥋 Normal',desc:'Balanced offense and defense, same as before'},hard:{name:'🔥 Hard',desc:'Fast reactions, blocks often, hits hard'}},
   hintHTML:'<span><b>Move</b> <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> / <kbd>←</kbd><kbd>→</kbd><kbd>↑</kbd><kbd>↓</kbd></span>'
     +'<span><b>Block</b> <kbd>Space</kbd> (hold)</span>'
     +'<span><b>Dodge</b> step in depth (<kbd>W</kbd>/<kbd>S</kbd>)</span>'
@@ -599,7 +629,7 @@ en:{
     +'<span><b>Reverse punch</b> <kbd>I</kbd></span>',
   touch:{block:['Block','hold'],mae:'Front',chudan:'Mid',jodan:'High',gedan:'Low',zuki:'Punch'},
   prev:'← Prev', next:'Next →', tipsTitle:'💡 Tips for beginners', applyTitle:'🥋 How to Apply It', goSpar:'Try it in sparring',
-  footer:['WazaLab v0.15 Demo','AxisMotion','Sister project of FormBuddy','Demos are for teaching — practice under a qualified instructor'],
+  footer:['WazaLab v0.16 Demo','AxisMotion','Sister project of FormBuddy','Demos are for teaching — practice under a qualified instructor'],
   blocked:'Blocked!', dodged:'Dodged!', winTitle:'You Win!',
   winSub:cn=>`Beautiful! Finished with ${cn}. Rematch?`,
   loseSub:'Finished by the AI… drill that technique in Tutorial mode, then come back for revenge!',
@@ -663,8 +693,16 @@ function applyLang(){
   document.getElementById('hpYouName').textContent=S.hpYouName;
   document.getElementById('hpYouTag').textContent=S.hpYouTag;
   document.getElementById('hpAiName').textContent=S.hpAiName;
-  document.getElementById('hpAiTag').textContent=S.hpAiTag;
+  document.getElementById('hpAiTag').textContent=S.hpAiTag+' · '+diffLabel();
   document.getElementById('btnRematch').textContent=S.rematch;
+  document.getElementById('btnChangeDiff').textContent=S.changeDiff;
+  document.getElementById('diffTitle').textContent=S.diffTitle;
+  document.getElementById('diffSub').textContent=S.diffSub;
+  document.querySelectorAll('#diffPicker .diffbtn').forEach(b=>{
+    const d=S.diffs[b.dataset.diff]; if(!d) return;
+    b.querySelector('.dname').textContent=d.name;
+    b.querySelector('.ddesc').textContent=d.desc;
+  });
   document.getElementById('hintbar').innerHTML=S.hintHTML;
   document.querySelectorAll('#touchpad .tbtn').forEach(b=>{
     const k=b.dataset.k;
@@ -974,17 +1012,41 @@ function tryHit(att,def){
   if(def.hp<=0&&def.state!=='ko'){ def.state='ko'; def.koT=0; def.moveDir=0; endRound(att); }
 }
 
+/* ================= AI 难度分级 =================
+   think: 思考间隔(秒,越小反应越快); block: 格挡概率; blockLow: 残血格挡概率
+   dodge: 闪避概率; atkP: 进入攻击范围时出招概率; atkCd: 出招后冷却(秒); pool: 出招池 */
+const DIFFS={
+  easy:  {label:'简单',labelEn:'Easy',  think:[0.30,0.48],block:0.15,blockLow:0.30,dodge:0.12,atkP:0.40,atkCd:[1.4,2.2],pool:['gedan','gedan','chudan','chudan','mae','zuki','zuki']},
+  normal:{label:'普通',labelEn:'Normal',think:[0.22,0.37],block:0.32,blockLow:0.50,dodge:0.30,atkP:0.62,atkCd:[0.9,1.8],pool:['gedan','gedan','chudan','chudan','mae','zuki','zuki','jodan']},
+  hard:  {label:'困难',labelEn:'Hard',  think:[0.12,0.20],block:0.55,blockLow:0.70,dodge:0.48,atkP:0.78,atkCd:[0.5,1.0],pool:['gedan','chudan','chudan','mae','mae','zuki','zuki','jodan','jodan']},
+};
+let aiDiff='normal', pickerOpen=false;
+function diffLabel(){ const d=DIFFS[aiDiff]; return LANG==='zh'?d.label:d.labelEn; }
+function showDiffPicker(){
+  pickerOpen=true;
+  document.getElementById('roundmsg').classList.remove('show');
+  document.getElementById('diffPicker').classList.add('show');
+}
+function setDifficulty(d){
+  if(!DIFFS[d]) d='normal';
+  aiDiff=d; pickerOpen=false;
+  document.getElementById('hpAiTag').textContent=STR[LANG].hpAiTag+' · '+diffLabel();
+  document.getElementById('diffPicker').classList.remove('show');
+  resetRound();
+}
+
 /* ================= 对战 AI ================= */
 function aiThink(dt){
   ai.thinkT-=dt;
   if(ai.thinkT>0) return;
-  ai.thinkT=0.22+Math.random()*0.15;
+  const D=DIFFS[aiDiff];
+  ai.thinkT=D.think[0]+Math.random()*(D.think[1]-D.think[0]);
   if(ai.state==='attack'||ai.state==='ko'||roundOver) return;
   const dist=Math.abs(player.x-ai.x);
   const pDep=player.depth||0, aDep=ai.depth||0;
 
   // 玩家正在攻击 → 有概率格挡
-  if(player.state==='attack'&&player.tech&&dist<220&&Math.random()<(ai.hp<35?0.5:0.32)){
+  if(player.state==='attack'&&player.tech&&dist<220&&Math.random()<(ai.hp<35?D.blockLow:D.block)){
     ai.aiMode='block'; ai.aiT=0.45+Math.random()*0.3; setBlock(ai,true); return;
   }
   if(ai.aiMode==='block'){ ai.aiT-=0.25; if(ai.aiT<=0){setBlock(ai,false);ai.aiMode='idle';} return; }
@@ -992,7 +1054,7 @@ function aiThink(dt){
   // 闪避中 → 倒计时
   if(ai.aiMode==='dodge'){ ai.aiT-=0.25; if(ai.aiT<=0) ai.aiMode='idle'; return; }
   // 玩家刚出招 → 概率纵移闪避
-  if(player.state==='attack'&&player.tech&&player.t<0.25&&dist<240&&Math.random()<0.30){
+  if(player.state==='attack'&&player.tech&&player.t<0.25&&dist<240&&Math.random()<D.dodge){
     ai.aiMode='dodge'; ai.aiT=0.4;
     ai.aiTargetDepth=clamp(aDep+(aDep>=pDep?55:-55),-30,52);
     setBlock(ai,false); return;
@@ -1008,10 +1070,10 @@ function aiThink(dt){
   } else if(dist<95&&r<0.4){
     ai.aiMode='retreat'; ai.aiT=0.35;
   } else if(dist<170){
-    if(ai.atkCd<=0&&r<0.62){
-      const pool=['gedan','gedan','chudan','chudan','mae','zuki','zuki','jodan'];
+    if(ai.atkCd<=0&&r<D.atkP){
+      const pool=D.pool;
       startAttack(ai,pool[Math.floor(Math.random()*pool.length)]);
-      ai.atkCd=0.9+Math.random()*0.9;
+      ai.atkCd=D.atkCd[0]+Math.random()*(D.atkCd[1]-D.atkCd[0]);
       ai.aiMode='idle';
     } else if(r<0.72){ ai.aiMode='approach'; ai.aiT=0.3; ai.aiTargetDepth=pDep; }
     else if(r<0.86){ ai.aiMode='strafe'; ai.aiT=0.5; // 纵向游走找角度
@@ -1177,7 +1239,8 @@ function setMode(m){
   document.body.dataset.mode=m;
   document.getElementById('tabDojo').classList.toggle('active',m==='dojo');
   document.getElementById('tabSpar').classList.toggle('active',m==='spar');
-  if(m==='spar') resetRound();
+  if(m==='spar') showDiffPicker(); // 对战开始前先选难度
+  else { pickerOpen=false; document.getElementById('diffPicker').classList.remove('show'); }
   fitStage();
 }
 document.getElementById('tabDojo').onclick=()=>setMode('dojo');
@@ -1190,6 +1253,7 @@ function resetRound(){
   player=makeFighter(300,1,true); ai=makeFighter(660,-1,false);
   particles=[]; floaters=[]; freeze=0; shakeT=0; roundOver=false;
   document.getElementById('roundmsg').classList.remove('show');
+  document.getElementById('diffPicker').classList.remove('show');
   updateHpBars(true);
 }
 function endRound(winner){
@@ -1201,6 +1265,8 @@ function endRound(winner){
   setTimeout(()=>document.getElementById('roundmsg').classList.add('show'),700);
 }
 document.getElementById('btnRematch').onclick=resetRound;
+document.getElementById('btnChangeDiff').onclick=showDiffPicker;
+document.querySelectorAll('#diffPicker .diffbtn').forEach(b=>{ b.onclick=()=>setDifficulty(b.dataset.diff); });
 
 function updateHpBars(snap){
   for(const [f,pre] of [[player,'P'],[ai,'A']]){
@@ -1242,7 +1308,7 @@ function frame(now){
     ctx.restore();
   } else {
     if(freeze>0){ freeze-=dt; }
-    else {
+    else if(!pickerOpen){ // 选难度时暂停对战
       // 玩家
       if(!roundOver&&player.state!=='ko'){
         if(keys.block) setBlock(player,true); else setBlock(player,false);
