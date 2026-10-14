@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="wazalab-version" content="0.16">
+<meta name="wazalab-version" content="0.17">
 <script>
 // 版本自检:每次打开都对比服务器最新版,发现本地是旧缓存则自动硬刷新一次
 (function(){
@@ -282,7 +282,7 @@
   <div class="brand">
     <div class="logo">技</div>
     <div>
-      <h1>WazaLab <span id="brandSub" style="font-size:15px;font-weight:500;">空手道动作教学游戏</span><span class="demo">Demo v0.16</span></h1>
+      <h1>WazaLab <span id="brandSub" style="font-size:15px;font-weight:500;">空手道动作教学游戏</span><span class="demo">Demo v0.17</span></h1>
       <p id="brandTag">AxisMotion 出品 · 构えから残心まで、技をゲームで学ぶ</p>
     </div>
   </div>
@@ -606,9 +606,9 @@ zh:{
     +'<span><b>逆突</b> <kbd>I</kbd></span>',
   touch:{block:['防','防御'],mae:'前踢',chudan:'中段踢',jodan:'高段踢',gedan:'下段踢',zuki:'逆突'},
   prev:'← 上一步', next:'下一步 →', tipsTitle:'💡 初学者要点', applyTitle:'🥋 实战应用', goSpar:'去对战试试',
-  footer:['WazaLab v0.16 Demo','AxisMotion','FormBuddy 姊妹项目','动作演示为教学示意，请在有资质教练指导下练习'],
-  blocked:'防住了!', dodged:'闪避!', winTitle:'勝!',
-  winSub:cn=>`漂亮！${cn}终结了对手。再来一局？`,
+  footer:['WazaLab v0.17 Demo','AxisMotion','FormBuddy 姊妹项目','动作演示为教学示意，请在有资质教练指导下练习'],
+  blocked:'防住了!', dodged:'闪避!', combo:n=>`${n} 连击！`, winTitle:'勝!',
+  winSub:(cn,mx)=>`漂亮！${cn}终结了对手，最高连击 ${mx}。再来一局？`,
   loseSub:'被 AI 终结了……去教学模式练练那招，再回来复仇！',
 },
 en:{
@@ -629,9 +629,9 @@ en:{
     +'<span><b>Reverse punch</b> <kbd>I</kbd></span>',
   touch:{block:['Block','hold'],mae:'Front',chudan:'Mid',jodan:'High',gedan:'Low',zuki:'Punch'},
   prev:'← Prev', next:'Next →', tipsTitle:'💡 Tips for beginners', applyTitle:'🥋 How to Apply It', goSpar:'Try it in sparring',
-  footer:['WazaLab v0.16 Demo','AxisMotion','Sister project of FormBuddy','Demos are for teaching — practice under a qualified instructor'],
-  blocked:'Blocked!', dodged:'Dodged!', winTitle:'You Win!',
-  winSub:cn=>`Beautiful! Finished with ${cn}. Rematch?`,
+  footer:['WazaLab v0.17 Demo','AxisMotion','Sister project of FormBuddy','Demos are for teaching — practice under a qualified instructor'],
+  blocked:'Blocked!', dodged:'Dodged!', combo:n=>`${n} HITS!`, winTitle:'You Win!',
+  winSub:(cn,mx)=>`Beautiful! Finished with ${cn}, max combo ${mx}. Rematch?`,
   loseSub:'Finished by the AI… drill that technique in Tutorial mode, then come back for revenge!',
 }
 };
@@ -880,7 +880,7 @@ function spawnSpark(x,y,big,blocked){
   }
   particles.push({x,y,vx:0,vy:0,life:0.18,t:0,col:'#ffffff',w:big?34:20,ring:true});
 }
-function spawnFloater(x,y,text,col){ floaters.push({x,y,text,col:col||'#ffd166',t:0,life:1.1}); }
+function spawnFloater(x,y,text,col,size){ floaters.push({x,y,text,col:col||'#ffd166',size:size||26,t:0,life:1.1}); }
 function updateFx(dt){
   for(const p of particles){ p.t+=dt; p.x+=p.vx*dt; p.y+=p.vy*dt; p.vy+=900*dt; }
   particles=particles.filter(p=>p.t<p.life);
@@ -899,7 +899,7 @@ function drawFx(){
   for(const fl of floaters){
     const k=1-fl.t/fl.life;
     ctx.save(); ctx.globalAlpha=Math.min(1,k*2); ctx.fillStyle=fl.col;
-    ctx.font='900 26px "Noto Sans SC",sans-serif'; ctx.textAlign='center';
+    ctx.font='900 '+fl.size+'px "Noto Sans SC",sans-serif'; ctx.textAlign='center';
     ctx.shadowColor='rgba(255,255,255,.9)'; ctx.shadowBlur=8;
     ctx.fillText(fl.text,fl.x,fl.y); ctx.restore();
   }
@@ -931,7 +931,7 @@ function drawTrail(f){
 function makeFighter(x,facing,isPlayer){
   return {x,facing,isPlayer,hp:100,maxhp:100,dispHp:100,depth:0,
     state:'idle',tech:null,t:0,blockT:0,moveDir:0,moveDep:0,stepping:false,walkPhase:0,
-    turnT:0,dodgeShown:false,hitDone:false,koT:0,flash:0,atkCd:0,
+    turnT:0,dodgeShown:false,hitDone:false,koT:0,flash:0,atkCd:0,combo:0,comboT:0,comboMax:0,
     thinkT:Math.random()*0.3,aiMode:'idle',aiT:0,aiTargetDepth:0};
 }
 let player=makeFighter(300,1,true), ai=makeFighter(660,-1,false);
@@ -1000,13 +1000,17 @@ function tryHit(att,def){
     return;
   }
   att.hitDone=true;
+  // 连击计数(v0.17):攻击方连击+1并刷新2.5秒窗口,被击中方连击清零
+  att.combo=(att.combo||0)+1; att.comboT=2.5; att.comboMax=Math.max(att.comboMax||0,att.combo);
+  def.combo=0; def.comboT=0;
   const blocked=def.state==='block';
   const dmg=blocked?Math.max(1,Math.round(tech.atk.damage*0.2)):tech.atk.damage;
   def.hp=Math.max(0,def.hp-dmg);
   def.flash=0.12;
   const zoneY=tech.atk.zone==='high'?GROUND-165:tech.atk.zone==='low'?GROUND-45:GROUND-110;
   spawnSpark(def.x-att.facing*30,zoneY,tech.atk.damage>=16,blocked);
-  spawnFloater(def.x-att.facing*40,zoneY-40,blocked?STR[LANG].blocked:techName(tech)+'!',blocked?'#1d6fd8':'#b45309');
+  spawnFloater(def.x-att.facing*40,zoneY-40,blocked?STR[LANG].blocked:techName(tech)+'!',blocked?'#1d6fd8':'#b45309',26);
+  spawnFloater(def.x-att.facing*10,zoneY-92,'-'+dmg,blocked?'#7cc4ff':'#ff6b5e',blocked?26:40); // 伤害数字
   freeze=blocked?0.06:0.13; shakeT=blocked?0.08:0.16;
   def.x+=att.facing*(blocked?8:26);
   if(def.hp<=0&&def.state!=='ko'){ def.state='ko'; def.koT=0; def.moveDir=0; endRound(att); }
@@ -1260,7 +1264,7 @@ function endRound(winner){
   roundOver=true;
   const title=document.getElementById('roundTitle'), sub=document.getElementById('roundSub');
   const S=STR[LANG];
-  if(winner.isPlayer){ title.textContent=S.winTitle; title.style.color='#43d17c'; sub.textContent=S.winSub(winner.tech?techName(winner.tech):''); }
+  if(winner.isPlayer){ title.textContent=S.winTitle; title.style.color='#43d17c'; sub.textContent=S.winSub(winner.tech?techName(winner.tech):'',winner.comboMax||0); }
   else { title.textContent='KO!'; title.style.color='#e63946'; sub.textContent=S.loseSub; }
   setTimeout(()=>document.getElementById('roundmsg').classList.add('show'),700);
 }
@@ -1349,6 +1353,8 @@ function frame(now){
       if(player.state==='ko')player.koT+=dt;
       if(ai.state==='ko')ai.koT+=dt;
       player.flash=Math.max(0,player.flash-dt); ai.flash=Math.max(0,ai.flash-dt);
+      // 连击窗口:2.5秒内没再命中则连击清零
+      for(const f of [player,ai]){ if(f.comboT>0){ f.comboT-=dt; if(f.comboT<=0){ f.combo=0; f.comboT=0; } } }
       // 命中
       tryHit(player,ai); tryHit(ai,player);
       updateHpBars(false);
@@ -1371,6 +1377,14 @@ function frame(now){
         ctx.save(); ctx.textAlign='center'; ctx.font='700 15px "Noto Sans SC",sans-serif';
         ctx.fillStyle=f.isPlayer?'#a16207':'#4b5563'; ctx.shadowColor='rgba(255,255,255,.9)'; ctx.shadowBlur=6;
         ctx.fillText(techName(f.tech),f.x,GROUND-215+(f.depth||0)); ctx.restore();
+      }
+    }
+    // 连击计数:≥2连击在头顶显示
+    for(const f of [player,ai]){
+      if(f.combo>=2&&!roundOver){
+        ctx.save(); ctx.textAlign='center'; ctx.font='900 24px "Noto Sans SC",sans-serif';
+        ctx.fillStyle=f.isPlayer?'#dc2626':'#b45309'; ctx.shadowColor='rgba(255,255,255,.9)'; ctx.shadowBlur=8;
+        ctx.fillText(STR[LANG].combo(f.combo),f.x,GROUND-245+(f.depth||0)); ctx.restore();
       }
     }
   }
