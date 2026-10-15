@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="wazalab-version" content="0.17">
+<meta name="wazalab-version" content="0.18">
 <script>
 // 版本自检:每次打开都对比服务器最新版,发现本地是旧缓存则自动硬刷新一次
 (function(){
@@ -58,6 +58,8 @@
   .modes button.active{background:var(--red);color:#fff;box-shadow:0 3px 12px rgba(230,57,70,.4);}
   #langBtn{border:1px solid var(--gold)!important;color:var(--gold)!important;font-size:13px!important;padding:8px 14px!important;}
   #langBtn:hover{background:rgba(242,177,52,.12);}
+  #sndBtn{border:1px solid var(--line)!important;color:var(--muted)!important;font-size:14px!important;padding:8px 12px!important;}
+  #sndBtn:hover{background:rgba(255,255,255,.06);}
 
   /* ---------- layout ---------- */
   main{width:100%;max-width:1180px;padding:8px 16px 20px;display:flex;gap:14px;align-items:flex-start;}
@@ -282,7 +284,7 @@
   <div class="brand">
     <div class="logo">技</div>
     <div>
-      <h1>WazaLab <span id="brandSub" style="font-size:15px;font-weight:500;">空手道动作教学游戏</span><span class="demo">Demo v0.17</span></h1>
+      <h1>WazaLab <span id="brandSub" style="font-size:15px;font-weight:500;">空手道动作教学游戏</span><span class="demo">Demo v0.18</span></h1>
       <p id="brandTag">AxisMotion 出品 · 构えから残心まで、技をゲームで学ぶ</p>
     </div>
   </div>
@@ -290,6 +292,7 @@
     <button id="tabDojo" class="active">📖 教学模式</button>
     <button id="tabSpar">⚔️ 对战模式</button>
     <button id="langBtn" title="Switch language / 切换语言">EN</button>
+    <button id="sndBtn" title="音效开关 / Sound">🔊</button>
   </div>
 </header>
 
@@ -594,7 +597,7 @@ zh:{
   brandTag:'AxisMotion 出品 · 构えから残心まで、技をゲームで学ぶ',
   tabDojo:'📖 教学模式', tabSpar:'⚔️ 对战模式', langBtn:'EN',
   hpYouName:'あなた', hpYouTag:'YOU · 红方', hpAiName:'あいて', hpAiTag:'AI 相手 · 白方',
-  rematch:'再来一局', changeDiff:'换难度',
+  rematch:'再来一局', changeDiff:'换难度', sndOn:'音效开', sndOff:'音效关',
   diffTitle:'选择 AI 难度', diffSub:'开始对战前，先选一位对手',
   diffs:{easy:{name:'🐣 简单',desc:'反应慢，出手少，适合新手练招'},normal:{name:'🥋 普通',desc:'攻守平衡，和之前一样的对手'},hard:{name:'🔥 困难',desc:'反应快，格挡多，出手狠'}},
   hintHTML:'<span><b>移动</b> <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> / <kbd>←</kbd><kbd>→</kbd><kbd>↑</kbd><kbd>↓</kbd></span>'
@@ -606,7 +609,7 @@ zh:{
     +'<span><b>逆突</b> <kbd>I</kbd></span>',
   touch:{block:['防','防御'],mae:'前踢',chudan:'中段踢',jodan:'高段踢',gedan:'下段踢',zuki:'逆突'},
   prev:'← 上一步', next:'下一步 →', tipsTitle:'💡 初学者要点', applyTitle:'🥋 实战应用', goSpar:'去对战试试',
-  footer:['WazaLab v0.17 Demo','AxisMotion','FormBuddy 姊妹项目','动作演示为教学示意，请在有资质教练指导下练习'],
+  footer:['WazaLab v0.18 Demo','AxisMotion','FormBuddy 姊妹项目','动作演示为教学示意，请在有资质教练指导下练习'],
   blocked:'防住了!', dodged:'闪避!', combo:n=>`${n} 连击！`, winTitle:'勝!',
   winSub:(cn,mx)=>`漂亮！${cn}终结了对手，最高连击 ${mx}。再来一局？`,
   loseSub:'被 AI 终结了……去教学模式练练那招，再回来复仇！',
@@ -617,7 +620,7 @@ en:{
   brandTag:'By AxisMotion · 構えから残心まで、技をゲームで学ぶ',
   tabDojo:'📖 Tutorial', tabSpar:'⚔️ Sparring', langBtn:'中文',
   hpYouName:'You', hpYouTag:'YOU · RED', hpAiName:'AI', hpAiTag:'AI · WHITE',
-  rematch:'Rematch', changeDiff:'Change difficulty',
+  rematch:'Rematch', changeDiff:'Change difficulty', sndOn:'Sound on', sndOff:'Sound off',
   diffTitle:'Choose AI Difficulty', diffSub:'Pick your opponent before the match',
   diffs:{easy:{name:'🐣 Easy',desc:'Slow reactions, fewer attacks — great for learning'},normal:{name:'🥋 Normal',desc:'Balanced offense and defense, same as before'},hard:{name:'🔥 Hard',desc:'Fast reactions, blocks often, hits hard'}},
   hintHTML:'<span><b>Move</b> <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> / <kbd>←</kbd><kbd>→</kbd><kbd>↑</kbd><kbd>↓</kbd></span>'
@@ -629,7 +632,7 @@ en:{
     +'<span><b>Reverse punch</b> <kbd>I</kbd></span>',
   touch:{block:['Block','hold'],mae:'Front',chudan:'Mid',jodan:'High',gedan:'Low',zuki:'Punch'},
   prev:'← Prev', next:'Next →', tipsTitle:'💡 Tips for beginners', applyTitle:'🥋 How to Apply It', goSpar:'Try it in sparring',
-  footer:['WazaLab v0.17 Demo','AxisMotion','Sister project of FormBuddy','Demos are for teaching — practice under a qualified instructor'],
+  footer:['WazaLab v0.18 Demo','AxisMotion','Sister project of FormBuddy','Demos are for teaching — practice under a qualified instructor'],
   blocked:'Blocked!', dodged:'Dodged!', combo:n=>`${n} HITS!`, winTitle:'You Win!',
   winSub:(cn,mx)=>`Beautiful! Finished with ${cn}, max combo ${mx}. Rematch?`,
   loseSub:'Finished by the AI… drill that technique in Tutorial mode, then come back for revenge!',
@@ -718,6 +721,7 @@ function applyLang(){
   document.getElementById('applyTitle').textContent=S.applyTitle;
   document.getElementById('goSparTxt').textContent=S.goSpar;
   document.getElementById('footer').innerHTML=S.footer.map((x,i)=>i?`<span class="sep">|</span>${x}`:x).join('');
+  syncSndBtn(); // v0.18: 音效按钮标题随语言更新
   renderTechList();
   renderDetail();
 }
@@ -927,6 +931,90 @@ function drawTrail(f){
   ctx.restore();
 }
 
+/* ================= 音效 (v0.18: WebAudio 合成,无外部文件) =================
+   hit: 击中闷响(噪声低通+正弦下坠); block: 格挡脆响(短促高频);
+   ko: 终结重音(低频轰鸣+下行滑音)。AudioContext 在首次用户手势后创建,
+   以满足浏览器自动播放策略;失败/不支持时静默无音,不影响游戏。 */
+let soundOn=(function(){ try{ return localStorage.getItem('wazalab_sound')!=='off'; }catch(e){ return true; } })();
+let AC=null;
+function ensureAudio(){
+  if(AC) return true;
+  try{
+    const Ctx=window.AudioContext||window.webkitAudioContext;
+    if(!Ctx) return false;
+    AC=new Ctx();
+    if(AC.state==='suspended') AC.resume();
+    return true;
+  }catch(e){ return false; }
+}
+window.addEventListener('pointerdown',ensureAudio);
+window.addEventListener('keydown',ensureAudio);
+function sfxNoise(dur){
+  const n=Math.max(1,Math.floor(AC.sampleRate*dur));
+  const b=AC.createBuffer(1,n,AC.sampleRate), d=b.getChannelData(0);
+  for(let i=0;i<n;i++) d[i]=Math.random()*2-1;
+  return b;
+}
+function sfxEnv(g,t0,a,peak,dec){
+  g.gain.setValueAtTime(0.0001,t0);
+  g.gain.exponentialRampToValueAtTime(peak,t0+a);
+  g.gain.exponentialRampToValueAtTime(0.0001,t0+a+dec);
+}
+function sfx(name){
+  if(!soundOn||!ensureAudio()) return;
+  try{
+    const t=AC.currentTime+0.001;
+    const master=AC.createGain(); master.gain.value=0.35; master.connect(AC.destination);
+    if(name==='hit'){
+      // 噪声爆音(低通 420Hz)+正弦 170→55Hz,约0.18s
+      const src=AC.createBufferSource(); src.buffer=sfxNoise(0.2);
+      const lp=AC.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=420;
+      const g=AC.createGain(); sfxEnv(g,t,0.004,0.9,0.16);
+      src.connect(lp); lp.connect(g); g.connect(master); src.start(t); src.stop(t+0.22);
+      const o=AC.createOscillator(); o.type='sine';
+      o.frequency.setValueAtTime(170,t); o.frequency.exponentialRampToValueAtTime(55,t+0.15);
+      const og=AC.createGain(); sfxEnv(og,t,0.004,1.0,0.15);
+      o.connect(og); og.connect(master); o.start(t); o.stop(t+0.2);
+    }else if(name==='block'){
+      // 短促脆响:三角波 820Hz 0.06s + 高频噪声
+      const o=AC.createOscillator(); o.type='triangle'; o.frequency.value=820;
+      const g=AC.createGain(); sfxEnv(g,t,0.003,0.55,0.06);
+      o.connect(g); g.connect(master); o.start(t); o.stop(t+0.1);
+      const src=AC.createBufferSource(); src.buffer=sfxNoise(0.08);
+      const hp=AC.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=1600;
+      const ng=AC.createGain(); sfxEnv(ng,t,0.003,0.35,0.05);
+      src.connect(hp); hp.connect(ng); ng.connect(master); src.start(t); src.stop(t+0.1);
+    }else if(name==='ko'){
+      // 终结重音:低频轰鸣 + 噪声冲击 + 锯齿下行滑音(392→98Hz)
+      const o=AC.createOscillator(); o.type='sine';
+      o.frequency.setValueAtTime(95,t); o.frequency.exponentialRampToValueAtTime(32,t+0.7);
+      const g=AC.createGain(); sfxEnv(g,t,0.008,1.0,0.8);
+      o.connect(g); g.connect(master); o.start(t); o.stop(t+0.9);
+      const src=AC.createBufferSource(); src.buffer=sfxNoise(0.7);
+      const lp=AC.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=240;
+      const ng=AC.createGain(); sfxEnv(ng,t,0.01,0.8,0.6);
+      src.connect(lp); lp.connect(ng); ng.connect(master); src.start(t); src.stop(t+0.75);
+      const s=AC.createOscillator(); s.type='sawtooth';
+      s.frequency.setValueAtTime(392,t+0.08); s.frequency.exponentialRampToValueAtTime(98,t+0.75);
+      const sg=AC.createGain(); sfxEnv(sg,t+0.08,0.02,0.28,0.65);
+      s.connect(sg); sg.connect(master); s.start(t+0.08); s.stop(t+0.85);
+    }
+    // 无名音效直接忽略
+  }catch(e){ /* 音频失败不影响游戏 */ }
+}
+function toggleSound(){
+  soundOn=!soundOn;
+  try{ localStorage.setItem('wazalab_sound',(soundOn?'on':'off')); }catch(e){}
+  syncSndBtn();
+  if(soundOn) sfx('block'); // 开启时给一个反馈音
+}
+function syncSndBtn(){
+  const b=document.getElementById('sndBtn'); if(!b) return;
+  const S=STR[LANG]||STR.zh;
+  b.textContent=soundOn?'🔊':'🔇';
+  b.title=(soundOn?S.sndOn:S.sndOff)+' / '+(soundOn?S.sndOff:S.sndOn);
+}
+
 /* ================= 武者状态 ================= */
 function makeFighter(x,facing,isPlayer){
   return {x,facing,isPlayer,hp:100,maxhp:100,dispHp:100,depth:0,
@@ -1012,6 +1100,7 @@ function tryHit(att,def){
   spawnFloater(def.x-att.facing*40,zoneY-40,blocked?STR[LANG].blocked:techName(tech)+'!',blocked?'#1d6fd8':'#b45309',26);
   spawnFloater(def.x-att.facing*10,zoneY-92,'-'+dmg,blocked?'#7cc4ff':'#ff6b5e',blocked?26:40); // 伤害数字
   freeze=blocked?0.06:0.13; shakeT=blocked?0.08:0.16;
+  sfx(blocked?'block':'hit'); // v0.18 音效
   def.x+=att.facing*(blocked?8:26);
   if(def.hp<=0&&def.state!=='ko'){ def.state='ko'; def.koT=0; def.moveDir=0; endRound(att); }
 }
@@ -1262,6 +1351,7 @@ function resetRound(){
 }
 function endRound(winner){
   roundOver=true;
+  sfx('ko'); // v0.18 音效
   const title=document.getElementById('roundTitle'), sub=document.getElementById('roundSub');
   const S=STR[LANG];
   if(winner.isPlayer){ title.textContent=S.winTitle; title.style.color='#43d17c'; sub.textContent=S.winSub(winner.tech?techName(winner.tech):'',winner.comboMax||0); }
@@ -1394,6 +1484,7 @@ function frame(now){
 
 /* ================= 启动 ================= */
 document.getElementById('langBtn').onclick=()=>{ LANG=LANG==='zh'?'en':'zh'; applyLang(); };
+document.getElementById('sndBtn').onclick=()=>toggleSound(); // v0.18 音效开关
 applyLang();
 fitStage();
 document.getElementById('vtag').textContent='v'+document.querySelector('meta[name="wazalab-version"]').getAttribute('content');
