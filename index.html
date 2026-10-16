@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="wazalab-version" content="0.18">
+<meta name="wazalab-version" content="0.19">
 <script>
 // 版本自检:每次打开都对比服务器最新版,发现本地是旧缓存则自动硬刷新一次
 (function(){
@@ -284,7 +284,7 @@
   <div class="brand">
     <div class="logo">技</div>
     <div>
-      <h1>WazaLab <span id="brandSub" style="font-size:15px;font-weight:500;">空手道动作教学游戏</span><span class="demo">Demo v0.18</span></h1>
+      <h1>WazaLab <span id="brandSub" style="font-size:15px;font-weight:500;">空手道动作教学游戏</span><span class="demo">Demo v0.19</span></h1>
       <p id="brandTag">AxisMotion 出品 · 构えから残心まで、技をゲームで学ぶ</p>
     </div>
   </div>
@@ -311,13 +311,13 @@
         <div class="hpname"><span id="hpYouName">あなた</span> <span class="tag" id="hpYouTag">YOU · 红方</span></div>
         <div class="hpbar"><div class="ghost" id="ghostP"></div><div class="fill" id="fillP" style="width:100%"></div></div>
       </div>
-      <div style="flex:0 0 auto;align-self:center;text-align:center;"><div style="font-weight:900;color:var(--gold);font-size:14px;text-shadow:0 1px 4px #000;">VS</div><div id="vtag" style="font-size:9px;color:#8a8fa3;font-weight:400;line-height:1.2;"></div></div>
+      <div style="flex:0 0 auto;align-self:center;text-align:center;"><div style="font-weight:900;color:var(--gold);font-size:14px;text-shadow:0 1px 4px #000;">VS</div><div id="vtag" style="font-size:9px;color:#8a8fa3;font-weight:400;line-height:1.2;"></div><div id="timer" style="font-weight:900;color:var(--white);font-size:19px;text-shadow:0 1px 4px #000;line-height:1.25;">1:30</div><div id="pips" style="font-size:11px;line-height:1.2;white-space:nowrap;"><span id="pipP" style="color:#ff5964;">○○</span><span id="pipA" style="color:#c3ccd9;">○○</span></div></div>
       <div class="hpbox right">
         <div class="hpname"><span class="tag" id="hpAiTag">AI 相手 · 白方</span> <span id="hpAiName">あいて</span></div>
         <div class="hpbar"><div class="ghost" id="ghostA"></div><div class="fill" id="fillA" style="width:100%"></div></div>
       </div>
     </div>
-    <div id="roundmsg"><h2 id="roundTitle">KO!</h2><p id="roundSub"></p><button id="btnRematch">再来一局</button><button id="btnChangeDiff" class="ghost">换难度</button></div>
+    <div id="roundmsg"><h2 id="roundTitle">KO!</h2><p id="roundSub"></p><button id="btnRematch">再来一局</button><button id="btnNextRound" style="display:none;">下一回合</button><button id="btnChangeDiff" class="ghost">换难度</button></div>
 
     <div id="diffPicker">
       <h2 id="diffTitle">选择 AI 难度</h2>
@@ -597,7 +597,7 @@ zh:{
   brandTag:'AxisMotion 出品 · 构えから残心まで、技をゲームで学ぶ',
   tabDojo:'📖 教学模式', tabSpar:'⚔️ 对战模式', langBtn:'EN',
   hpYouName:'あなた', hpYouTag:'YOU · 红方', hpAiName:'あいて', hpAiTag:'AI 相手 · 白方',
-  rematch:'再来一局', changeDiff:'换难度', sndOn:'音效开', sndOff:'音效关',
+  rematch:'再来一局', nextRound:'下一回合', changeDiff:'换难度', sndOn:'音效开', sndOff:'音效关',
   diffTitle:'选择 AI 难度', diffSub:'开始对战前，先选一位对手',
   diffs:{easy:{name:'🐣 简单',desc:'反应慢，出手少，适合新手练招'},normal:{name:'🥋 普通',desc:'攻守平衡，和之前一样的对手'},hard:{name:'🔥 困难',desc:'反应快，格挡多，出手狠'}},
   hintHTML:'<span><b>移动</b> <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> / <kbd>←</kbd><kbd>→</kbd><kbd>↑</kbd><kbd>↓</kbd></span>'
@@ -609,10 +609,18 @@ zh:{
     +'<span><b>逆突</b> <kbd>I</kbd></span>',
   touch:{block:['防','防御'],mae:'前踢',chudan:'中段踢',jodan:'高段踢',gedan:'下段踢',zuki:'逆突'},
   prev:'← 上一步', next:'下一步 →', tipsTitle:'💡 初学者要点', applyTitle:'🥋 实战应用', goSpar:'去对战试试',
-  footer:['WazaLab v0.18 Demo','AxisMotion','FormBuddy 姊妹项目','动作演示为教学示意，请在有资质教练指导下练习'],
+  footer:['WazaLab v0.19 Demo','AxisMotion','FormBuddy 姊妹项目','动作演示为教学示意，请在有资质教练指导下练习'],
   blocked:'防住了!', dodged:'闪避!', combo:n=>`${n} 连击！`, winTitle:'勝!',
   winSub:(cn,mx)=>`漂亮！${cn}终结了对手，最高连击 ${mx}。再来一局？`,
   loseSub:'被 AI 终结了……去教学模式练练那招，再回来复仇！',
+  roundAnn:n=>`第 ${n} 回合`, fightAnn:'開始！', timeUp:'時間切れ！',
+  roundWinP:n=>`第 ${n} 回合 · 你赢了！`, roundWinA:n=>`第 ${n} 回合 · AI 赢了`,
+  roundKoP:cn=>`漂亮！${cn}终结了对手。`, roundKoA:'AI 终结了你。',
+  roundTimeP:'时间到 —— 你的血量占优！', roundTimeA:'时间到 —— AI 的血量占优。',
+  roundDraw:'双方血量相同 —— 本回合重赛！',
+  matchWinTitle:'勝！', matchLoseTitle:'敗北',
+  matchWinSub:(p,a,mx)=>`总比分 ${p}:${a}，最高连击 ${mx}。漂亮的比赛！`,
+  matchLoseSub:(p,a)=>`总比分 ${p}:${a}。去教学模式练练，再回来复仇！`,
 },
 en:{
   title:'WazaLab Karate Technique Game (Demo)',
@@ -620,7 +628,7 @@ en:{
   brandTag:'By AxisMotion · 構えから残心まで、技をゲームで学ぶ',
   tabDojo:'📖 Tutorial', tabSpar:'⚔️ Sparring', langBtn:'中文',
   hpYouName:'You', hpYouTag:'YOU · RED', hpAiName:'AI', hpAiTag:'AI · WHITE',
-  rematch:'Rematch', changeDiff:'Change difficulty', sndOn:'Sound on', sndOff:'Sound off',
+  rematch:'Rematch', nextRound:'Next round', changeDiff:'Change difficulty', sndOn:'Sound on', sndOff:'Sound off',
   diffTitle:'Choose AI Difficulty', diffSub:'Pick your opponent before the match',
   diffs:{easy:{name:'🐣 Easy',desc:'Slow reactions, fewer attacks — great for learning'},normal:{name:'🥋 Normal',desc:'Balanced offense and defense, same as before'},hard:{name:'🔥 Hard',desc:'Fast reactions, blocks often, hits hard'}},
   hintHTML:'<span><b>Move</b> <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> / <kbd>←</kbd><kbd>→</kbd><kbd>↑</kbd><kbd>↓</kbd></span>'
@@ -632,10 +640,18 @@ en:{
     +'<span><b>Reverse punch</b> <kbd>I</kbd></span>',
   touch:{block:['Block','hold'],mae:'Front',chudan:'Mid',jodan:'High',gedan:'Low',zuki:'Punch'},
   prev:'← Prev', next:'Next →', tipsTitle:'💡 Tips for beginners', applyTitle:'🥋 How to Apply It', goSpar:'Try it in sparring',
-  footer:['WazaLab v0.18 Demo','AxisMotion','Sister project of FormBuddy','Demos are for teaching — practice under a qualified instructor'],
+  footer:['WazaLab v0.19 Demo','AxisMotion','Sister project of FormBuddy','Demos are for teaching — practice under a qualified instructor'],
   blocked:'Blocked!', dodged:'Dodged!', combo:n=>`${n} HITS!`, winTitle:'You Win!',
   winSub:(cn,mx)=>`Beautiful! Finished with ${cn}, max combo ${mx}. Rematch?`,
   loseSub:'Finished by the AI… drill that technique in Tutorial mode, then come back for revenge!',
+  roundAnn:n=>`ROUND ${n}`, fightAnn:'FIGHT!', timeUp:"TIME'S UP!",
+  roundWinP:n=>`ROUND ${n} · YOU WIN`, roundWinA:n=>`ROUND ${n} · AI WINS`,
+  roundKoP:cn=>`Beautiful! Finished with ${cn}.`, roundKoA:'The AI finished you.',
+  roundTimeP:"Time's up — you had more HP!", roundTimeA:"Time's up — the AI had more HP.",
+  roundDraw:'Even HP — this round is a draw, replay!',
+  matchWinTitle:'You Win!', matchLoseTitle:'You Lose',
+  matchWinSub:(p,a,mx)=>`Match score ${p}:${a}, max combo ${mx}. Beautiful match!`,
+  matchLoseSub:(p,a)=>`Match score ${p}:${a}. Drill in Tutorial mode, then come back for revenge!`,
 }
 };
 const TECH_EN={
@@ -698,6 +714,7 @@ function applyLang(){
   document.getElementById('hpAiName').textContent=S.hpAiName;
   document.getElementById('hpAiTag').textContent=S.hpAiTag+' · '+diffLabel();
   document.getElementById('btnRematch').textContent=S.rematch;
+  document.getElementById('btnNextRound').textContent=S.nextRound;
   document.getElementById('btnChangeDiff').textContent=S.changeDiff;
   document.getElementById('diffTitle').textContent=S.diffTitle;
   document.getElementById('diffSub').textContent=S.diffSub;
@@ -1102,7 +1119,7 @@ function tryHit(att,def){
   freeze=blocked?0.06:0.13; shakeT=blocked?0.08:0.16;
   sfx(blocked?'block':'hit'); // v0.18 音效
   def.x+=att.facing*(blocked?8:26);
-  if(def.hp<=0&&def.state!=='ko'){ def.state='ko'; def.koT=0; def.moveDir=0; endRound(att); }
+  if(def.hp<=0&&def.state!=='ko'){ def.state='ko'; def.koT=0; def.moveDir=0; endRound(att,'ko'); }
 }
 
 /* ================= AI 难度分级 =================
@@ -1125,7 +1142,7 @@ function setDifficulty(d){
   aiDiff=d; pickerOpen=false;
   document.getElementById('hpAiTag').textContent=STR[LANG].hpAiTag+' · '+diffLabel();
   document.getElementById('diffPicker').classList.remove('show');
-  resetRound();
+  resetMatch(); // 换难度=重新开赛
 }
 
 /* ================= 对战 AI ================= */
@@ -1258,7 +1275,7 @@ const ATKMAP={KeyJ:'mae',KeyK:'chudan',KeyL:'jodan',KeyU:'gedan',KeyI:'zuki'};
 window.addEventListener('keydown',e=>{
   if(KEYMAP[e.code]||ATKMAP[e.code]) e.preventDefault();
   if(e.repeat) return;
-  if(mode!=='spar'||roundOver) return;
+  if(mode!=='spar'||roundOver||roundPhase!=='fight') return; // v0.19:播报中不出招
   if(KEYMAP[e.code]) keys[KEYMAP[e.code]]=true;
   if(ATKMAP[e.code]) startAttack(player,ATKMAP[e.code]);
 });
@@ -1267,7 +1284,7 @@ window.addEventListener('keyup',e=>{ if(KEYMAP[e.code]) keys[KEYMAP[e.code]]=fal
 document.querySelectorAll('.tbtn').forEach(b=>{
   const k=b.dataset.k;
   const on=e=>{ e.preventDefault(); b.classList.add('held');
-    if(mode!=='spar'||roundOver) return;
+    if(mode!=='spar'||roundOver||roundPhase!=='fight') return; // v0.19:播报中不出招
     if(k in keys) keys[k]=true; else startAttack(player,k); };
   const off=e=>{ e.preventDefault(); b.classList.remove('held');
     if(k in keys) keys[k]=false; };
@@ -1342,23 +1359,63 @@ document.getElementById('goSpar').onclick=()=>setMode('spar');
 document.getElementById('btnPrev').onclick=()=>{ if(dojoStep>0){dojoStep--;dojoT=0;renderDetail();} };
 document.getElementById('btnNext').onclick=()=>{ if(dojoStep<dojoTech.steps.length-1){dojoStep++;dojoT=0;renderDetail();} };
 
+/* ================= 回合制 + 计时器 (v0.19):三局两胜 ================= */
+const ROUND_TIME=90, WIN_ROUNDS=2; // 每回合90秒,先拿2回合者胜
+let match={p:0,a:0,round:1}; // p=玩家回合胜数,a=AI回合胜数
+let roundT=ROUND_TIME, roundPhase='fight', annText='', annT=0, introStep=0, lastRoundDraw=false;
+function fmtTime(s){ s=Math.max(0,Math.ceil(s)); return Math.floor(s/60)+':'+String(s%60).padStart(2,'0'); }
+function updateTimer(){
+  const el=document.getElementById('timer');
+  el.textContent=fmtTime(roundT);
+  el.style.color=(roundT<=10&&roundPhase==='fight')?'#ff5964':'var(--white)';
+}
+function updatePips(){
+  document.getElementById('pipP').textContent='●'.repeat(match.p)+'○'.repeat(WIN_ROUNDS-match.p);
+  document.getElementById('pipA').textContent='●'.repeat(match.a)+'○'.repeat(WIN_ROUNDS-match.a);
+}
+function announce(txt,dur){ annText=txt; annT=dur; }
+function beginRoundIntro(){ roundPhase='intro'; introStep=0; announce(STR[LANG].roundAnn(match.round),1.4); }
+
 function resetRound(){
   player=makeFighter(300,1,true); ai=makeFighter(660,-1,false);
   particles=[]; floaters=[]; freeze=0; shakeT=0; roundOver=false;
+  roundT=ROUND_TIME; updateTimer();
   document.getElementById('roundmsg').classList.remove('show');
   document.getElementById('diffPicker').classList.remove('show');
   updateHpBars(true);
+  beginRoundIntro(); // 回合开始:第 N 回合 → 開始!/FIGHT!
 }
-function endRound(winner){
-  roundOver=true;
-  sfx('ko'); // v0.18 音效
-  const title=document.getElementById('roundTitle'), sub=document.getElementById('roundSub');
+function nextRound(){ if(!lastRoundDraw) match.round++; resetRound(); } // 平局重赛,回合数不变
+function resetMatch(){ match={p:0,a:0,round:1}; updatePips(); resetRound(); }
+function endRound(winner,reason){ // reason:'ko'|'time'; winner=null=时间到且血量相同
+  roundPhase='over'; roundOver=true;
   const S=STR[LANG];
-  if(winner.isPlayer){ title.textContent=S.winTitle; title.style.color='#43d17c'; sub.textContent=S.winSub(winner.tech?techName(winner.tech):'',winner.comboMax||0); }
-  else { title.textContent='KO!'; title.style.color='#e63946'; sub.textContent=S.loseSub; }
-  setTimeout(()=>document.getElementById('roundmsg').classList.add('show'),700);
+  const title=document.getElementById('roundTitle'), sub=document.getElementById('roundSub');
+  const bRem=document.getElementById('btnRematch'), bDiff=document.getElementById('btnChangeDiff'), bNext=document.getElementById('btnNextRound');
+  if(winner){
+    if(reason==='ko') sfx('ko'); // v0.18 音效
+    if(winner.isPlayer) match.p++; else match.a++;
+    lastRoundDraw=false;
+  } else lastRoundDraw=true;
+  updatePips();
+  if(match.p>=WIN_ROUNDS||match.a>=WIN_ROUNDS){ // 整场比赛结束
+    const wp=match.p>=WIN_ROUNDS, best=Math.max(player.comboMax||0,ai.comboMax||0);
+    title.textContent=wp?S.matchWinTitle:S.matchLoseTitle;
+    title.style.color=wp?'#43d17c':'#e63946';
+    sub.textContent=wp?S.matchWinSub(match.p,match.a,best):S.matchLoseSub(match.p,match.a);
+    bRem.style.display=''; bDiff.style.display=''; bNext.style.display='none';
+  } else { // 本回合结束,下一回合
+    if(!winner){ title.textContent=S.timeUp; title.style.color='#f2b134'; sub.textContent=S.roundDraw; }
+    else if(winner.isPlayer){ title.textContent=S.roundWinP(match.round); title.style.color='#43d17c';
+      sub.textContent=reason==='ko'?S.roundKoP(winner.tech?techName(winner.tech):''):S.roundTimeP; }
+    else { title.textContent=S.roundWinA(match.round); title.style.color='#e63946';
+      sub.textContent=reason==='ko'?S.roundKoA:S.roundTimeA; }
+    bRem.style.display='none'; bDiff.style.display='none'; bNext.style.display='';
+  }
+  setTimeout(()=>document.getElementById('roundmsg').classList.add('show'),(winner&&reason==='ko')?700:400);
 }
-document.getElementById('btnRematch').onclick=resetRound;
+document.getElementById('btnRematch').onclick=resetMatch;
+document.getElementById('btnNextRound').onclick=nextRound;
 document.getElementById('btnChangeDiff').onclick=showDiffPicker;
 document.querySelectorAll('#diffPicker .diffbtn').forEach(b=>{ b.onclick=()=>setDifficulty(b.dataset.diff); });
 
@@ -1403,6 +1460,19 @@ function frame(now){
   } else {
     if(freeze>0){ freeze-=dt; }
     else if(!pickerOpen){ // 选难度时暂停对战
+      if(annT>0) annT-=dt;
+      if(roundPhase==='intro'){ // v0.19 回合开始播报:第 N 回合 → 開始!/FIGHT!,播报中冻结
+        if(annT<=0){
+          if(introStep===0){ announce(STR[LANG].fightAnn,0.8); introStep=1; }
+          else roundPhase='fight';
+        }
+      } else if(roundPhase==='fight'){
+        roundT-=dt; updateTimer();
+        if(roundT<=0){ // v0.19 时间到:按血量判回合胜负,相同则重赛
+          if(player.hp>ai.hp) endRound(player,'time');
+          else if(ai.hp>player.hp) endRound(ai,'time');
+          else endRound(null,'time');
+        } else {
       // 玩家
       if(!roundOver&&player.state!=='ko'){
         if(keys.block) setBlock(player,true); else setBlock(player,false);
@@ -1447,6 +1517,8 @@ function frame(now){
       for(const f of [player,ai]){ if(f.comboT>0){ f.comboT-=dt; if(f.comboT<=0){ f.combo=0; f.comboT=0; } } }
       // 命中
       tryHit(player,ai); tryHit(ai,player);
+        } // 计时回合进行中才结算出招(v0.19)
+      }
       updateHpBars(false);
     }
     updateFx(dt);
@@ -1461,6 +1533,15 @@ function frame(now){
       ctx.restore();
     }
     drawFx();
+    // v0.19 回合播报(第 N 回合 / 開始!/FIGHT!)
+    if(annT>0){
+      ctx.save(); ctx.textAlign='center';
+      ctx.globalAlpha=Math.min(1,0.3+annT*2);
+      ctx.font='900 64px "Noto Sans SC",sans-serif';
+      ctx.lineWidth=10; ctx.strokeStyle='rgba(250,246,238,.92)'; ctx.fillStyle='#0d0f16';
+      ctx.strokeText(annText,W/2,GROUND-235); ctx.fillText(annText,W/2,GROUND-235);
+      ctx.restore();
+    }
     // 招式名提示(攻击中)
     for(const f of [player,ai]){
       if(f.state==='attack'&&f.tech&&!roundOver){
