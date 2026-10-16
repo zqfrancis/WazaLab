@@ -715,6 +715,7 @@ function applyLang(){
   document.getElementById('hpAiTag').textContent=S.hpAiTag+' · '+diffLabel();
   document.getElementById('btnRematch').textContent=S.rematch;
   document.getElementById('btnNextRound').textContent=S.nextRound;
+  renderResultMsg(); // v0.19 补丁:结果面板开着时切换语言也重绘
   document.getElementById('btnChangeDiff').textContent=S.changeDiff;
   document.getElementById('diffTitle').textContent=S.diffTitle;
   document.getElementById('diffSub').textContent=S.diffSub;
@@ -1389,30 +1390,40 @@ function nextRound(){ if(!lastRoundDraw) match.round++; resetRound(); } // 平�
 function resetMatch(){ match={p:0,a:0,round:1}; updatePips(); resetRound(); }
 function endRound(winner,reason){ // reason:'ko'|'time'; winner=null=时间到且血量相同
   roundPhase='over'; roundOver=true;
-  const S=STR[LANG];
-  const title=document.getElementById('roundTitle'), sub=document.getElementById('roundSub');
-  const bRem=document.getElementById('btnRematch'), bDiff=document.getElementById('btnChangeDiff'), bNext=document.getElementById('btnNextRound');
   if(winner){
     if(reason==='ko') sfx('ko'); // v0.18 音效
     if(winner.isPlayer) match.p++; else match.a++;
     lastRoundDraw=false;
   } else lastRoundDraw=true;
   updatePips();
-  if(match.p>=WIN_ROUNDS||match.a>=WIN_ROUNDS){ // 整场比赛结束
-    const wp=match.p>=WIN_ROUNDS, best=Math.max(player.comboMax||0,ai.comboMax||0);
-    title.textContent=wp?S.matchWinTitle:S.matchLoseTitle;
-    title.style.color=wp?'#43d17c':'#e63946';
-    sub.textContent=wp?S.matchWinSub(match.p,match.a,best):S.matchLoseSub(match.p,match.a);
+  const matchDone=match.p>=WIN_ROUNDS||match.a>=WIN_ROUNDS;
+  lastResult=matchDone // v0.19 补丁:记下结果,供切换语言时重绘
+    ? {kind:'match', wp:match.p>=WIN_ROUNDS, p:match.p, a:match.a, best:Math.max(player.comboMax||0,ai.comboMax||0)}
+    : {kind:'round', winner:winner?(winner.isPlayer?1:0):null, reason, round:match.round, cn:winner&&winner.tech?techName(winner.tech):''};
+  renderResultMsg();
+  setTimeout(()=>document.getElementById('roundmsg').classList.add('show'),(winner&&reason==='ko')?700:400);
+}
+// 渲染回合/比赛结果面板;切换语言时 applyLang 会重调它(v0.19 补丁)
+let lastResult=null;
+function renderResultMsg(){
+  if(!lastResult) return;
+  const S=STR[LANG];
+  const title=document.getElementById('roundTitle'), sub=document.getElementById('roundSub');
+  const bRem=document.getElementById('btnRematch'), bDiff=document.getElementById('btnChangeDiff'), bNext=document.getElementById('btnNextRound');
+  const R=lastResult;
+  if(R.kind==='match'){
+    title.textContent=R.wp?S.matchWinTitle:S.matchLoseTitle;
+    title.style.color=R.wp?'#43d17c':'#e63946';
+    sub.textContent=R.wp?S.matchWinSub(R.p,R.a,R.best):S.matchLoseSub(R.p,R.a);
     bRem.style.display=''; bDiff.style.display=''; bNext.style.display='none';
-  } else { // 本回合结束,下一回合
-    if(!winner){ title.textContent=S.timeUp; title.style.color='#f2b134'; sub.textContent=S.roundDraw; }
-    else if(winner.isPlayer){ title.textContent=S.roundWinP(match.round); title.style.color='#43d17c';
-      sub.textContent=reason==='ko'?S.roundKoP(winner.tech?techName(winner.tech):''):S.roundTimeP; }
-    else { title.textContent=S.roundWinA(match.round); title.style.color='#e63946';
-      sub.textContent=reason==='ko'?S.roundKoA:S.roundTimeA; }
+  } else {
+    if(R.winner===null){ title.textContent=S.timeUp; title.style.color='#f2b134'; sub.textContent=S.roundDraw; }
+    else if(R.winner){ title.textContent=S.roundWinP(R.round); title.style.color='#43d17c';
+      sub.textContent=R.reason==='ko'?S.roundKoP(R.cn):S.roundTimeP; }
+    else { title.textContent=S.roundWinA(R.round); title.style.color='#e63946';
+      sub.textContent=R.reason==='ko'?S.roundKoA:S.roundTimeA; }
     bRem.style.display='none'; bDiff.style.display='none'; bNext.style.display='';
   }
-  setTimeout(()=>document.getElementById('roundmsg').classList.add('show'),(winner&&reason==='ko')?700:400);
 }
 document.getElementById('btnRematch').onclick=resetMatch;
 document.getElementById('btnNextRound').onclick=nextRound;
