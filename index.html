@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="wazalab-version" content="0.19">
+<meta name="wazalab-version" content="0.20">
 <script>
 // 版本自检:每次打开都对比服务器最新版,发现本地是旧缓存则自动硬刷新一次
 (function(){
@@ -64,6 +64,10 @@
   /* ---------- layout ---------- */
   main{width:100%;max-width:1180px;padding:8px 16px 20px;display:flex;gap:14px;align-items:flex-start;}
   #stage-wrap{flex:1 1 auto;min-width:0;position:relative;}
+  canvas#gl{position:absolute;inset:0;width:100%;height:100%;z-index:0;display:none;}
+  body.gl3d canvas#gl{display:block;}
+  body.gl3d canvas#stage{background:transparent;}
+  canvas#stage{position:relative;z-index:1;}
   canvas#stage{
     width:100%;height:auto;display:block;border-radius:14px;border:1px solid var(--line);
     background:#10131c; touch-action:none; user-select:none;-webkit-user-select:none;
@@ -284,7 +288,7 @@
   <div class="brand">
     <div class="logo">技</div>
     <div>
-      <h1>WazaLab <span id="brandSub" style="font-size:15px;font-weight:500;">空手道动作教学游戏</span><span class="demo">Demo v0.19</span></h1>
+      <h1>WazaLab <span id="brandSub" style="font-size:15px;font-weight:500;">空手道动作教学游戏</span><span class="demo">Demo v0.20</span></h1>
       <p id="brandTag">AxisMotion 出品 · 构えから残心まで、技をゲームで学ぶ</p>
     </div>
   </div>
@@ -305,6 +309,7 @@
 
   <!-- center: stage -->
   <div id="stage-wrap">
+    <canvas id="gl"></canvas>
     <canvas id="stage" width="960" height="480"></canvas>
     <div id="hud">
       <div class="hpbox left">
@@ -378,6 +383,7 @@
 
 <footer id="footer"></footer>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.149.0/three.min.js"></script>
 <script>
 'use strict';
 /* ================= 基础工具 ================= */
@@ -609,7 +615,7 @@ zh:{
     +'<span><b>逆突</b> <kbd>I</kbd></span>',
   touch:{block:['防','防御'],mae:'前踢',chudan:'中段踢',jodan:'高段踢',gedan:'下段踢',zuki:'逆突'},
   prev:'← 上一步', next:'下一步 →', tipsTitle:'💡 初学者要点', applyTitle:'🥋 实战应用', goSpar:'去对战试试',
-  footer:['WazaLab v0.19 Demo','AxisMotion','FormBuddy 姊妹项目','动作演示为教学示意，请在有资质教练指导下练习'],
+  footer:['WazaLab v0.20 Demo','AxisMotion','FormBuddy 姊妹项目','动作演示为教学示意，请在有资质教练指导下练习'],
   blocked:'防住了!', dodged:'闪避!', combo:n=>`${n} 连击！`, winTitle:'勝!',
   winSub:(cn,mx)=>`漂亮！${cn}终结了对手，最高连击 ${mx}。再来一局？`,
   loseSub:'被 AI 终结了……去教学模式练练那招，再回来复仇！',
@@ -640,7 +646,7 @@ en:{
     +'<span><b>Reverse punch</b> <kbd>I</kbd></span>',
   touch:{block:['Block','hold'],mae:'Front',chudan:'Mid',jodan:'High',gedan:'Low',zuki:'Punch'},
   prev:'← Prev', next:'Next →', tipsTitle:'💡 Tips for beginners', applyTitle:'🥋 How to Apply It', goSpar:'Try it in sparring',
-  footer:['WazaLab v0.19 Demo','AxisMotion','Sister project of FormBuddy','Demos are for teaching — practice under a qualified instructor'],
+  footer:['WazaLab v0.20 Demo','AxisMotion','Sister project of FormBuddy','Demos are for teaching — practice under a qualified instructor'],
   blocked:'Blocked!', dodged:'Dodged!', combo:n=>`${n} HITS!`, winTitle:'You Win!',
   winSub:(cn,mx)=>`Beautiful! Finished with ${cn}, max combo ${mx}. Rematch?`,
   loseSub:'Finished by the AI… drill that technique in Tutorial mode, then come back for revenge!',
@@ -1447,10 +1453,12 @@ function frame(now){
   let dt=(now-lastT)/1000; lastT=now;
   dt=Math.min(dt,0.05);
   const t=now/1000;
+  const use3D=USE3D&&mode!=='dojo'; // v0.20:对战模式走 3D,教学模式暂保持 2D
+  document.body.classList.toggle('gl3d',!!use3D);
 
   ctx.save();
-  if(shakeT>0){ shakeT-=dt; ctx.translate((Math.random()-0.5)*10*shakeT*8,(Math.random()-0.5)*8*shakeT*8); }
-  drawDojo(t);
+  if(shakeT>0){ shakeT-=dt; if(!use3D) ctx.translate((Math.random()-0.5)*10*shakeT*8,(Math.random()-0.5)*8*shakeT*8); }
+  if(use3D) ctx.clearRect(0,0,W,H); else drawDojo(t);
 
   if(mode==='dojo'){
     dojoT+=dt;
@@ -1533,6 +1541,20 @@ function frame(now){
       updateHpBars(false);
     }
     updateFx(dt);
+    if(use3D){
+      // v0.20: 3D 武者(姿势数据与 2D 共用),纵深由透视自然处理
+      applyPose3D(GL.pRig,player,fighterPose(player,t));
+      applyPose3D(GL.aRig,ai,fighterPose(ai,t));
+      renderGL();
+      for(const pair of [[player,GL.pRig],[ai,GL.aRig]]){
+        const f=pair[0], rig=pair[1];
+        if(f.state==='attack'&&f.tech&&f.tech.trail){
+          const p=rigToeScreen(rig);
+          if(p) pushTrail(f,{toeX:p[0],toeY:p[1]});
+        } else fadeTrail(f);
+        drawTrail(f);
+      }
+    } else {
     // 纵深排序:远的先画;纵深越近人越大
     const order=[ai,player].sort((a,b)=>(a.depth||0)-(b.depth||0));
     for(const f of order){
@@ -1542,6 +1564,7 @@ function frame(now){
       if(f.state==='attack'&&f.tech&&f.tech.trail)pushTrail(f,finfo); else fadeTrail(f);
       drawTrail(f);
       ctx.restore();
+    }
     }
     drawFx();
     // v0.19 回合播报(第 N 回合 / 開始!/FIGHT!)
@@ -1573,6 +1596,199 @@ function frame(now){
   ctx.restore();
   requestAnimationFrame(frame);
 }
+
+/* ================= 3D 对战 (v0.20): Three.js 低模小人 + 3D 道场 =================
+   架构: WebGL 画布 #gl 垫在 2D #stage 之下;3D 负责道场+武者,2D 只画 HUD/粒子/拖尾/文字。
+   姿势数据复用同一套 P() 字段(fighterPose),2D/3D 共用,对战逻辑零改动。
+   教学模式(道场演示)暂保持 2D。无 THREE 或 WebGL 初始化失败时自动回退 2D。 */
+const HAS3D=(typeof THREE!=='undefined');
+
+/* 纯数学:2D 姿势字段 → 3D 关节弧度(可在 Node 测试,无 THREE 依赖)
+   坐标系: x=面向方向(米制:px),y=上,z=朝观众;facing=+1 面向右,-1 面向左 */
+function rigAngles(pose,f){
+  const d=f.facing*D2R;
+  return {
+    rootX:f.x+pose.hipX*f.facing, hipY:pose.hipY, depthZ:f.depth||0,
+    torso:-pose.torso*d, head:-pose.head*d,
+    shF:pose.fSh*d, elF:pose.fEl*d, shB:pose.bSh*d, elB:pose.bEl*d,
+    hipF:pose.fHip*d, kneeF:-pose.fKnee*d, ankF:pose.fAnk*d,
+    hipB:pose.bHip*d, kneeB:-pose.bKnee*d, ankB:pose.bAnk*d,
+    swingF:-pose.fSwing*0.9*f.facing, swingB:-pose.bSwing*0.9*f.facing,
+  };
+}
+
+/* 低模武者:胶囊四肢 + 球头 + 道服配色,全部代码生成,无外部模型文件 */
+function buildFighterRig(isPlayer){
+  const root=new THREE.Group(), J={};
+  const mats=[];
+  const M=c=>{ const m=new THREE.MeshStandardMaterial({color:c,roughness:.9,metalness:0}); mats.push(m); return m; };
+  const giM=M(0xf5f6f8), giDM=M(0xdfe3ea), skinM=M(0xf0bd93),
+        hairM=M(0x2e2620), beltM=M(isPlayer?0xe63946:0xe8ebf0), darkM=M(0x23262e);
+  const cap=(r,len,mat)=>{ const m=new THREE.Mesh(new THREE.CapsuleGeometry(r,len,4,10),mat); m.castShadow=true; return m; };
+  const ball=(r,mat)=>{ const m=new THREE.Mesh(new THREE.SphereGeometry(r,14,12),mat); m.castShadow=true; return m; };
+  const at=(mesh,x,y,z)=>{ mesh.position.set(x,y,z); return mesh; };
+
+  const hips=new THREE.Group(); root.add(hips); J.hips=hips;
+  const pelvis=cap(11,12,giDM); pelvis.rotation.z=Math.PI/2; hips.add(at(pelvis,0,2,0));
+  const belt=new THREE.Mesh(new THREE.BoxGeometry(27,8,23),beltM); belt.castShadow=true; hips.add(at(belt,0,10,0));
+  const knot=new THREE.Mesh(new THREE.BoxGeometry(7,7,6),beltM); hips.add(knot); // x 每帧按 facing 放
+
+  const torso=new THREE.Group(); hips.add(torso); J.torso=torso;
+  torso.add(at(cap(13,BODY.torso-18,giM),0,BODY.torso/2,0));
+
+  function arm(side){ // side=+1 前手(近观众),-1 后手
+    const sh=new THREE.Group(); sh.position.set(0,BODY.torso-10,side*9); torso.add(sh);
+    sh.add(at(cap(6.5,BODY.uArm-9,giM),0,-BODY.uArm/2,0));
+    const el=new THREE.Group(); el.position.set(0,-BODY.uArm,0); sh.add(el);
+    el.add(at(cap(5.5,BODY.fArm-8,giM),0,-BODY.fArm/2,0));
+    el.add(at(ball(6.5,skinM),0,-BODY.fArm,0));
+    return {sh,el};
+  }
+  const aF=arm(1), aB=arm(-1); J.shF=aF.sh; J.elF=aF.el; J.shB=aB.sh; J.elB=aB.el;
+
+  const head=new THREE.Group(); head.position.set(0,BODY.torso+2,0); torso.add(head); J.head=head;
+  const hy=BODY.neck+BODY.headR;
+  head.add(at(ball(BODY.headR,skinM),0,hy,0));
+  const hair=ball(BODY.headR*1.04,hairM); hair.scale.set(0.95,0.8,0.98); head.add(hair);
+  const eyeL=ball(2.3,darkM), eyeR=ball(2.3,darkM); head.add(eyeL); head.add(eyeR);
+
+  function leg(side){ // side=+1 前脚(近观众),-1 后脚
+    const hip=new THREE.Group(); hip.position.set(0,-4,side*7); hips.add(hip);
+    hip.add(at(cap(8.5,BODY.thigh-13,giM),0,-BODY.thigh/2,0));
+    const knee=new THREE.Group(); knee.position.set(0,-BODY.thigh,0); hip.add(knee);
+    knee.add(at(cap(6.5,BODY.shin-11,giM),0,-BODY.shin/2,0));
+    const ank=new THREE.Group(); ank.position.set(0,-BODY.shin,0); knee.add(ank);
+    const foot=new THREE.Mesh(new THREE.BoxGeometry(12,8,BODY.foot+8),skinM);
+    foot.castShadow=true; ank.add(at(foot,0,-BODY.foot/2,0));
+    const toe=new THREE.Object3D(); toe.position.set(0,-BODY.foot-2,0); ank.add(toe);
+    return {hip,knee,ank,toe};
+  }
+  const lF=leg(1), lB=leg(-1);
+  J.hipF=lF.hip; J.kneeF=lF.knee; J.ankF=lF.ank;
+  J.hipB=lB.hip; J.kneeB=lB.knee; J.ankB=lB.ank;
+
+  return {root,J,mats,knot,hair,eyeL,eyeR,toeB:lB.toe,headY:hy};
+}
+
+function applyPose3D(rig,f,pose){
+  const a=rigAngles(pose,f), J=rig.J, dir=f.facing;
+  rig.root.position.set(a.rootX,0,a.depthZ);
+  J.hips.position.set(0,a.hipY,0);
+  J.torso.rotation.z=a.torso; J.head.rotation.z=a.head;
+  J.shF.rotation.z=a.shF; J.elF.rotation.z=a.elF;
+  J.shB.rotation.z=a.shB; J.elB.rotation.z=a.elB;
+  J.hipF.rotation.z=a.hipF; J.kneeF.rotation.z=a.kneeF; J.ankF.rotation.z=a.ankF;
+  J.hipB.rotation.z=a.hipB; J.kneeB.rotation.z=a.kneeB; J.ankB.rotation.z=a.ankB;
+  J.hipF.rotation.y=a.swingF; J.hipB.rotation.y=a.swingB;
+  // 非对称细节(眼睛/发髻/腰带结)按 facing 摆向对手一侧
+  rig.knot.position.set(dir*15,8,0);
+  rig.eyeL.position.set(dir*BODY.headR*0.72,rig.headY+1,BODY.headR*0.42);
+  rig.eyeR.position.set(dir*BODY.headR*0.72,rig.headY+1,-BODY.headR*0.42);
+  rig.hair.position.set(-dir*2,rig.headY+3.5,0);
+  // 受击闪白
+  const fl=f.flash>0;
+  for(const m of rig.mats){ m.emissive.setHex(fl?0xffffff:0x000000); m.emissiveIntensity=fl?0.9:0; }
+}
+
+/* 后脚脚尖投影到 2D 画布坐标(供踢击拖尾用) */
+const _pv=(typeof THREE!=='undefined')?new THREE.Vector3():null;
+function rigToeScreen(rig){
+  if(!GL||!_pv) return null;
+  rig.toeB.getWorldPosition(_pv); _pv.project(GL.camera);
+  return [(_pv.x*0.5+0.5)*W,(-_pv.y*0.5+0.5)*H];
+}
+
+function woodTexture(){
+  const c=document.createElement('canvas'); c.width=c.height=256;
+  const x=c.getContext('2d');
+  x.fillStyle='#cfa96f'; x.fillRect(0,0,256,256);
+  for(let i=0;i<4;i++){ const y=i*64;
+    x.strokeStyle='rgba(90,60,30,.35)'; x.lineWidth=3;
+    x.beginPath(); x.moveTo(0,y); x.lineTo(256,y); x.stroke();
+    x.strokeStyle='rgba(120,85,45,.20)'; x.lineWidth=1;
+    for(let k=0;k<5;k++){ const gy=y+8+k*11;
+      x.beginPath(); x.moveTo(0,gy);
+      for(let px=0;px<=256;px+=32) x.lineTo(px,gy+Math.sin(px*0.05+k)*2);
+      x.stroke(); }
+  }
+  const t=new THREE.CanvasTexture(c);
+  t.wrapS=t.wrapT=THREE.RepeatWrapping; t.repeat.set(8,3);
+  return t;
+}
+function wallTexture(){
+  const c=document.createElement('canvas'); c.width=1024; c.height=512;
+  const x=c.getContext('2d');
+  const g=x.createLinearGradient(0,0,0,512);
+  g.addColorStop(0,'#f4ecdc'); g.addColorStop(1,'#e0d2b8');
+  x.fillStyle=g; x.fillRect(0,0,1024,512);
+  x.save(); x.globalAlpha=0.30; x.fillStyle='#e63946';
+  x.beginPath(); x.arc(512,300,110,0,Math.PI*2); x.fill(); x.restore();
+  x.save(); x.globalAlpha=0.10; x.fillStyle='#3a3226';
+  x.font='700 120px "Noto Serif JP",serif'; x.textAlign='center';
+  x.fillText('道',920,180); x.fillText('場',920,320); x.restore();
+  return new THREE.CanvasTexture(c);
+}
+
+let GL=null;
+function initGL(){
+  if(!HAS3D) return false;
+  try{
+    const renderer=new THREE.WebGLRenderer({canvas:document.getElementById('gl'),antialias:true});
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
+    renderer.shadowMap.enabled=true;
+    renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+    if(THREE.sRGBEncoding!==undefined) renderer.outputEncoding=THREE.sRGBEncoding;
+    const scene=new THREE.Scene();
+    scene.background=new THREE.Color(0xf3e9d4);
+    scene.fog=new THREE.Fog(0xf3e9d4,1100,2600);
+    const camera=new THREE.PerspectiveCamera(36,2,1,5000);
+    camera.position.set(480,250,760); camera.lookAt(480,150,0);
+
+    scene.add(new THREE.HemisphereLight(0xfff8ec,0x9a7c55,0.85));
+    const sun=new THREE.DirectionalLight(0xffffff,1.15);
+    sun.position.set(350,650,550); sun.castShadow=true;
+    sun.shadow.mapSize.set(1024,1024);
+    sun.shadow.camera.left=-700; sun.shadow.camera.right=700;
+    sun.shadow.camera.top=700; sun.shadow.camera.bottom=-700;
+    sun.shadow.camera.near=1; sun.shadow.camera.far=2500;
+    sun.shadow.bias=-0.0005;
+    sun.target.position.set(480,0,0); scene.add(sun.target); scene.add(sun);
+
+    const floor=new THREE.Mesh(new THREE.PlaneGeometry(2600,1100),
+      new THREE.MeshStandardMaterial({map:woodTexture(),roughness:.95}));
+    floor.rotation.x=-Math.PI/2; floor.position.set(480,0,200);
+    floor.receiveShadow=true; scene.add(floor);
+
+    const wallMat=new THREE.MeshStandardMaterial({map:wallTexture(),roughness:1});
+    const wall=new THREE.Mesh(new THREE.PlaneGeometry(2600,800),wallMat);
+    wall.position.set(480,400,-280); scene.add(wall);
+    if(document.fonts&&document.fonts.ready) document.fonts.ready.then(()=>{
+      try{ wallMat.map=wallTexture(); wallMat.needsUpdate=true; }catch(_){}
+    });
+    const stripe=new THREE.Mesh(new THREE.BoxGeometry(2600,5,3),
+      new THREE.MeshStandardMaterial({color:0xe63946,roughness:.8}));
+    stripe.position.set(480,3,-278); scene.add(stripe);
+
+    const pRig=buildFighterRig(true), aRig=buildFighterRig(false);
+    scene.add(pRig.root); scene.add(aRig.root);
+    GL={renderer,scene,camera,pRig,aRig,cw:0,ch:0};
+    return true;
+  }catch(e){ GL=null; return false; }
+}
+function renderGL(){
+  const st=document.getElementById('stage');
+  const cw=st.clientWidth||960, ch=st.clientHeight||480;
+  if(cw!==GL.cw||ch!==GL.ch){
+    GL.cw=cw; GL.ch=ch;
+    GL.renderer.setSize(cw,ch,false);
+    GL.camera.aspect=cw/ch; GL.camera.updateProjectionMatrix();
+  }
+  const sh=shakeT>0?shakeT:0;
+  GL.camera.position.set(480+(Math.random()-0.5)*80*sh,250+(Math.random()-0.5)*64*sh,760);
+  GL.camera.lookAt(480,150,0);
+  GL.renderer.render(GL.scene,GL.camera);
+}
+const USE3D=initGL();
 
 /* ================= 启动 ================= */
 document.getElementById('langBtn').onclick=()=>{ LANG=LANG==='zh'?'en':'zh'; applyLang(); };
