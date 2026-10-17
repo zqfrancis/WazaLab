@@ -1746,8 +1746,8 @@ function initGL(){
     const camera=new THREE.PerspectiveCamera(36,2,1,5000);
     camera.position.set(480,250,760); camera.lookAt(480,150,0);
 
-    scene.add(new THREE.HemisphereLight(0xfff8ec,0x9a7c55,0.85));
-    const sun=new THREE.DirectionalLight(0xffffff,1.15);
+    scene.add(new THREE.HemisphereLight(0xfff8ec,0x9a7c55,0.55));
+    const sun=new THREE.DirectionalLight(0xffffff,0.8);
     sun.position.set(350,650,550); sun.castShadow=true;
     sun.shadow.mapSize.set(1024,1024);
     sun.shadow.camera.left=-700; sun.shadow.camera.right=700;
