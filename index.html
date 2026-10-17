@@ -1609,7 +1609,7 @@ const HAS3D=(typeof THREE!=='undefined');
 function rigAngles(pose,f){
   const d=f.facing*D2R;
   return {
-    rootX:f.x+pose.hipX*f.facing, hipY:pose.hipY, depthZ:f.depth||0,
+    rootX:f.x+pose.hipX*f.facing, hipY:pose.hipY, depthZ:(f.depth||0)*2.5, // v0.20 热修复:纵深视觉放大 2.5 倍,判定用原始值不变
     torso:-pose.torso*d, head:-pose.head*d,
     shF:pose.fSh*d, elF:pose.fEl*d, shB:pose.bSh*d, elB:pose.bEl*d,
     hipF:pose.fHip*d, kneeF:-pose.fKnee*d, ankF:pose.fAnk*d,
