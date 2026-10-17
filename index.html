@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="wazalab-version" content="0.21">
+<meta name="wazalab-version" content="0.22">
 <script>
 // 版本自检:每次打开都对比服务器最新版,发现本地是旧缓存则自动硬刷新一次
 (function(){
@@ -280,6 +280,10 @@
     body[data-mode="spar"] #joyknob{width:46px;height:46px;}
     body[data-mode="spar"] .actions .tbtn{height:48px;font-size:12px;}
     body[data-mode="spar"] #lsExit{display:flex;}
+    /* v0.22: 弹窗(难度选择/回合结果)打开时隐藏横屏悬浮操控,避免遮挡底部按钮;
+       极矮视口下弹窗内容可滚动,圆角与满屏舞台对齐 */
+    body.ovl[data-mode="spar"] #touchpad{display:none;}
+    body[data-mode="spar"] #diffPicker, body[data-mode="spar"] #roundmsg{border-radius:0;overflow-y:auto;}
   }
 </style>
 </head>
@@ -289,7 +293,7 @@
   <div class="brand">
     <div class="logo">技</div>
     <div>
-      <h1>WazaLab <span id="brandSub" style="font-size:15px;font-weight:500;">空手道动作教学游戏</span><span class="demo">Demo v0.21</span></h1>
+      <h1>WazaLab <span id="brandSub" style="font-size:15px;font-weight:500;">空手道动作教学游戏</span><span class="demo">Demo v0.22</span></h1>
       <p id="brandTag">AxisMotion 出品 · 构えから残心まで、技をゲームで学ぶ</p>
     </div>
   </div>
@@ -616,7 +620,7 @@ zh:{
     +'<span><b>逆突</b> <kbd>I</kbd></span>',
   touch:{block:['防','防御'],mae:'前踢',chudan:'中段踢',jodan:'高段踢',gedan:'下段踢',zuki:'逆突'},
   prev:'← 上一步', next:'下一步 →', tipsTitle:'💡 初学者要点', applyTitle:'🥋 实战应用', goSpar:'去对战试试',
-  footer:['WazaLab v0.21 Demo','AxisMotion','FormBuddy 姊妹项目','动作演示为教学示意，请在有资质教练指导下练习'],
+  footer:['WazaLab v0.22 Demo','AxisMotion','FormBuddy 姊妹项目','动作演示为教学示意，请在有资质教练指导下练习'],
   blocked:'防住了!', dodged:'闪避!', combo:n=>`${n} 连击！`, winTitle:'勝!',
   winSub:(cn,mx)=>`漂亮！${cn}终结了对手，最高连击 ${mx}。再来一局？`,
   loseSub:'被 AI 终结了……去教学模式练练那招，再回来复仇！',
@@ -647,7 +651,7 @@ en:{
     +'<span><b>Reverse punch</b> <kbd>I</kbd></span>',
   touch:{block:['Block','hold'],mae:'Front',chudan:'Mid',jodan:'High',gedan:'Low',zuki:'Punch'},
   prev:'← Prev', next:'Next →', tipsTitle:'💡 Tips for beginners', applyTitle:'🥋 How to Apply It', goSpar:'Try it in sparring',
-  footer:['WazaLab v0.21 Demo','AxisMotion','Sister project of FormBuddy','Demos are for teaching — practice under a qualified instructor'],
+  footer:['WazaLab v0.22 Demo','AxisMotion','Sister project of FormBuddy','Demos are for teaching — practice under a qualified instructor'],
   blocked:'Blocked!', dodged:'Dodged!', combo:n=>`${n} HITS!`, winTitle:'You Win!',
   winSub:(cn,mx)=>`Beautiful! Finished with ${cn}, max combo ${mx}. Rematch?`,
   loseSub:'Finished by the AI… drill that technique in Tutorial mode, then come back for revenge!',
@@ -1144,12 +1148,14 @@ function showDiffPicker(){
   pickerOpen=true;
   document.getElementById('roundmsg').classList.remove('show');
   document.getElementById('diffPicker').classList.add('show');
+  document.body.classList.add('ovl'); // v0.22: 横屏下隐藏悬浮操控,防遮挡底部按钮
 }
 function setDifficulty(d){
   if(!DIFFS[d]) d='normal';
   aiDiff=d; pickerOpen=false;
   document.getElementById('hpAiTag').textContent=STR[LANG].hpAiTag+' · '+diffLabel();
   document.getElementById('diffPicker').classList.remove('show');
+  document.body.classList.remove('ovl'); // v0.22
   resetMatch(); // 换难度=重新开赛
 }
 
@@ -1358,7 +1364,9 @@ function setMode(m){
   document.getElementById('tabDojo').classList.toggle('active',m==='dojo');
   document.getElementById('tabSpar').classList.toggle('active',m==='spar');
   if(m==='spar') showDiffPicker(); // 对战开始前先选难度
-  else { pickerOpen=false; document.getElementById('diffPicker').classList.remove('show'); }
+  else { pickerOpen=false; document.getElementById('diffPicker').classList.remove('show');
+    document.getElementById('roundmsg').classList.remove('show'); // v0.22: 切回教学时顺手收起结果面板
+    document.body.classList.remove('ovl'); } // v0.22
   fitStage();
 }
 document.getElementById('tabDojo').onclick=()=>setMode('dojo');
@@ -1390,6 +1398,7 @@ function resetRound(){
   roundT=ROUND_TIME; updateTimer();
   document.getElementById('roundmsg').classList.remove('show');
   document.getElementById('diffPicker').classList.remove('show');
+  document.body.classList.remove('ovl'); // v0.22: 新回合开始,悬浮操控恢复
   updateHpBars(true);
   beginRoundIntro(); // 回合开始:第 N 回合 → 開始!/FIGHT!
 }
@@ -1408,6 +1417,7 @@ function endRound(winner,reason){ // reason:'ko'|'time'; winner=null=时间到�
     ? {kind:'match', wp:match.p>=WIN_ROUNDS, p:match.p, a:match.a, best:Math.max(player.comboMax||0,ai.comboMax||0)}
     : {kind:'round', winner:winner?(winner.isPlayer?1:0):null, reason, round:match.round, cn:winner&&winner.tech?techName(winner.tech):''};
   renderResultMsg();
+  document.body.classList.add('ovl'); // v0.22: 结果面板弹出,横屏下隐藏悬浮操控
   setTimeout(()=>document.getElementById('roundmsg').classList.add('show'),(winner&&reason==='ko')?700:400);
 }
 // 渲染回合/比赛结果面板;切换语言时 applyLang 会重调它(v0.19 补丁)
