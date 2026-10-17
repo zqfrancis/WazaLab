@@ -64,7 +64,8 @@
   /* ---------- layout ---------- */
   main{width:100%;max-width:1180px;padding:8px 16px 20px;display:flex;gap:14px;align-items:flex-start;}
   #stage-wrap{flex:1 1 auto;min-width:0;position:relative;}
-  canvas#gl{position:absolute;inset:0;width:100%;height:100%;z-index:0;display:none;}
+  canvas#gl{position:absolute;inset:0;width:100%;height:100%;z-index:0;display:none;border-radius:14px;}
+  body[data-mode="spar"] canvas#gl{border-radius:0;}
   body.gl3d canvas#gl{display:block;}
   body.gl3d canvas#stage{background:transparent;}
   canvas#stage{position:relative;z-index:1;}
@@ -1737,7 +1738,8 @@ function initGL(){
     renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
     renderer.shadowMap.enabled=true;
     renderer.shadowMap.type=THREE.PCFSoftShadowMap;
-    if(THREE.sRGBEncoding!==undefined) renderer.outputEncoding=THREE.sRGBEncoding;
+    // 注:不设 outputEncoding,保持 legacy 管线使颜色与 2D 原画一致
+    // (r149 下 sRGBEncoding 会让未标记 encoding 的 CanvasTexture 洗白)
     const scene=new THREE.Scene();
     scene.background=new THREE.Color(0xf3e9d4);
     scene.fog=new THREE.Fog(0xf3e9d4,1100,2600);
