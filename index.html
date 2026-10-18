@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="wazalab-version" content="0.22">
+<meta name="wazalab-version" content="0.23">
 <script>
 // 版本自检:每次打开都对比服务器最新版,发现本地是旧缓存则自动硬刷新一次
 (function(){
@@ -293,7 +293,7 @@
   <div class="brand">
     <div class="logo">技</div>
     <div>
-      <h1>WazaLab <span id="brandSub" style="font-size:15px;font-weight:500;">空手道动作教学游戏</span><span class="demo">Demo v0.22</span></h1>
+      <h1>WazaLab <span id="brandSub" style="font-size:15px;font-weight:500;">空手道动作教学游戏</span><span class="demo">Demo v0.23</span></h1>
       <p id="brandTag">AxisMotion 出品 · 构えから残心まで、技をゲームで学ぶ</p>
     </div>
   </div>
@@ -620,7 +620,7 @@ zh:{
     +'<span><b>逆突</b> <kbd>I</kbd></span>',
   touch:{block:['防','防御'],mae:'前踢',chudan:'中段踢',jodan:'高段踢',gedan:'下段踢',zuki:'逆突'},
   prev:'← 上一步', next:'下一步 →', tipsTitle:'💡 初学者要点', applyTitle:'🥋 实战应用', goSpar:'去对战试试',
-  footer:['WazaLab v0.22 Demo','AxisMotion','FormBuddy 姊妹项目','动作演示为教学示意，请在有资质教练指导下练习'],
+  footer:['WazaLab v0.23 Demo','AxisMotion','FormBuddy 姊妹项目','动作演示为教学示意，请在有资质教练指导下练习'],
   blocked:'防住了!', dodged:'闪避!', combo:n=>`${n} 连击！`, winTitle:'勝!',
   winSub:(cn,mx)=>`漂亮！${cn}终结了对手，最高连击 ${mx}。再来一局？`,
   loseSub:'被 AI 终结了……去教学模式练练那招，再回来复仇！',
@@ -651,7 +651,7 @@ en:{
     +'<span><b>Reverse punch</b> <kbd>I</kbd></span>',
   touch:{block:['Block','hold'],mae:'Front',chudan:'Mid',jodan:'High',gedan:'Low',zuki:'Punch'},
   prev:'← Prev', next:'Next →', tipsTitle:'💡 Tips for beginners', applyTitle:'🥋 How to Apply It', goSpar:'Try it in sparring',
-  footer:['WazaLab v0.22 Demo','AxisMotion','Sister project of FormBuddy','Demos are for teaching — practice under a qualified instructor'],
+  footer:['WazaLab v0.23 Demo','AxisMotion','Sister project of FormBuddy','Demos are for teaching — practice under a qualified instructor'],
   blocked:'Blocked!', dodged:'Dodged!', combo:n=>`${n} HITS!`, winTitle:'You Win!',
   winSub:(cn,mx)=>`Beautiful! Finished with ${cn}, max combo ${mx}. Rematch?`,
   loseSub:'Finished by the AI… drill that technique in Tutorial mode, then come back for revenge!',
@@ -1635,24 +1635,41 @@ function buildFighterRig(isPlayer){
   const M=c=>{ const m=new THREE.MeshStandardMaterial({color:c,roughness:.9,metalness:0}); mats.push(m); return m; };
   const giM=M(0xf5f6f8), giDM=M(0xdfe3ea), skinM=M(0xf0bd93),
         hairM=M(0x2e2620), beltM=M(isPlayer?0xe63946:0xe8ebf0), darkM=M(0x23262e);
+  skinM.roughness=0.55; // v0.23: 肤色带一点高光(肌肉明暗),减少塑料感
+  const skirtM=new THREE.MeshStandardMaterial({color:0xf5f6f8,roughness:.92,metalness:0,side:THREE.DoubleSide});
+  mats.push(skirtM); // v0.23: 道服下摆材质(双面)
   const cap=(r,len,mat)=>{ const m=new THREE.Mesh(new THREE.CapsuleGeometry(r,len,4,10),mat); m.castShadow=true; return m; };
   const ball=(r,mat)=>{ const m=new THREE.Mesh(new THREE.SphereGeometry(r,14,12),mat); m.castShadow=true; return m; };
   const at=(mesh,x,y,z)=>{ mesh.position.set(x,y,z); return mesh; };
 
   const hips=new THREE.Group(); root.add(hips); J.hips=hips;
-  const pelvis=cap(11,12,giDM); pelvis.rotation.z=Math.PI/2; hips.add(at(pelvis,0,2,0));
-  const belt=new THREE.Mesh(new THREE.BoxGeometry(27,8,23),beltM); belt.castShadow=true; hips.add(at(belt,0,10,0));
-  const knot=new THREE.Mesh(new THREE.BoxGeometry(7,7,6),beltM); hips.add(knot); // x 每帧按 facing 放
+  const pelvis=cap(14,12,giDM); pelvis.rotation.z=Math.PI/2; hips.add(at(pelvis,0,2,0)); // v0.23: 骨盆加粗
+  const belt=new THREE.Mesh(new THREE.BoxGeometry(30,9,25),beltM); belt.castShadow=true; hips.add(at(belt,0,10,0));
+  const knot=new THREE.Mesh(new THREE.BoxGeometry(9,8,7),beltM); knot.castShadow=true; hips.add(knot); // x 每帧按 facing 放
+  // v0.23: 腰带结垂带(两条,挂在 knot 下随 facing 摆动)
+  const beltEndF=new THREE.Mesh(new THREE.BoxGeometry(3.5,13,1.4),beltM); beltEndF.castShadow=true;
+  const beltEndB=new THREE.Mesh(new THREE.BoxGeometry(3.5,13,1.4),beltM); beltEndB.castShadow=true;
+  knot.add(beltEndF); beltEndF.position.set(0,-10,2.6); beltEndF.rotation.x=0.12;
+  knot.add(beltEndB); beltEndB.position.set(0,-10,-2.6); beltEndB.rotation.x=-0.12;
+  // v0.23: 道服下摆(上窄下宽锥筒,盖住大腿根部,减少火柴人感)
+  const giSkirt=new THREE.Mesh(new THREE.CylinderGeometry(17,25,26,12,1,true),skirtM);
+  giSkirt.castShadow=true; hips.add(at(giSkirt,0,-4,0));
 
   const torso=new THREE.Group(); hips.add(torso); J.torso=torso;
-  torso.add(at(cap(13,BODY.torso-18,giM),0,BODY.torso/2,0));
+  // v0.23: 躯干改上宽下窄锥体(胸廓感)+颈+三角肌球,替代均匀胶囊,减少火柴人感
+  const chest=new THREE.Mesh(new THREE.CylinderGeometry(19,14.5,BODY.torso,12),giM);
+  chest.castShadow=true; torso.add(at(chest,0,BODY.torso/2,0));
+  torso.add(at(cap(5.5,8,skinM),0,BODY.torso+1,0));
+  const deltoidF=ball(9.5,giM), deltoidB=ball(9.5,giM);
+  torso.add(at(deltoidF,0,BODY.torso-10,9)); torso.add(at(deltoidB,0,BODY.torso-10,-9));
 
   function arm(side){ // side=+1 前手(近观众),-1 后手
     const sh=new THREE.Group(); sh.position.set(0,BODY.torso-10,side*9); torso.add(sh);
-    sh.add(at(cap(6.5,BODY.uArm-9,giM),0,-BODY.uArm/2,0));
+    sh.add(at(cap(9,BODY.uArm-12,giM),0,-BODY.uArm/2,0)); // v0.23: 上臂加粗
     const el=new THREE.Group(); el.position.set(0,-BODY.uArm,0); sh.add(el);
-    el.add(at(cap(5.5,BODY.fArm-8,giM),0,-BODY.fArm/2,0));
-    el.add(at(ball(6.5,skinM),0,-BODY.fArm,0));
+    el.add(at(ball(7.5,giM),0,0,0)); // v0.23: 肘关节球填充
+    el.add(at(cap(7.5,BODY.fArm-10,giM),0,-BODY.fArm/2,0)); // v0.23: 前臂加粗
+    el.add(at(ball(7.5,skinM),0,-BODY.fArm,0)); // v0.23: 拳头加大
     return {sh,el};
   }
   const aF=arm(1), aB=arm(-1); J.shF=aF.sh; J.elF=aF.el; J.shB=aB.sh; J.elB=aB.el;
@@ -1665,9 +1682,10 @@ function buildFighterRig(isPlayer){
 
   function leg(side){ // side=+1 前脚(近观众),-1 后脚
     const hip=new THREE.Group(); hip.position.set(0,-4,side*7); hips.add(hip);
-    hip.add(at(cap(8.5,BODY.thigh-13,giM),0,-BODY.thigh/2,0));
+    hip.add(at(cap(11.5,BODY.thigh-16,giM),0,-BODY.thigh/2,0)); // v0.23: 大腿加粗
     const knee=new THREE.Group(); knee.position.set(0,-BODY.thigh,0); hip.add(knee);
-    knee.add(at(cap(6.5,BODY.shin-11,giM),0,-BODY.shin/2,0));
+    knee.add(at(ball(8.5,giM),0,0,0)); // v0.23: 膝关节球填充
+    knee.add(at(cap(8.5,BODY.shin-14,giM),0,-BODY.shin/2,0)); // v0.23: 小腿加粗
     const ank=new THREE.Group(); ank.position.set(0,-BODY.shin,0); knee.add(ank);
     const foot=new THREE.Mesh(new THREE.BoxGeometry(12,8,BODY.foot+8),skinM);
     foot.castShadow=true; ank.add(at(foot,0,-BODY.foot/2,0));
