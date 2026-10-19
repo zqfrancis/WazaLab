@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="wazalab-version" content="0.23">
+<meta name="wazalab-version" content="0.24">
 <script>
 // 版本自检:每次打开都对比服务器最新版,发现本地是旧缓存则自动硬刷新一次
 (function(){
@@ -201,6 +201,8 @@
   }
   .stepnav button:disabled{opacity:.35;cursor:default;}
   .stepnav button:not(:disabled):active{background:var(--red);border-color:var(--red);}
+  #btnSlow{padding:8px 12px!important;white-space:nowrap;}
+  #btnSlow.on{background:#4a3510;border-color:var(--gold);color:var(--gold);} /* v0.24: 慢动作开启高亮 */
   #stepdots{display:flex;gap:6px;}
   #stepdots span{width:9px;height:9px;border-radius:50%;background:var(--line);}
   #stepdots span.on{background:var(--red);}
@@ -293,7 +295,7 @@
   <div class="brand">
     <div class="logo">技</div>
     <div>
-      <h1>WazaLab <span id="brandSub" style="font-size:15px;font-weight:500;">空手道动作教学游戏</span><span class="demo">Demo v0.23</span></h1>
+      <h1>WazaLab <span id="brandSub" style="font-size:15px;font-weight:500;">空手道动作教学游戏</span><span class="demo">Demo v0.24</span></h1>
       <p id="brandTag">AxisMotion 出品 · 构えから残心まで、技をゲームで学ぶ</p>
     </div>
   </div>
@@ -376,6 +378,7 @@
       <div class="stepnav">
         <button id="btnPrev">← 上一步</button>
         <div id="stepdots"></div>
+        <button id="btnSlow" title="慢动作回放">🐢 慢放 ×0.5</button>
         <button id="btnNext">下一步 →</button>
       </div>
       <div class="applybox" id="applyBox"><h4 id="applyTitle">🥋 实战应用</h4><p id="dApply"></p></div>
@@ -620,7 +623,8 @@ zh:{
     +'<span><b>逆突</b> <kbd>I</kbd></span>',
   touch:{block:['防','防御'],mae:'前踢',chudan:'中段踢',jodan:'高段踢',gedan:'下段踢',zuki:'逆突'},
   prev:'← 上一步', next:'下一步 →', tipsTitle:'💡 初学者要点', applyTitle:'🥋 实战应用', goSpar:'去对战试试',
-  footer:['WazaLab v0.23 Demo','AxisMotion','FormBuddy 姊妹项目','动作演示为教学示意，请在有资质教练指导下练习'],
+  slowOff:'▶️ 常速', slowOn:'🐢 慢放 ×0.5', slowTip:'慢动作回放（快捷键 M）',
+  footer:['WazaLab v0.24 Demo','AxisMotion','FormBuddy 姊妹项目','动作演示为教学示意，请在有资质教练指导下练习'],
   blocked:'防住了!', dodged:'闪避!', combo:n=>`${n} 连击！`, winTitle:'勝!',
   winSub:(cn,mx)=>`漂亮！${cn}终结了对手，最高连击 ${mx}。再来一局？`,
   loseSub:'被 AI 终结了……去教学模式练练那招，再回来复仇！',
@@ -651,7 +655,8 @@ en:{
     +'<span><b>Reverse punch</b> <kbd>I</kbd></span>',
   touch:{block:['Block','hold'],mae:'Front',chudan:'Mid',jodan:'High',gedan:'Low',zuki:'Punch'},
   prev:'← Prev', next:'Next →', tipsTitle:'💡 Tips for beginners', applyTitle:'🥋 How to Apply It', goSpar:'Try it in sparring',
-  footer:['WazaLab v0.23 Demo','AxisMotion','Sister project of FormBuddy','Demos are for teaching — practice under a qualified instructor'],
+  slowOff:'▶️ Normal', slowOn:'🐢 Slow-mo ×0.5', slowTip:'Slow-motion replay (shortcut: M)',
+  footer:['WazaLab v0.24 Demo','AxisMotion','Sister project of FormBuddy','Demos are for teaching — practice under a qualified instructor'],
   blocked:'Blocked!', dodged:'Dodged!', combo:n=>`${n} HITS!`, winTitle:'You Win!',
   winSub:(cn,mx)=>`Beautiful! Finished with ${cn}, max combo ${mx}. Rematch?`,
   loseSub:'Finished by the AI… drill that technique in Tutorial mode, then come back for revenge!',
@@ -751,6 +756,7 @@ function applyLang(){
   document.getElementById('goSparTxt').textContent=S.goSpar;
   document.getElementById('footer').innerHTML=S.footer.map((x,i)=>i?`<span class="sep">|</span>${x}`:x).join('');
   syncSndBtn(); // v0.18: 音效按钮标题随语言更新
+  syncSlowBtn(); // v0.24: 慢放按钮随语言更新
   renderTechList();
   renderDetail();
 }
@@ -1221,6 +1227,17 @@ function aiAct(dt){
 
 /* ================= 教学模式 ================= */
 let dojoTech=TECHNIQUES[0], dojoStep=0, dojoT=0;
+// v0.24: 教学演示慢动作回放(×0.5)开关
+let dojoSlow=1;
+try{ const s=localStorage.getItem('wazalab_slow'); if(s==='0.5'||s==='1') dojoSlow=parseFloat(s); }catch(e){}
+function toggleSlow(){ dojoSlow=dojoSlow===1?0.5:1; try{localStorage.setItem('wazalab_slow',String(dojoSlow));}catch(e){} syncSlowBtn(); }
+function syncSlowBtn(){
+  const b=document.getElementById('btnSlow'); if(!b) return;
+  const S=STR[LANG]||STR.zh;
+  b.textContent=dojoSlow===1?S.slowOff:S.slowOn;
+  b.title=S.slowTip;
+  b.classList.toggle('on',dojoSlow!==1);
+}
 const techlistEl=document.getElementById('techlist');
 function renderTechList(){
   techlistEl.innerHTML='';
@@ -1289,6 +1306,7 @@ const ATKMAP={KeyJ:'mae',KeyK:'chudan',KeyL:'jodan',KeyU:'gedan',KeyI:'zuki'};
 window.addEventListener('keydown',e=>{
   if(KEYMAP[e.code]||ATKMAP[e.code]) e.preventDefault();
   if(e.repeat) return;
+  if(e.code==='KeyM'&&mode==='dojo'){ toggleSlow(); return; } // v0.24: 教学模式下 M 键切换慢动作
   if(mode!=='spar'||roundOver||roundPhase!=='fight') return; // v0.19:播报中不出招
   if(KEYMAP[e.code]) keys[KEYMAP[e.code]]=true;
   if(ATKMAP[e.code]) startAttack(player,ATKMAP[e.code]);
@@ -1472,7 +1490,7 @@ function frame(now){
   if(use3D) ctx.clearRect(0,0,W,H); else drawDojo(t);
 
   if(mode==='dojo'){
-    dojoT+=dt;
+    dojoT+=dt*dojoSlow; // v0.24: 慢动作时演示时间减速
     demoFighter.x=W/2; demoFighter.facing=1;
     const pose=dojoPose(dojoT);
     const dinfo=drawFighter(ctx,demoFighter,pose,{time:t});
@@ -1487,6 +1505,13 @@ function frame(now){
     ctx.font='500 14px "Noto Serif JP",serif'; ctx.fillStyle='#6b5f4c';
     ctx.fillText(`${dojoTech.jp} — ${techName(dojoTech)} (${dojoTech.roma})`,W/2,66);
     ctx.restore();
+    if(dojoSlow!==1){ // v0.24: 慢动作角标
+      ctx.save(); ctx.textAlign='right';
+      ctx.font='700 15px "Noto Sans SC",sans-serif'; ctx.fillStyle='#b98a1e';
+      ctx.shadowColor='rgba(255,255,255,.85)'; ctx.shadowBlur=6;
+      ctx.fillText(LANG==='zh'?'🐢 慢动作 ×0.5':'🐢 SLOW-MO ×0.5',W-14,42);
+      ctx.restore();
+    }
   } else {
     if(freeze>0){ freeze-=dt; }
     else if(!pickerOpen){ // 选难度时暂停对战
@@ -1823,6 +1848,7 @@ const USE3D=initGL();
 /* ================= 启动 ================= */
 document.getElementById('langBtn').onclick=()=>{ LANG=LANG==='zh'?'en':'zh'; applyLang(); };
 document.getElementById('sndBtn').onclick=()=>toggleSound(); // v0.18 音效开关
+document.getElementById('btnSlow').onclick=()=>toggleSlow(); // v0.24 教学慢放开关
 applyLang();
 fitStage();
 document.getElementById('vtag').textContent='v'+document.querySelector('meta[name="wazalab-version"]').getAttribute('content');
