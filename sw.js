@@ -1,5 +1,5 @@
-// v0.25: PWA 离线支持 —— 缓存名与应用版本号同步,发版时随版本号递增
-var CACHE = 'wazalab-v0.25';
+// v0.26: PWA 离线支持 —— 缓存名与应用版本号同步,发版时随版本号递增
+var CACHE = 'wazalab-v0.26';
 var CORE = [
   './',
   'index.html',

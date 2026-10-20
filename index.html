@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="wazalab-version" content="0.25">
+<meta name="wazalab-version" content="0.26">
 <script>
 // 版本自检:每次打开都对比服务器最新版,发现本地是旧缓存则自动硬刷新一次
 (function(){
@@ -302,14 +302,14 @@
   <div class="brand">
     <div class="logo">技</div>
     <div>
-      <h1>WazaLab <span id="brandSub" style="font-size:15px;font-weight:500;">空手道动作教学游戏</span><span class="demo">Demo v0.25</span></h1>
+      <h1>WazaLab <span id="brandSub" style="font-size:15px;font-weight:500;">空手道动作教学游戏</span><span class="demo">Demo v0.26</span></h1>
       <p id="brandTag">AxisMotion 出品 · 构えから残心まで、技をゲームで学ぶ</p>
     </div>
   </div>
   <div class="modes">
     <button id="tabDojo" class="active">📖 教学模式</button>
     <button id="tabSpar">⚔️ 对战模式</button>
-    <button id="langBtn" title="Switch language / 切换语言">EN</button>
+    <button id="langBtn" title="Switch language / 切换语言 / 言語切替">EN</button>
     <button id="sndBtn" title="音效开关 / Sound">🔊</button>
   </div>
 </header>
@@ -608,9 +608,9 @@ const TECH_BY_ID={}; for(const t of TECHNIQUES)TECH_BY_ID[t.id]=t;
 for(const t of TECHNIQUES){ if(t.atk) t.atk.abs=resolveAtk(t.frames,t.atk.win); t.total=framesTotal(t.frames); }
 const BLOCK_POSE=TECH_BY_ID.uke.frames[1].pose;
 
-/* ================= 中英双语 =================
-   日文名(jp)与罗马音(roma)两种语言下都保留,只切换中文/英文讲解 */
-let LANG='zh';
+/* ================= 三语（中/英/日） =================
+   日文名(jp)与罗马音(roma)各语言下都保留,讲解文字三语切换 */
+let LANG=(function(){ try{ const l=localStorage.getItem('wazalab_lang'); return (l==='en'||l==='ja')?l:'zh'; }catch(e){ return 'zh'; } })();
 const STR={
 zh:{
   title:'WazaLab 空手道动作教学游戏 (Demo)',
@@ -631,7 +631,7 @@ zh:{
   touch:{block:['防','防御'],mae:'前踢',chudan:'中段踢',jodan:'高段踢',gedan:'下段踢',zuki:'逆突'},
   prev:'← 上一步', next:'下一步 →', tipsTitle:'💡 初学者要点', applyTitle:'🥋 实战应用', goSpar:'去对战试试',
   slowOff:'▶️ 常速', slowOn:'🐢 慢放 ×0.5', slowTip:'慢动作回放（快捷键 M）',
-  footer:['WazaLab v0.25 Demo','AxisMotion','FormBuddy 姊妹项目','动作演示为教学示意，请在有资质教练指导下练习'],
+  footer:['WazaLab v0.26 Demo','AxisMotion','FormBuddy 姊妹项目','动作演示为教学示意，请在有资质教练指导下练习'],
   blocked:'防住了!', dodged:'闪避!', combo:n=>`${n} 连击！`, winTitle:'勝!',
   winSub:(cn,mx)=>`漂亮！${cn}终结了对手，最高连击 ${mx}。再来一局？`,
   loseSub:'被 AI 终结了……去教学模式练练那招，再回来复仇！',
@@ -648,7 +648,7 @@ en:{
   title:'WazaLab Karate Technique Game (Demo)',
   brandSub:'Karate Technique Game',
   brandTag:'By AxisMotion · 構えから残心まで、技をゲームで学ぶ',
-  tabDojo:'📖 Tutorial', tabSpar:'⚔️ Sparring', langBtn:'中文',
+  tabDojo:'📖 Tutorial', tabSpar:'⚔️ Sparring', langBtn:'日本語',
   hpYouName:'You', hpYouTag:'YOU · RED', hpAiName:'AI', hpAiTag:'AI · WHITE',
   rematch:'Rematch', nextRound:'Next round', changeDiff:'Change difficulty', sndOn:'Sound on', sndOff:'Sound off',
   diffTitle:'Choose AI Difficulty', diffSub:'Pick your opponent before the match',
@@ -663,7 +663,7 @@ en:{
   touch:{block:['Block','hold'],mae:'Front',chudan:'Mid',jodan:'High',gedan:'Low',zuki:'Punch'},
   prev:'← Prev', next:'Next →', tipsTitle:'💡 Tips for beginners', applyTitle:'🥋 How to Apply It', goSpar:'Try it in sparring',
   slowOff:'▶️ Normal', slowOn:'🐢 Slow-mo ×0.5', slowTip:'Slow-motion replay (shortcut: M)',
-  footer:['WazaLab v0.25 Demo','AxisMotion','Sister project of FormBuddy','Demos are for teaching — practice under a qualified instructor'],
+  footer:['WazaLab v0.26 Demo','AxisMotion','Sister project of FormBuddy','Demos are for teaching — practice under a qualified instructor'],
   blocked:'Blocked!', dodged:'Dodged!', combo:n=>`${n} HITS!`, winTitle:'You Win!',
   winSub:(cn,mx)=>`Beautiful! Finished with ${cn}, max combo ${mx}. Rematch?`,
   loseSub:'Finished by the AI… drill that technique in Tutorial mode, then come back for revenge!',
@@ -675,6 +675,38 @@ en:{
   matchWinTitle:'You Win!', matchLoseTitle:'You Lose',
   matchWinSub:(p,a,mx)=>`Match score ${p}:${a}, max combo ${mx}. Beautiful match!`,
   matchLoseSub:(p,a)=>`Match score ${p}:${a}. Drill in Tutorial mode, then come back for revenge!`,
+},
+ja:{
+  title:'WazaLab 空手道テクニックゲーム (Demo)',
+  brandSub:'空手道テクニックゲーム',
+  brandTag:'AxisMotion 制作 · 構えから残心まで、技をゲームで学ぶ',
+  tabDojo:'📖 練習モード', tabSpar:'⚔️ 組手モード', langBtn:'中文',
+  hpYouName:'あなた', hpYouTag:'YOU · 赤', hpAiName:'あいて', hpAiTag:'AI 相手 · 白',
+  rematch:'もう一試合', nextRound:'次のラウンド', changeDiff:'難易度変更', sndOn:'サウンド ON', sndOff:'サウンド OFF',
+  diffTitle:'AI の難易度を選択', diffSub:'試合の前に相手を選んでください',
+  diffs:{easy:{name:'🐣 簡単',desc:'反応が遅く技も少なめ、技の練習に最適'},normal:{name:'🥋 普通',desc:'攻守のバランスが取れた相手'},hard:{name:'🔥 難しい',desc:'反応が速く、よく受け、強く攻めてくる'}},
+  hintHTML:'<span><b>移動</b> <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> / <kbd>←</kbd><kbd>→</kbd><kbd>↑</kbd><kbd>↓</kbd></span>'
+    +'<span><b>受け</b> <kbd>Space</kbd>（長押し）</span>'
+    +'<span><b>回避</b> 奥行き移動（<kbd>W</kbd>/<kbd>S</kbd>）で間合いを取る</span>'
+    +'<span><b>回り込み</b> 背後に回って相手を振り向かせる</span>'
+    +'<span><b>前蹴り</b> <kbd>J</kbd></span><span><b>中段回し蹴り</b> <kbd>K</kbd></span>'
+    +'<span><b>上段回し蹴り</b> <kbd>L</kbd></span><span><b>下段蹴り</b> <kbd>U</kbd></span>'
+    +'<span><b>逆突き</b> <kbd>I</kbd></span>',
+  touch:{block:['防御','長押し'],mae:'前蹴り',chudan:'中段',jodan:'上段',gedan:'下段',zuki:'逆突き'},
+  prev:'← 前へ', next:'次へ →', tipsTitle:'💡 初心者のポイント', applyTitle:'🥋 実戦での使い方', goSpar:'組手で試す',
+  slowOff:'▶️ 通常速度', slowOn:'🐢 スロー ×0.5', slowTip:'スロー再生（ショートカット M）',
+  footer:['WazaLab v0.26 Demo','AxisMotion','FormBuddy の姉妹プロジェクト','演武は指導用です。有資格の指導者のもとで練習してください'],
+  blocked:'受けた！', dodged:'回避！', combo:n=>`${n} ヒット！`, winTitle:'勝ち！',
+  winSub:(cn,mx)=>`見事！${cn}でフィニッシュ、最大 ${mx} ヒット。もう一試合？`,
+  loseSub:'AI にやられた…練習モードでその技を磨いて、リベンジしよう！',
+  roundAnn:n=>`第 ${n} ラウンド`, fightAnn:'始め！', timeUp:'時間切れ！',
+  roundWinP:n=>`第 ${n} ラウンド · あなたの勝ち！`, roundWinA:n=>`第 ${n} ラウンド · AI の勝ち`,
+  roundKoP:cn=>`見事！${cn}でフィニッシュ。`, roundKoA:'AI にフィニッシュされた。',
+  roundTimeP:'時間切れ —— 体力でリード！', roundTimeA:'時間切れ —— AI の体力が上。',
+  roundDraw:'体力が同じ —— このラウンドは再試合！',
+  matchWinTitle:'勝利！', matchLoseTitle:'敗北',
+  matchWinSub:(p,a,mx)=>`スコア ${p}:${a}、最大 ${mx} ヒット。素晴らしい試合でした！`,
+  matchLoseSub:(p,a)=>`スコア ${p}:${a}。練習モードで磨いて、リベンジしよう！`,
 }
 };
 const TECH_EN={
@@ -718,14 +750,55 @@ uke:{en:'High Block',steps:[
   apply:'Block strikes aimed at the head (punches, palm strikes or high kicks). The pulling hand is already cocked at the hip — deflect the incoming attack and fire straight back. Block first, counter second: the basic rhythm of sparring.',
   tips:['In-game, hold S (or the Block button) to block and cut most damage.','Deflect with the outer forearm bone, do not grab with the palm.','Counter right after the block — blocking without attacking gets you pressured.']},
 };
-const STATLBL={zh:{速度:'速度',距离:'距离',威力:'威力'},en:{速度:'Speed',距离:'Range',威力:'Power'}};
-function techName(t){return LANG==='zh'?t.cn:TECH_EN[t.id].en;}
-function stepTitle(t,i){return LANG==='zh'?t.steps[i].cn:TECH_EN[t.id].steps[i].en;}
-function stepDesc(t,i){return LANG==='zh'?t.steps[i].desc:TECH_EN[t.id].steps[i].edesc;}
-function techTips(t){return LANG==='zh'?t.tips:TECH_EN[t.id].tips;}
+const TECH_JA={
+jodan:{name:'上段回し蹴り',steps:[
+  {title:'膝を抱える',desc:'膝を曲げ、蹴り足をできるだけ高く上げる――膝を肩の近くまで上げ、すねをしっかり折りたたみ、両拳で顔をガードする。蹴る前に膝を深く折りたたむほど、蹴りの弾みが速くなる。'},
+  {title:'腰を返す',desc:'膝を体の中心線を横切るように振りながら腰を返し、軸足を母指球を軸に外へねじる（かかとを相手に向ける）。軸足が十分に回らないと腰が開かず、蹴りが弱くなり、膝も痛めやすい。'},
+  {title:'蹴り抜く',desc:'側方から下から上へ、相手の頭部を足の甲（背足）で蹴る。蹴り側の腕を後ろに振って加速する。当たった瞬間に全身を引き締める――これが「極め」である。'}],
+  apply:'相手のこめかみ（Komekami）や顎（Ago）を狙う。',
+  tips:['力は腰の回転から生まれる。すねを振り回すのではなく、腰で脚を「投げ出す」イメージで。','上段蹴りは間合いが遠く速度も遅い。限界の距離で無理に出すと、脚を取られて反撃される。','蹴った後は速く引く――脚を空中に出したままにすると、反撃の隙になる。']},
+chudan:{name:'中段回し蹴り',steps:[
+  {title:'膝を抱える',desc:'膝を曲げ、蹴り足を帯の高さまで上げる――上段のように肩まで上げる必要はない。両拳で頭をガードする。'},
+  {title:'腰を返す',desc:'膝を体の中心線を横切るように振り、腰を返して軸足をねじる。腰の回転が先で、すねがそれに続く。'},
+  {title:'蹴り抜く',desc:'側方から水平に、相手の胴体を足の甲で蹴る。蹴り側の腕を後ろに振って加速し、脚を引くときに腕も戻す――これは全ての回し蹴りに共通する。当てるだけではなく、目標を「貫く」ように蹴る。'}],
+  apply:'相手の体の側面（あばら）を狙う。',
+  tips:['中段は回し蹴りで最も実用的な高さ。攻守のバランスが良く、リスクも最小。','狙うのはあばらや腹部。力を貫通させる。','蹴った後は速く引く――脚を空中に出したままにすると、反撃の隙になる。']},
+gedan:{name:'下段回し蹴り',steps:[
+  {title:'小さく膝を上げる',desc:'後ろ脚の膝を少しだけ上げる。蹴り足は帯の少し下、軽く折りたたみ、両拳で頭をガード。動きが小さいからこそ、爆発的で読みにくい。'},
+  {title:'腰を返して沈む',desc:'腰を返し軸足をねじりながら、軸脚を少し深く曲げて重心を目標へ沈める――重心が沈むからこそ、蹴りに重みが出る。'},
+  {title:'薙ぎ払う',desc:'足の甲（背足）または脛（Sune）で下へ薙ぎ払う。蹴り側の腕を後ろに振る。鎌のように脚を「斬り」落とし、相手の大腿外側を打ってバランスを崩す。'}],
+  apply:'相手の大腿を狙う。または脚を払ってバランスを崩し、倒す。',
+  tips:['下段蹴りは大きな動きではなく、速さと不意打ちで勝つ。','脛で大腿外側を叩く。同じ場所を繰り返し攻めると相手は崩れていく。','組手で最もよく使う消耗技。左右の連打を練習しよう。']},
+mae:{name:'前蹴り',steps:[
+  {title:'構え',desc:'標準的な組手の構え。'},
+  {title:'膝を抱える',desc:'後ろ脚の膝をまっすぐ前上方へ引き上げる。大腿は床と平行、すねは垂らす。蹴り足は足指を立てて足首をロックする（前足部で打つための準備）。'},
+  {title:'蹴り出す',desc:'軸脚で床を蹴って腰を送り込み、すねをピストンのようにまっすぐ前へ、相手の腹部（水月）へ突き出す。前蹴りは直線の技：抱える・出す・引くの三点が一直線。'},
+  {title:'残心',desc:'同じ軌道で引き戻し、構えに戻って警戒を怠らない。'}],
+  apply:'相手の水月（みぞおち）へ突き出す。または突進してくる相手を迎え撃つ。',
+  tips:['打つのは前足部。足首をロックしないと捻挫する。','軸脚は軽く曲げ、床を蹴って体重を蹴りに乗せる。','前蹴りは直線で間合いを詰める。突進してくる相手の迎撃に最適。']},
+zuki:{name:'逆突き',steps:[
+  {title:'構え',desc:'標準的な組手の構え。'},
+  {title:'引き手と腰の捻り',desc:'突くと同時に、反対の手を腰へ鋭く引く――これが「引き手」。肩と腰が捻れ始め、力が床から後ろ脚、腰を通って伝わる。'},
+  {title:'まっすぐ突く',desc:'後ろの拳をまっすぐ打ち出す。拳眼は上、前足は内側へ向ける。命中した瞬間に腰の捻りが完成し、全身が引き締まる（極め）。打つのは正拳（人差し指と中指の拳頭）、手首はまっすぐロックする。'},
+  {title:'残心',desc:'拳を同じ軌道で鋭く引き戻し、構えと警戒に戻る。'}],
+  apply:'相手の顔面または胴体（中段）へまっすぐ打ち込む。組手で最も直接的な得点技。',
+  tips:['逆突きの力は腕ではなく腰の回転から生まれる。腕は力を伝えるだけ。','引き手と突きは同時でなければならない。引く手が速いほど、突きが重くなる。','突くときに後ろのかかとが回り、前足が内側を向く――それが力を地面に根付かせる。']},
+uke:{name:'上段受け',steps:[
+  {title:'構え',desc:'標準的な組手の構え。'},
+  {title:'受けを上げる',desc:'前腕を頭の上へ上げる。頭蓋から拳一つの距離を保つ。反対の手は引き手として腰へ引き、重心を少し沈める。'},
+  {title:'受けを保つ',desc:'力とまともにぶつからず、前腕の外側で相手の攻撃を逸らす。姿勢を保ち、反撃の機会を待つ。'},
+  {title:'残心',desc:'受けと反撃は一体。受けが決まった瞬間に反撃し、構えに戻る。'}],
+  apply:'頭部を狙う攻撃（突き、掌底、高段蹴り）を受け止める。引き手はすでに腰で構えている――攻撃を逸らした瞬間にまっすぐ反撃する。まず受けて、それから攻める。これが組手の基本リズム。',
+  tips:['ゲームでは S キー（または「防御」ボタン）を長押しすると受けられ、大部分のダメージを軽減できる。','掌で掴まず、前腕の骨の外側で逸らす。','受けた直後に反撃する――受けるだけで攻めないと、押し切られる。']},
+};
+const STATLBL={zh:{速度:'速度',距离:'距离',威力:'威力'},en:{速度:'Speed',距离:'Range',威力:'Power'},ja:{速度:'スピード',距离:'間合い',威力:'威力'}};
+function techName(t){return LANG==='zh'?t.cn:(LANG==='ja'?TECH_JA[t.id].name:TECH_EN[t.id].en);}
+function stepTitle(t,i){return LANG==='zh'?t.steps[i].cn:(LANG==='ja'?TECH_JA[t.id].steps[i].title:TECH_EN[t.id].steps[i].en);}
+function stepDesc(t,i){return LANG==='zh'?t.steps[i].desc:(LANG==='ja'?TECH_JA[t.id].steps[i].desc:TECH_EN[t.id].steps[i].edesc);}
+function techTips(t){return LANG==='zh'?t.tips:(LANG==='ja'?TECH_JA[t.id].tips:TECH_EN[t.id].tips);}
 function applyLang(){
   const S=STR[LANG];
-  document.documentElement.lang=LANG==='zh'?'zh-CN':'en';
+  document.documentElement.lang=LANG==='zh'?'zh-CN':(LANG==='ja'?'ja':'en');
   document.title=S.title;
   document.getElementById('brandSub').textContent=S.brandSub;
   document.getElementById('brandTag').textContent=S.brandTag;
@@ -1151,12 +1224,12 @@ function tryHit(att,def){
    think: 思考间隔(秒,越小反应越快); block: 格挡概率; blockLow: 残血格挡概率
    dodge: 闪避概率; atkP: 进入攻击范围时出招概率; atkCd: 出招后冷却(秒); pool: 出招池 */
 const DIFFS={
-  easy:  {label:'简单',labelEn:'Easy',  think:[0.30,0.48],block:0.15,blockLow:0.30,dodge:0.12,atkP:0.40,atkCd:[1.4,2.2],pool:['gedan','gedan','chudan','chudan','mae','zuki','zuki']},
-  normal:{label:'普通',labelEn:'Normal',think:[0.22,0.37],block:0.32,blockLow:0.50,dodge:0.30,atkP:0.62,atkCd:[0.9,1.8],pool:['gedan','gedan','chudan','chudan','mae','zuki','zuki','jodan']},
-  hard:  {label:'困难',labelEn:'Hard',  think:[0.12,0.20],block:0.55,blockLow:0.70,dodge:0.48,atkP:0.78,atkCd:[0.5,1.0],pool:['gedan','chudan','chudan','mae','mae','zuki','zuki','jodan','jodan']},
+  easy:  {label:'简单',labelEn:'Easy',labelJa:'簡単',  think:[0.30,0.48],block:0.15,blockLow:0.30,dodge:0.12,atkP:0.40,atkCd:[1.4,2.2],pool:['gedan','gedan','chudan','chudan','mae','zuki','zuki']},
+  normal:{label:'普通',labelEn:'Normal',labelJa:'普通',think:[0.22,0.37],block:0.32,blockLow:0.50,dodge:0.30,atkP:0.62,atkCd:[0.9,1.8],pool:['gedan','gedan','chudan','chudan','mae','zuki','zuki','jodan']},
+  hard:  {label:'困难',labelEn:'Hard',labelJa:'難しい',  think:[0.12,0.20],block:0.55,blockLow:0.70,dodge:0.48,atkP:0.78,atkCd:[0.5,1.0],pool:['gedan','chudan','chudan','mae','mae','zuki','zuki','jodan','jodan']},
 };
 let aiDiff='normal', pickerOpen=false;
-function diffLabel(){ const d=DIFFS[aiDiff]; return LANG==='zh'?d.label:d.labelEn; }
+function diffLabel(){ const d=DIFFS[aiDiff]; return LANG==='zh'?d.label:(LANG==='ja'?d.labelJa:d.labelEn); }
 function showDiffPicker(){
   pickerOpen=true;
   document.getElementById('roundmsg').classList.remove('show');
@@ -1263,7 +1336,7 @@ function renderDetail(){
   const vc=document.getElementById('dVocab');
   if(dojoTech.vocab&&dojoTech.vocab.length){
     vc.style.display='flex';
-    vc.innerHTML=dojoTech.vocab.map(x=>`<span title="${x.t}">${LANG==='zh'?x.c:x.t}</span>`).join('');
+    vc.innerHTML=dojoTech.vocab.map(x=>`<span title="${x.t}">${LANG==='zh'?x.c:(LANG==='ja'?x.c.split(' · ')[0]:x.t)}</span>`).join('');
   } else { vc.style.display='none'; vc.innerHTML=''; }
   const s=dojoTech.steps[dojoStep];
   document.getElementById('sNum').textContent=`STEP ${dojoStep+1} / ${dojoTech.steps.length}`;
@@ -1275,9 +1348,10 @@ function renderDetail(){
   document.getElementById('sDesc').textContent=stepDesc(dojoTech,dojoStep);
   const ab=document.getElementById('applyBox');
   const enApply=TECH_EN[dojoTech.id]&&TECH_EN[dojoTech.id].apply;
+  const jaApply=TECH_JA[dojoTech.id]&&TECH_JA[dojoTech.id].apply;
   if(dojoTech.apply){
     ab.style.display='block';
-    document.getElementById('dApply').textContent=LANG==='zh'?dojoTech.apply.zh:(enApply||dojoTech.apply.zh);
+    document.getElementById('dApply').textContent=LANG==='zh'?dojoTech.apply.zh:(LANG==='ja'?(jaApply||dojoTech.apply.zh):(enApply||dojoTech.apply.zh));
   } else ab.style.display='none';
   document.getElementById('btnPrev').disabled=dojoStep===0;
   document.getElementById('btnNext').disabled=dojoStep===dojoTech.steps.length-1;
@@ -1516,7 +1590,7 @@ function frame(now){
       ctx.save(); ctx.textAlign='right';
       ctx.font='700 15px "Noto Sans SC",sans-serif'; ctx.fillStyle='#b98a1e';
       ctx.shadowColor='rgba(255,255,255,.85)'; ctx.shadowBlur=6;
-      ctx.fillText(LANG==='zh'?'🐢 慢动作 ×0.5':'🐢 SLOW-MO ×0.5',W-14,42);
+      ctx.fillText(LANG==='zh'?'🐢 慢动作 ×0.5':(LANG==='ja'?'🐢 スロー ×0.5':'🐢 SLOW-MO ×0.5'),W-14,42);
       ctx.restore();
     }
   } else {
@@ -1853,7 +1927,7 @@ function renderGL(){
 const USE3D=initGL();
 
 /* ================= 启动 ================= */
-document.getElementById('langBtn').onclick=()=>{ LANG=LANG==='zh'?'en':'zh'; applyLang(); };
+document.getElementById('langBtn').onclick=()=>{ LANG=LANG==='zh'?'en':(LANG==='en'?'ja':'zh'); try{ localStorage.setItem('wazalab_lang',LANG); }catch(e){} applyLang(); };
 document.getElementById('sndBtn').onclick=()=>toggleSound(); // v0.18 音效开关
 document.getElementById('btnSlow').onclick=()=>toggleSlow(); // v0.24 教学慢放开关
 applyLang();
