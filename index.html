@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="wazalab-version" content="0.26">
+<meta name="wazalab-version" content="0.27">
 <script>
 // 版本自检:每次打开都对比服务器最新版,发现本地是旧缓存则自动硬刷新一次
 (function(){
@@ -63,8 +63,9 @@
     font-family:inherit;font-size:14px;font-weight:700;padding:9px 20px;border-radius:8px;transition:all .18s;
   }
   .modes button.active{background:var(--red);color:#fff;box-shadow:0 3px 12px rgba(230,57,70,.4);}
-  #langBtn{border:1px solid var(--gold)!important;color:var(--gold)!important;font-size:13px!important;padding:8px 14px!important;}
-  #langBtn:hover{background:rgba(242,177,52,.12);}
+  #langSel{border:1px solid var(--gold);color:var(--gold);background:transparent;font-size:13px;padding:8px 10px;border-radius:8px;cursor:pointer;font-family:inherit;}
+  #langSel:hover{background:rgba(242,177,52,.12);}
+  #langSel option{color:#111;}
   #sndBtn{border:1px solid var(--line)!important;color:var(--muted)!important;font-size:14px!important;padding:8px 12px!important;}
   #sndBtn:hover{background:rgba(255,255,255,.06);}
 
@@ -250,7 +251,7 @@
     .brand h1 .demo{font-size:10px;}
     .brand p{display:none;}
     .modes button{font-size:12px;padding:8px 12px;}
-    #langBtn{font-size:12px!important;padding:7px 10px!important;}
+    #langSel{font-size:12px;padding:7px 8px;}
     main{padding:6px 12px 16px;}
     #joystick{width:112px;height:112px;}
     #joyknob{width:50px;height:50px;}
@@ -302,14 +303,18 @@
   <div class="brand">
     <div class="logo">技</div>
     <div>
-      <h1>WazaLab <span id="brandSub" style="font-size:15px;font-weight:500;">空手道动作教学游戏</span><span class="demo">Demo v0.26</span></h1>
+      <h1>WazaLab <span id="brandSub" style="font-size:15px;font-weight:500;">空手道动作教学游戏</span><span class="demo">Demo v0.27</span></h1>
       <p id="brandTag">AxisMotion 出品 · 构えから残心まで、技をゲームで学ぶ</p>
     </div>
   </div>
   <div class="modes">
     <button id="tabDojo" class="active">📖 教学模式</button>
     <button id="tabSpar">⚔️ 对战模式</button>
-    <button id="langBtn" title="Switch language / 切换语言 / 言語切替">EN</button>
+    <select id="langSel" title="Language / 语言 / 言語" aria-label="Language / 语言 / 言語">
+      <option value="zh">中文</option>
+      <option value="en">English</option>
+      <option value="ja">日本語</option>
+    </select>
     <button id="sndBtn" title="音效开关 / Sound">🔊</button>
   </div>
 </header>
@@ -616,7 +621,7 @@ zh:{
   title:'WazaLab 空手道动作教学游戏 (Demo)',
   brandSub:'空手道动作教学游戏',
   brandTag:'AxisMotion 出品 · 构えから残心まで、技をゲームで学ぶ',
-  tabDojo:'📖 教学模式', tabSpar:'⚔️ 对战模式', langBtn:'EN',
+  tabDojo:'📖 教学模式', tabSpar:'⚔️ 对战模式',
   hpYouName:'あなた', hpYouTag:'YOU · 红方', hpAiName:'あいて', hpAiTag:'AI 相手 · 白方',
   rematch:'再来一局', nextRound:'下一回合', changeDiff:'换难度', sndOn:'音效开', sndOff:'音效关',
   diffTitle:'选择 AI 难度', diffSub:'开始对战前，先选一位对手',
@@ -631,7 +636,7 @@ zh:{
   touch:{block:['防','防御'],mae:'前踢',chudan:'中段踢',jodan:'高段踢',gedan:'下段踢',zuki:'逆突'},
   prev:'← 上一步', next:'下一步 →', tipsTitle:'💡 初学者要点', applyTitle:'🥋 实战应用', goSpar:'去对战试试',
   slowOff:'▶️ 常速', slowOn:'🐢 慢放 ×0.5', slowTip:'慢动作回放（快捷键 M）',
-  footer:['WazaLab v0.26 Demo','AxisMotion','FormBuddy 姊妹项目','动作演示为教学示意，请在有资质教练指导下练习'],
+  footer:['WazaLab v0.27 Demo','AxisMotion','FormBuddy 姊妹项目','动作演示为教学示意，请在有资质教练指导下练习'],
   blocked:'防住了!', dodged:'闪避!', combo:n=>`${n} 连击！`, winTitle:'勝!',
   winSub:(cn,mx)=>`漂亮！${cn}终结了对手，最高连击 ${mx}。再来一局？`,
   loseSub:'被 AI 终结了……去教学模式练练那招，再回来复仇！',
@@ -648,7 +653,7 @@ en:{
   title:'WazaLab Karate Technique Game (Demo)',
   brandSub:'Karate Technique Game',
   brandTag:'By AxisMotion · 構えから残心まで、技をゲームで学ぶ',
-  tabDojo:'📖 Tutorial', tabSpar:'⚔️ Sparring', langBtn:'日本語',
+  tabDojo:'📖 Tutorial', tabSpar:'⚔️ Sparring',
   hpYouName:'You', hpYouTag:'YOU · RED', hpAiName:'AI', hpAiTag:'AI · WHITE',
   rematch:'Rematch', nextRound:'Next round', changeDiff:'Change difficulty', sndOn:'Sound on', sndOff:'Sound off',
   diffTitle:'Choose AI Difficulty', diffSub:'Pick your opponent before the match',
@@ -663,7 +668,7 @@ en:{
   touch:{block:['Block','hold'],mae:'Front',chudan:'Mid',jodan:'High',gedan:'Low',zuki:'Punch'},
   prev:'← Prev', next:'Next →', tipsTitle:'💡 Tips for beginners', applyTitle:'🥋 How to Apply It', goSpar:'Try it in sparring',
   slowOff:'▶️ Normal', slowOn:'🐢 Slow-mo ×0.5', slowTip:'Slow-motion replay (shortcut: M)',
-  footer:['WazaLab v0.26 Demo','AxisMotion','Sister project of FormBuddy','Demos are for teaching — practice under a qualified instructor'],
+  footer:['WazaLab v0.27 Demo','AxisMotion','Sister project of FormBuddy','Demos are for teaching — practice under a qualified instructor'],
   blocked:'Blocked!', dodged:'Dodged!', combo:n=>`${n} HITS!`, winTitle:'You Win!',
   winSub:(cn,mx)=>`Beautiful! Finished with ${cn}, max combo ${mx}. Rematch?`,
   loseSub:'Finished by the AI… drill that technique in Tutorial mode, then come back for revenge!',
@@ -680,7 +685,7 @@ ja:{
   title:'WazaLab 空手道テクニックゲーム (Demo)',
   brandSub:'空手道テクニックゲーム',
   brandTag:'AxisMotion 制作 · 構えから残心まで、技をゲームで学ぶ',
-  tabDojo:'📖 練習モード', tabSpar:'⚔️ 組手モード', langBtn:'中文',
+  tabDojo:'📖 練習モード', tabSpar:'⚔️ 組手モード',
   hpYouName:'あなた', hpYouTag:'YOU · 赤', hpAiName:'あいて', hpAiTag:'AI 相手 · 白',
   rematch:'もう一試合', nextRound:'次のラウンド', changeDiff:'難易度変更', sndOn:'サウンド ON', sndOff:'サウンド OFF',
   diffTitle:'AI の難易度を選択', diffSub:'試合の前に相手を選んでください',
@@ -695,7 +700,7 @@ ja:{
   touch:{block:['防御','長押し'],mae:'前蹴り',chudan:'中段',jodan:'上段',gedan:'下段',zuki:'逆突き'},
   prev:'← 前へ', next:'次へ →', tipsTitle:'💡 初心者のポイント', applyTitle:'🥋 実戦での使い方', goSpar:'組手で試す',
   slowOff:'▶️ 通常速度', slowOn:'🐢 スロー ×0.5', slowTip:'スロー再生（ショートカット M）',
-  footer:['WazaLab v0.26 Demo','AxisMotion','FormBuddy の姉妹プロジェクト','演武は指導用です。有資格の指導者のもとで練習してください'],
+  footer:['WazaLab v0.27 Demo','AxisMotion','FormBuddy の姉妹プロジェクト','演武は指導用です。有資格の指導者のもとで練習してください'],
   blocked:'受けた！', dodged:'回避！', combo:n=>`${n} ヒット！`, winTitle:'勝ち！',
   winSub:(cn,mx)=>`見事！${cn}でフィニッシュ、最大 ${mx} ヒット。もう一試合？`,
   loseSub:'AI にやられた…練習モードでその技を磨いて、リベンジしよう！',
@@ -804,7 +809,7 @@ function applyLang(){
   document.getElementById('brandTag').textContent=S.brandTag;
   document.getElementById('tabDojo').textContent=S.tabDojo;
   document.getElementById('tabSpar').textContent=S.tabSpar;
-  document.getElementById('langBtn').textContent=S.langBtn;
+  document.getElementById('langSel').value=LANG;
   document.getElementById('hpYouName').textContent=S.hpYouName;
   document.getElementById('hpYouTag').textContent=S.hpYouTag;
   document.getElementById('hpAiName').textContent=S.hpAiName;
@@ -1927,7 +1932,7 @@ function renderGL(){
 const USE3D=initGL();
 
 /* ================= 启动 ================= */
-document.getElementById('langBtn').onclick=()=>{ LANG=LANG==='zh'?'en':(LANG==='en'?'ja':'zh'); try{ localStorage.setItem('wazalab_lang',LANG); }catch(e){} applyLang(); };
+document.getElementById('langSel').onchange=e=>{ const v=e.target.value; if(v==='zh'||v==='en'||v==='ja'){ LANG=v; try{ localStorage.setItem('wazalab_lang',LANG); }catch(err){} applyLang(); } };
 document.getElementById('sndBtn').onclick=()=>toggleSound(); // v0.18 音效开关
 document.getElementById('btnSlow').onclick=()=>toggleSlow(); // v0.24 教学慢放开关
 applyLang();
