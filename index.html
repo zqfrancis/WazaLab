@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="wazalab-version" content="0.27">
+<meta name="wazalab-version" content="0.28">
 <script>
 // 版本自检:每次打开都对比服务器最新版,发现本地是旧缓存则自动硬刷新一次
 (function(){
@@ -73,7 +73,7 @@
   main{width:100%;max-width:1180px;padding:8px 16px 20px;display:flex;gap:14px;align-items:flex-start;}
   #stage-wrap{flex:1 1 auto;min-width:0;position:relative;}
   canvas#gl{position:absolute;top:0;left:0;width:100%;height:auto;aspect-ratio:2/1;z-index:0;display:none;border-radius:14px;}
-  body[data-mode="spar"] canvas#gl{border-radius:0;}
+body[data-mode="spar"] canvas#gl, body[data-mode="demo"] canvas#gl{border-radius:0;}
   body.gl3d canvas#gl{display:block;}
   body.gl3d canvas#stage{background:transparent;}
   canvas#stage{position:relative;z-index:1;}
@@ -232,7 +232,7 @@
   footer{width:100%;max-width:1180px;padding:6px 16px 26px;font-size:11.5px;color:var(--muted);text-align:center;}
   footer .sep{margin:0 8px;color:var(--line);}
 
-  body[data-mode="spar"] #panel-left, body[data-mode="spar"] #panel-right{display:none;}
+body[data-mode="spar"] #panel-left, body[data-mode="demo"] #panel-left, body[data-mode="spar"] #panel-right, body[data-mode="demo"] #panel-right{display:none;}
   body[data-mode="dojo"] #hintbar, body[data-mode="dojo"] #touchpad{display:none;}
   body[data-mode="dojo"] #hud{display:none;}
 
@@ -260,8 +260,8 @@
     .tbtn small{font-size:8px;}
   }
   @media (pointer:coarse){
-    body[data-mode="spar"] #touchpad{display:flex;}
-    body[data-mode="spar"] #hintbar{display:none;}
+body[data-mode="spar"] #touchpad, body[data-mode="demo"] #touchpad{display:flex;}
+body[data-mode="spar"] #hintbar, body[data-mode="demo"] #hintbar{display:none;}
   }
   /* 横屏对战:画布按高度撑满居中,操控悬浮覆盖在画面下方 */
   #lsExit{
@@ -270,31 +270,35 @@
     font-size:18px;align-items:center;justify-content:center;cursor:pointer;
   }
   @media (pointer:coarse) and (orientation:landscape){
-    body[data-mode="spar"] header, body[data-mode="spar"] footer{display:none;}
-    body[data-mode="spar"] main{
+body[data-mode="spar"] header, body[data-mode="demo"] header, body[data-mode="spar"] footer, body[data-mode="demo"] footer{display:none;}
+body[data-mode="spar"] main, body[data-mode="demo"] main{
       width:100vw;max-width:none;margin:0;padding:0;
       height:100vh;height:100dvh;display:flex;align-items:center;justify-content:center;overflow:hidden;
     }
     /* 画布尺寸由 JS 按真实视口定 px,不依赖 dvh/min() 解析 */
-    body[data-mode="spar"] #stage-wrap{position:relative;flex:none;}
-    body[data-mode="spar"] canvas#stage{width:auto;height:auto;max-width:100vw;max-height:100vh;max-height:100dvh;border:none;border-radius:0;}
-    body[data-mode="spar"] #touchpad{
+body[data-mode="spar"] #stage-wrap, body[data-mode="demo"] #stage-wrap{position:relative;flex:none;}
+body[data-mode="spar"] canvas#stage, body[data-mode="demo"] canvas#stage{width:auto;height:auto;max-width:100vw;max-height:100vh;max-height:100dvh;border:none;border-radius:0;}
+body[data-mode="spar"] #touchpad, body[data-mode="demo"] #touchpad{
       position:absolute;left:0;right:0;bottom:0;z-index:6;
       justify-content:space-between;align-items:flex-end;
       margin-top:0;padding:8px 12px calc(8px + env(safe-area-inset-bottom));
       pointer-events:none;
       background:linear-gradient(transparent,rgba(10,10,14,.45));
     }
-    body[data-mode="spar"] #touchpad>*{pointer-events:auto;}
-    body[data-mode="spar"] #joystick{width:104px;height:104px;}
-    body[data-mode="spar"] #joyknob{width:46px;height:46px;}
-    body[data-mode="spar"] .actions .tbtn{height:48px;font-size:12px;}
-    body[data-mode="spar"] #lsExit{display:flex;}
+body[data-mode="spar"] #touchpad>*, body[data-mode="demo"] #touchpad>*{pointer-events:auto;}
+body[data-mode="spar"] #joystick, body[data-mode="demo"] #joystick{width:104px;height:104px;}
+body[data-mode="spar"] #joyknob, body[data-mode="demo"] #joyknob{width:46px;height:46px;}
+body[data-mode="spar"] .actions .tbtn, body[data-mode="demo"] .actions .tbtn{height:48px;font-size:12px;}
+body[data-mode="spar"] #lsExit, body[data-mode="demo"] #lsExit{display:flex;}
     /* v0.22: 弹窗(难度选择/回合结果)打开时隐藏横屏悬浮操控,避免遮挡底部按钮;
        极矮视口下弹窗内容可滚动,圆角与满屏舞台对齐 */
-    body.ovl[data-mode="spar"] #touchpad{display:none;}
-    body[data-mode="spar"] #diffPicker, body[data-mode="spar"] #roundmsg{border-radius:0;overflow-y:auto;}
+body.ovl[data-mode="spar"] #touchpad, body.ovl[data-mode="demo"] #touchpad{display:none;}
+body[data-mode="spar"] #diffPicker, body[data-mode="demo"] #diffPicker, body[data-mode="spar"] #roundmsg, body[data-mode="demo"] #roundmsg{border-radius:0;overflow-y:auto;}
   }
+  /* v0.28: 演示模式 HUD:隐藏计时器/回合点,显示陪练提示 */
+  #demoHint{display:none;}
+body[data-mode="demo"] #timer, body[data-mode="demo"] #pips{display:none;}
+body[data-mode="demo"] #demoHint{display:block;}
 </style>
 </head>
 <body data-mode="dojo">
@@ -303,13 +307,14 @@
   <div class="brand">
     <div class="logo">技</div>
     <div>
-      <h1>WazaLab <span id="brandSub" style="font-size:15px;font-weight:500;">空手道动作教学游戏</span><span class="demo">Demo v0.27</span></h1>
+      <h1>WazaLab <span id="brandSub" style="font-size:15px;font-weight:500;">空手道动作教学游戏</span><span class="demo">Demo v0.28</span></h1>
       <p id="brandTag">AxisMotion 出品 · 构えから残心まで、技をゲームで学ぶ</p>
     </div>
   </div>
   <div class="modes">
     <button id="tabDojo" class="active">📖 教学模式</button>
     <button id="tabSpar">⚔️ 对战模式</button>
+    <button id="tabDemo">🧪 演示模式</button>
     <select id="langSel" title="Language / 语言 / 言語" aria-label="Language / 语言 / 言語">
       <option value="zh">中文</option>
       <option value="en">English</option>
@@ -335,7 +340,7 @@
         <div class="hpname"><span id="hpYouName">あなた</span> <span class="tag" id="hpYouTag">YOU · 红方</span></div>
         <div class="hpbar"><div class="ghost" id="ghostP"></div><div class="fill" id="fillP" style="width:100%"></div></div>
       </div>
-      <div style="flex:0 0 auto;align-self:center;text-align:center;"><div style="font-weight:900;color:var(--gold);font-size:14px;text-shadow:0 1px 4px #000;">VS</div><div id="vtag" style="font-size:9px;color:#8a8fa3;font-weight:400;line-height:1.2;"></div><div id="timer" style="font-weight:900;color:var(--white);font-size:19px;text-shadow:0 1px 4px #000;line-height:1.25;">1:30</div><div id="pips" style="font-size:11px;line-height:1.2;white-space:nowrap;"><span id="pipP" style="color:#ff5964;">○○</span><span id="pipA" style="color:#c3ccd9;">○○</span></div></div>
+      <div style="flex:0 0 auto;align-self:center;text-align:center;"><div style="font-weight:900;color:var(--gold);font-size:14px;text-shadow:0 1px 4px #000;">VS</div><div id="vtag" style="font-size:9px;color:#8a8fa3;font-weight:400;line-height:1.2;"></div><div id="timer" style="font-weight:900;color:var(--white);font-size:19px;text-shadow:0 1px 4px #000;line-height:1.25;">1:30</div><div id="pips" style="font-size:11px;line-height:1.2;white-space:nowrap;"><span id="pipP" style="color:#ff5964;">○○</span><span id="pipA" style="color:#c3ccd9;">○○</span></div><div id="demoHint" style="font-size:11px;color:#43d17c;font-weight:700;line-height:1.2;text-shadow:0 1px 4px #000;white-space:nowrap;">陪练不还手 · 受击 1 秒后回满血</div></div>
       <div class="hpbox right">
         <div class="hpname"><span class="tag" id="hpAiTag">AI 相手 · 白方</span> <span id="hpAiName">あいて</span></div>
         <div class="hpbar"><div class="ghost" id="ghostA"></div><div class="fill" id="fillA" style="width:100%"></div></div>
@@ -621,7 +626,8 @@ zh:{
   title:'WazaLab 空手道动作教学游戏 (Demo)',
   brandSub:'空手道动作教学游戏',
   brandTag:'AxisMotion 出品 · 构えから残心まで、技をゲームで学ぶ',
-  tabDojo:'📖 教学模式', tabSpar:'⚔️ 对战模式',
+  tabDojo:'📖 教学模式', tabSpar:'⚔️ 对战模式', tabDemo:'🧪 演示模式',
+  demoName:'陪练', demoTag:'陪练 · 不还手', demoHint:'陪练不还手 · 受击 1 秒后回满血', demoHeal:'回满了！',
   hpYouName:'あなた', hpYouTag:'YOU · 红方', hpAiName:'あいて', hpAiTag:'AI 相手 · 白方',
   rematch:'再来一局', nextRound:'下一回合', changeDiff:'换难度', sndOn:'音效开', sndOff:'音效关',
   diffTitle:'选择 AI 难度', diffSub:'开始对战前，先选一位对手',
@@ -636,7 +642,7 @@ zh:{
   touch:{block:['防','防御'],mae:'前踢',chudan:'中段踢',jodan:'高段踢',gedan:'下段踢',zuki:'逆突'},
   prev:'← 上一步', next:'下一步 →', tipsTitle:'💡 初学者要点', applyTitle:'🥋 实战应用', goSpar:'去对战试试',
   slowOff:'▶️ 常速', slowOn:'🐢 慢放 ×0.5', slowTip:'慢动作回放（快捷键 M）',
-  footer:['WazaLab v0.27 Demo','AxisMotion','FormBuddy 姊妹项目','动作演示为教学示意，请在有资质教练指导下练习'],
+  footer:['WazaLab v0.28 Demo','AxisMotion','FormBuddy 姊妹项目','动作演示为教学示意，请在有资质教练指导下练习'],
   blocked:'防住了!', dodged:'闪避!', combo:n=>`${n} 连击！`, winTitle:'勝!',
   winSub:(cn,mx)=>`漂亮！${cn}终结了对手，最高连击 ${mx}。再来一局？`,
   loseSub:'被 AI 终结了……去教学模式练练那招，再回来复仇！',
@@ -653,7 +659,8 @@ en:{
   title:'WazaLab Karate Technique Game (Demo)',
   brandSub:'Karate Technique Game',
   brandTag:'By AxisMotion · 構えから残心まで、技をゲームで学ぶ',
-  tabDojo:'📖 Tutorial', tabSpar:'⚔️ Sparring',
+  tabDojo:'📖 Tutorial', tabSpar:'⚔️ Sparring', tabDemo:'🧪 Demo',
+  demoName:'Dummy', demoTag:'DUMMY · NO COUNTER', demoHint:'Dummy never fights back · HP refills 1s after a hit', demoHeal:'FULL HP!',
   hpYouName:'You', hpYouTag:'YOU · RED', hpAiName:'AI', hpAiTag:'AI · WHITE',
   rematch:'Rematch', nextRound:'Next round', changeDiff:'Change difficulty', sndOn:'Sound on', sndOff:'Sound off',
   diffTitle:'Choose AI Difficulty', diffSub:'Pick your opponent before the match',
@@ -668,7 +675,7 @@ en:{
   touch:{block:['Block','hold'],mae:'Front',chudan:'Mid',jodan:'High',gedan:'Low',zuki:'Punch'},
   prev:'← Prev', next:'Next →', tipsTitle:'💡 Tips for beginners', applyTitle:'🥋 How to Apply It', goSpar:'Try it in sparring',
   slowOff:'▶️ Normal', slowOn:'🐢 Slow-mo ×0.5', slowTip:'Slow-motion replay (shortcut: M)',
-  footer:['WazaLab v0.27 Demo','AxisMotion','Sister project of FormBuddy','Demos are for teaching — practice under a qualified instructor'],
+  footer:['WazaLab v0.28 Demo','AxisMotion','Sister project of FormBuddy','Demos are for teaching — practice under a qualified instructor'],
   blocked:'Blocked!', dodged:'Dodged!', combo:n=>`${n} HITS!`, winTitle:'You Win!',
   winSub:(cn,mx)=>`Beautiful! Finished with ${cn}, max combo ${mx}. Rematch?`,
   loseSub:'Finished by the AI… drill that technique in Tutorial mode, then come back for revenge!',
@@ -685,7 +692,8 @@ ja:{
   title:'WazaLab 空手道テクニックゲーム (Demo)',
   brandSub:'空手道テクニックゲーム',
   brandTag:'AxisMotion 制作 · 構えから残心まで、技をゲームで学ぶ',
-  tabDojo:'📖 練習モード', tabSpar:'⚔️ 組手モード',
+  tabDojo:'📖 練習モード', tabSpar:'⚔️ 組手モード', tabDemo:'🧪 デモモード',
+  demoName:'ダミー', demoTag:'ダミー · 反撃なし', demoHint:'ダミーは反撃しません · 1秒後に体力全回復', demoHeal:'全回復！',
   hpYouName:'あなた', hpYouTag:'YOU · 赤', hpAiName:'あいて', hpAiTag:'AI 相手 · 白',
   rematch:'もう一試合', nextRound:'次のラウンド', changeDiff:'難易度変更', sndOn:'サウンド ON', sndOff:'サウンド OFF',
   diffTitle:'AI の難易度を選択', diffSub:'試合の前に相手を選んでください',
@@ -700,7 +708,7 @@ ja:{
   touch:{block:['防御','長押し'],mae:'前蹴り',chudan:'中段',jodan:'上段',gedan:'下段',zuki:'逆突き'},
   prev:'← 前へ', next:'次へ →', tipsTitle:'💡 初心者のポイント', applyTitle:'🥋 実戦での使い方', goSpar:'組手で試す',
   slowOff:'▶️ 通常速度', slowOn:'🐢 スロー ×0.5', slowTip:'スロー再生（ショートカット M）',
-  footer:['WazaLab v0.27 Demo','AxisMotion','FormBuddy の姉妹プロジェクト','演武は指導用です。有資格の指導者のもとで練習してください'],
+  footer:['WazaLab v0.28 Demo','AxisMotion','FormBuddy の姉妹プロジェクト','演武は指導用です。有資格の指導者のもとで練習してください'],
   blocked:'受けた！', dodged:'回避！', combo:n=>`${n} ヒット！`, winTitle:'勝ち！',
   winSub:(cn,mx)=>`見事！${cn}でフィニッシュ、最大 ${mx} ヒット。もう一試合？`,
   loseSub:'AI にやられた…練習モードでその技を磨いて、リベンジしよう！',
@@ -809,11 +817,13 @@ function applyLang(){
   document.getElementById('brandTag').textContent=S.brandTag;
   document.getElementById('tabDojo').textContent=S.tabDojo;
   document.getElementById('tabSpar').textContent=S.tabSpar;
+  document.getElementById('tabDemo').textContent=S.tabDemo;
   document.getElementById('langSel').value=LANG;
   document.getElementById('hpYouName').textContent=S.hpYouName;
   document.getElementById('hpYouTag').textContent=S.hpYouTag;
-  document.getElementById('hpAiName').textContent=S.hpAiName;
-  document.getElementById('hpAiTag').textContent=S.hpAiTag+' · '+diffLabel();
+  document.getElementById('hpAiName').textContent=mode==='demo'?S.demoName:S.hpAiName;
+  document.getElementById('hpAiTag').textContent=mode==='demo'?S.demoTag:S.hpAiTag+' · '+diffLabel();
+  document.getElementById('demoHint').textContent=S.demoHint;
   document.getElementById('btnRematch').textContent=S.rematch;
   document.getElementById('btnNextRound').textContent=S.nextRound;
   renderResultMsg(); // v0.19 补丁:结果面板开着时切换语言也重绘
@@ -1137,7 +1147,7 @@ function syncSndBtn(){
 
 /* ================= 武者状态 ================= */
 function makeFighter(x,facing,isPlayer){
-  return {x,facing,isPlayer,hp:100,maxhp:100,dispHp:100,depth:0,
+  return {x,facing,isPlayer,hp:100,maxhp:100,dispHp:100,depth:0,regenT:0,
     state:'idle',tech:null,t:0,blockT:0,moveDir:0,moveDep:0,stepping:false,walkPhase:0,
     turnT:0,dodgeShown:false,hitDone:false,koT:0,flash:0,atkCd:0,combo:0,comboT:0,comboMax:0,
     thinkT:Math.random()*0.3,aiMode:'idle',aiT:0,aiTargetDepth:0};
@@ -1214,6 +1224,7 @@ function tryHit(att,def){
   const blocked=def.state==='block';
   const dmg=blocked?Math.max(1,Math.round(tech.atk.damage*0.2)):tech.atk.damage;
   def.hp=Math.max(0,def.hp-dmg);
+  if(mode==='demo'&&def===ai) def.regenT=1; // v0.28: 演示模式陪练受击后 1 秒回满
   def.flash=0.12;
   const zoneY=tech.atk.zone==='high'?GROUND-165:tech.atk.zone==='low'?GROUND-45:GROUND-110;
   spawnSpark(def.x-att.facing*30,zoneY,tech.atk.damage>=16,blocked);
@@ -1222,7 +1233,7 @@ function tryHit(att,def){
   freeze=blocked?0.06:0.13; shakeT=blocked?0.08:0.16;
   sfx(blocked?'block':'hit'); // v0.18 音效
   def.x+=att.facing*(blocked?8:26);
-  if(def.hp<=0&&def.state!=='ko'){ def.state='ko'; def.koT=0; def.moveDir=0; endRound(att,'ko'); }
+  if(def.hp<=0&&def.state!=='ko'&&mode!=='demo'){ def.state='ko'; def.koT=0; def.moveDir=0; endRound(att,'ko'); }
 }
 
 /* ================= AI 难度分级 =================
@@ -1393,7 +1404,7 @@ window.addEventListener('keydown',e=>{
   if(KEYMAP[e.code]||ATKMAP[e.code]) e.preventDefault();
   if(e.repeat) return;
   if(e.code==='KeyM'&&mode==='dojo'){ toggleSlow(); return; } // v0.24: 教学模式下 M 键切换慢动作
-  if(mode!=='spar'||roundOver||roundPhase!=='fight') return; // v0.19:播报中不出招
+  if((mode!=='spar'&&mode!=='demo')||roundOver||roundPhase!=='fight') return; // v0.19:播报中不出招;v0.28:演示模式同样可出招
   if(KEYMAP[e.code]) keys[KEYMAP[e.code]]=true;
   if(ATKMAP[e.code]) startAttack(player,ATKMAP[e.code]);
 });
@@ -1402,7 +1413,7 @@ window.addEventListener('keyup',e=>{ if(KEYMAP[e.code]) keys[KEYMAP[e.code]]=fal
 document.querySelectorAll('.tbtn').forEach(b=>{
   const k=b.dataset.k;
   const on=e=>{ e.preventDefault(); b.classList.add('held');
-    if(mode!=='spar'||roundOver||roundPhase!=='fight') return; // v0.19:播报中不出招
+    if((mode!=='spar'&&mode!=='demo')||roundOver||roundPhase!=='fight') return; // v0.19:播报中不出招;v0.28:演示模式同样可出招
     if(k in keys) keys[k]=true; else startAttack(player,k); };
   const off=e=>{ e.preventDefault(); b.classList.remove('held');
     if(k in keys) keys[k]=false; };
@@ -1454,7 +1465,7 @@ function fitStage(){
   const cv=document.getElementById('stage');
   const land=matchMedia('(pointer:coarse)').matches
     && matchMedia('(orientation:landscape)').matches
-    && document.body.dataset.mode==='spar';
+    && (document.body.dataset.mode==='spar'||document.body.dataset.mode==='demo');
   if(!land){ cv.style.width=''; cv.style.height=''; return; }
   const s=Math.min(window.innerWidth/960, window.innerHeight/480);
   cv.style.width=Math.floor(960*s)+'px';
@@ -1467,14 +1478,38 @@ function setMode(m){
   document.body.dataset.mode=m;
   document.getElementById('tabDojo').classList.toggle('active',m==='dojo');
   document.getElementById('tabSpar').classList.toggle('active',m==='spar');
+  document.getElementById('tabDemo').classList.toggle('active',m==='demo');
   if(m==='spar') showDiffPicker(); // 对战开始前先选难度
+  else if(m==='demo') resetDemo(); // v0.28: 演示模式初始化
   else { pickerOpen=false; document.getElementById('diffPicker').classList.remove('show');
     document.getElementById('roundmsg').classList.remove('show'); // v0.22: 切回教学时顺手收起结果面板
     document.body.classList.remove('ovl'); } // v0.22
   fitStage();
 }
+/* v0.28: 演示模式:陪练不还手、一直跟着玩家、受击 1 秒后回满血 */
+function resetDemo(){
+  pickerOpen=false; roundOver=false; roundPhase='fight'; annT=0;
+  player=makeFighter(300,1,true); ai=makeFighter(660,-1,false);
+  particles=[]; floaters=[]; freeze=0; shakeT=0;
+  document.getElementById('diffPicker').classList.remove('show');
+  document.getElementById('roundmsg').classList.remove('show');
+  document.body.classList.remove('ovl');
+  updateHpBars(true);
+  applyLang(); // 刷新对手标签为陪练
+}
+function demoFollow(dt){ // 陪练:不攻击不格挡,始终跟着玩家保持出招距离
+  if(ai.state==='attack'||ai.state==='ko'){ ai.moveDir=0; ai.moveDep=0; return; }
+  const gap=110; // 所有技法射程内(下段 118/前踢 128/中段 135/上段 140)
+  const dx=player.x-ai.x;
+  if(Math.abs(dx)>gap){ ai.moveDir=Math.sign(dx); ai.x+=ai.moveDir*260*dt; }
+  else ai.moveDir=0;
+  const dd=(player.depth||0)-(ai.depth||0);
+  if(Math.abs(dd)>6){ ai.moveDep=Math.sign(dd); ai.depth=clamp(ai.depth+ai.moveDep*160*dt,-30,52); }
+  else ai.moveDep=0;
+}
 document.getElementById('tabDojo').onclick=()=>setMode('dojo');
 document.getElementById('tabSpar').onclick=()=>setMode('spar');
+document.getElementById('tabDemo').onclick=()=>setMode('demo');
 document.getElementById('goSpar').onclick=()=>setMode('spar');
 document.getElementById('btnPrev').onclick=()=>{ if(dojoStep>0){dojoStep--;dojoT=0;renderDetail();} };
 document.getElementById('btnNext').onclick=()=>{ if(dojoStep<dojoTech.steps.length-1){dojoStep++;dojoT=0;renderDetail();} };
@@ -1608,12 +1643,15 @@ function frame(now){
           else roundPhase='fight';
         }
       } else if(roundPhase==='fight'){
-        roundT-=dt; updateTimer();
-        if(roundT<=0){ // v0.19 时间到:按血量判回合胜负,相同则重赛
-          if(player.hp>ai.hp) endRound(player,'time');
-          else if(ai.hp>player.hp) endRound(ai,'time');
-          else endRound(null,'time');
-        } else {
+        if(mode!=='demo'){
+          roundT-=dt; updateTimer();
+          if(roundT<=0){ // v0.19 时间到:按血量判回合胜负,相同则重赛
+            if(player.hp>ai.hp) endRound(player,'time');
+            else if(ai.hp>player.hp) endRound(ai,'time');
+            else endRound(null,'time');
+          }
+        }
+        if(mode==='demo'||roundT>0){
       // 玩家
       if(!roundOver&&player.state!=='ko'){
         if(keys.block) setBlock(player,true); else setBlock(player,false);
@@ -1630,12 +1668,14 @@ function frame(now){
       }
       // AI
       if(!roundOver){
-        aiThink(dt); aiAct(dt);
+        if(mode==='demo') demoFollow(dt); else { aiThink(dt); aiAct(dt); }
         if(ai.state==='attack'){ ai.t+=dt; if(ai.t>=ai.tech.total){ai.state='idle';ai.tech=null;} }
         if(ai.state==='block') ai.blockT+=dt;
         if(ai.state!=='attack'){
-          if(ai.moveDir!==0) ai.x+=ai.moveDir*200*dt;
-          if(ai.moveDep!==0) ai.depth=clamp(ai.depth+ai.moveDep*130*dt,-30,52);
+          if(mode!=='demo'){ // 演示模式陪练已在 demoFollow 里直接移动,避免双倍位移
+            if(ai.moveDir!==0) ai.x+=ai.moveDir*200*dt;
+            if(ai.moveDep!==0) ai.depth=clamp(ai.depth+ai.moveDep*130*dt,-30,52);
+          }
           ai.stepping=(ai.moveDir!==0||ai.moveDep!==0);
           if(ai.stepping) ai.walkPhase+=dt*11;
         } else ai.stepping=false;
@@ -1658,7 +1698,9 @@ function frame(now){
       for(const f of [player,ai]){ if(f.comboT>0){ f.comboT-=dt; if(f.comboT<=0){ f.combo=0; f.comboT=0; } } }
       // 命中
       tryHit(player,ai); tryHit(ai,player);
-        } // 计时回合进行中才结算出招(v0.19)
+      // 演示模式:陪练回血(v0.28):受击后 1 秒回满
+      if(mode==='demo'&&ai.regenT>0){ ai.regenT-=dt; if(ai.regenT<=0&&ai.hp<ai.maxhp){ ai.hp=ai.maxhp; spawnFloater(ai.x,GROUND-160+(ai.depth||0),STR[LANG].demoHeal,'#43d17c',26); } }
+        } // 演示模式或计时回合进行中才结算出招
       }
       updateHpBars(false);
     }
