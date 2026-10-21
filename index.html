@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="wazalab-version" content="0.29">
+<meta name="wazalab-version" content="0.30">
 <script>
 // 版本自检:每次打开都对比服务器最新版,发现本地是旧缓存则自动硬刷新一次
 (function(){
@@ -309,7 +309,7 @@ body[data-mode="demo"] #demoHint{display:block;}
   <div class="brand">
     <div class="logo">技</div>
     <div>
-      <h1>WazaLab <span id="brandSub" style="font-size:15px;font-weight:500;">空手道动作教学游戏</span><span class="demo">Demo v0.29</span></h1>
+      <h1>WazaLab <span id="brandSub" style="font-size:15px;font-weight:500;">空手道动作教学游戏</span><span class="demo">Demo v0.30</span></h1>
       <p id="brandTag">AxisMotion 出品 · 构えから残心まで、技をゲームで学ぶ</p>
     </div>
   </div>
@@ -646,7 +646,7 @@ zh:{
   prev:'← 上一步', next:'下一步 →', tipsTitle:'💡 初学者要点', applyTitle:'🥋 实战应用', goSpar:'去对战试试',
   slowOff:'▶️ 常速', slowOn:'🐢 慢放 ×0.5', slowTip:'慢动作回放（快捷键 M）',
   replayOff:'🔁 回放', replay05:'🔁 回放 ×0.5', replay025:'🔁 回放 ×0.25', replayTip:'全动作慢动作回放（快捷键 R）', replayLabel:'🔁 全动作回放',
-  footer:['WazaLab v0.29 Demo','AxisMotion','FormBuddy 姊妹项目','动作演示为教学示意，请在有资质教练指导下练习'],
+  footer:['WazaLab v0.30 Demo','AxisMotion','FormBuddy 姊妹项目','动作演示为教学示意，请在有资质教练指导下练习'],
   blocked:'防住了!', dodged:'闪避!', combo:n=>`${n} 连击！`, winTitle:'勝!',
   winSub:(cn,mx)=>`漂亮！${cn}终结了对手，最高连击 ${mx}。再来一局？`,
   loseSub:'被 AI 终结了……去教学模式练练那招，再回来复仇！',
@@ -680,7 +680,7 @@ en:{
   prev:'← Prev', next:'Next →', tipsTitle:'💡 Tips for beginners', applyTitle:'🥋 How to Apply It', goSpar:'Try it in sparring',
   slowOff:'▶️ Normal', slowOn:'🐢 Slow-mo ×0.5', slowTip:'Slow-motion replay (shortcut: M)',
   replayOff:'🔁 Replay', replay05:'🔁 Replay ×0.5', replay025:'🔁 Replay ×0.25', replayTip:'Full-technique slow-mo replay (shortcut: R)', replayLabel:'🔁 FULL REPLAY',
-  footer:['WazaLab v0.29 Demo','AxisMotion','Sister project of FormBuddy','Demos are for teaching — practice under a qualified instructor'],
+  footer:['WazaLab v0.30 Demo','AxisMotion','Sister project of FormBuddy','Demos are for teaching — practice under a qualified instructor'],
   blocked:'Blocked!', dodged:'Dodged!', combo:n=>`${n} HITS!`, winTitle:'You Win!',
   winSub:(cn,mx)=>`Beautiful! Finished with ${cn}, max combo ${mx}. Rematch?`,
   loseSub:'Finished by the AI… drill that technique in Tutorial mode, then come back for revenge!',
@@ -714,7 +714,7 @@ ja:{
   prev:'← 前へ', next:'次へ →', tipsTitle:'💡 初心者のポイント', applyTitle:'🥋 実戦での使い方', goSpar:'組手で試す',
   slowOff:'▶️ 通常速度', slowOn:'🐢 スロー ×0.5', slowTip:'スロー再生（ショートカット M）',
   replayOff:'🔁 再生', replay05:'🔁 再生 ×0.5', replay025:'🔁 再生 ×0.25', replayTip:'全技スロー再生（ショートカット R）', replayLabel:'🔁 フル再生',
-  footer:['WazaLab v0.29 Demo','AxisMotion','FormBuddy の姉妹プロジェクト','演武は指導用です。有資格の指導者のもとで練習してください'],
+  footer:['WazaLab v0.30 Demo','AxisMotion','FormBuddy の姉妹プロジェクト','演武は指導用です。有資格の指導者のもとで練習してください'],
   blocked:'受けた！', dodged:'回避！', combo:n=>`${n} ヒット！`, winTitle:'勝ち！',
   winSub:(cn,mx)=>`見事！${cn}でフィニッシュ、最大 ${mx} ヒット。もう一試合？`,
   loseSub:'AI にやられた…練習モードでその技を磨いて、リベンジしよう！',
@@ -1539,7 +1539,7 @@ function demoFollow(dt){ // 陪练:不攻击不格挡,始终跟着玩家保持�
   if(Math.abs(dx)>gap){ ai.moveDir=Math.sign(dx); ai.x+=ai.moveDir*260*dt; }
   else ai.moveDir=0;
   const dd=(player.depth||0)-(ai.depth||0);
-  if(Math.abs(dd)>6){ ai.moveDep=Math.sign(dd); ai.depth=clamp(ai.depth+ai.moveDep*160*dt,-30,52); }
+  if(Math.abs(dd)>6){ ai.moveDep=Math.sign(dd); ai.depth=clamp(ai.depth+ai.moveDep*100*dt,-30,52); } // v0.30: 演示模式纵深跟随放慢,便于斜向绕到陪练另一边
   else ai.moveDep=0;
 }
 document.getElementById('tabDojo').onclick=()=>setMode('dojo');
@@ -1728,8 +1728,8 @@ function frame(now){
           if(ai.stepping) ai.walkPhase+=dt*11;
         } else ai.stepping=false;
       }
-      // 身体碰撞:同纵深才挡路,不同纵深可绕过
-      {
+      // 身体碰撞:同纵深才挡路,不同纵深可绕过;演示模式无碰撞,可绕到陪练另一边(v0.30)
+      if(mode!=='demo'){
         const sx=ai.x-player.x, sd=Math.abs((ai.depth||0)-(player.depth||0));
         if(Math.abs(sx)<64&&sd<34){
           const push=(64-Math.abs(sx))/2*(sx>=0?1:-1);
